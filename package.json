@@ -1,15 +1,15 @@
 {
   "name": "easy-log-plus",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A simple and powerful logging utility for TypeScript/JavaScript",
-  "main": "dist/easy-log-plus.umd.js",
-  "module": "dist/easy-log-plus.js",
+  "type": "module",
+  "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/easy-log-plus.js",
-      "require": "./dist/easy-log-plus.umd.js",
-      "types": "./dist/easy-check-version.d.ts"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
@@ -25,9 +25,12 @@
   ],
   "author": "QINJIN",
   "license": "ISC",
-  "devDependencies": {
+  "devDependencies": {},
+  "dependencies": {
+    "rollup-plugin-visualizer": "^5.14.0",
     "typescript": "^5.2.0",
     "vite": "^5.0.0",
-    "vite-plugin-dts": "^4.5.4"
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-progress": "^0.0.7"
   }
 }

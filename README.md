@@ -19,7 +19,7 @@ const logger = createLogger({
   level: 'debug',
   prefix: 'MyApp',
   timestamp: true,
-  colors: true
+  color: true || 'red'
 });
 
 logger.debug('这是一条调试信息');

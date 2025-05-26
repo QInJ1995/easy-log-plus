@@ -15,7 +15,7 @@ class Logger {
             level: options.level || 'info',
             prefix: options.prefix || '',
             timestamp: options.timestamp ?? true,
-            colors: options.colors ?? true
+            color: options.color ?? true
         };
     }
 
@@ -23,7 +23,7 @@ class Logger {
         const timestamp = this.options.timestamp ? `[${new Date().toISOString()}]` : '';
         const prefix = this.options.prefix ? `[${this.options.prefix}]` : '';
         const levelStr = `[${level.toUpperCase()}]`;
-        return `${timestamp}${prefix}${levelStr} ${message.join(' ')}`;
+        return `${timestamp}${prefix}${levelStr} -> ${message.join(' ')}`;
     }
 
     private shouldLog(level: LogLevel): boolean {
@@ -32,11 +32,13 @@ class Logger {
     }
 
     private log(level: LogLevel, ...args: any[]) {
-        if (!this.shouldLog(level)) return;
+        if (!this.shouldLog(level)) {
+            return new Error(`【Easy-Log-Plus】- ${level} level is not allowed to log, debug < info < warn < error. `); // 
+        };
 
         const message = this.formatMessage(level, args);
-        if (this.options.colors) {
-            console.log(`%c${message}`, `color: ${this.colors[level]}`);
+        if (this.options.color) {
+            console.log(`%c${message}`, `color: ${typeof this.options.color === 'string' ? this.options.color : this.colors[level]} `);
         } else {
             console.log(message);
         }

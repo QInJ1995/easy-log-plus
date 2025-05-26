@@ -4,5 +4,5 @@ export interface LogOptions {
   level?: LogLevel;
   prefix?: string;
   timestamp?: boolean;
-  colors?: boolean;
+  color?: boolean | string;
 } 
