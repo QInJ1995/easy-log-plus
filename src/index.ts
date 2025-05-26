@@ -68,7 +68,7 @@ class Logger {
     }
 }
 
-export const createLogger = (options?: LogOptions) => new Logger(options);
+const createLogger = (options?: LogOptions) => new Logger(options);
 
 // 默认导出
 export default createLogger; 
