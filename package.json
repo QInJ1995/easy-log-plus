@@ -21,16 +21,18 @@
     "log",
     "logger",
     "typescript",
-    "javascript"
+    "javascript",
+    "vite-plugin",
+    "webpack-plugin"
   ],
   "author": "QINJIN",
   "license": "ISC",
-  "devDependencies": {},
-  "dependencies": {
+  "devDependencies": {
     "rollup-plugin-visualizer": "^5.14.0",
     "typescript": "^5.2.0",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-progress": "^0.0.7"
-  }
+  },
+  "dependencies": {}
 }
