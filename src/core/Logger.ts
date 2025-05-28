@@ -1,17 +1,16 @@
-import { LogLevel, LogOptions } from '../types';
-import { getCurrentTimeDate } from '../utils';
-
+import { LogLevel, LogOptions, Colors } from '../types';
+import { getColor, shouldLog, formatMessage } from '../utils';
 export default class Logger {
     private options: Required<LogOptions>;
-    private colors = {
-        debug: '#7f8c8d',
-        info: '#3498db',
-        warn: '#f1c40f',
-        error: '#e74c3c',
-        reset: '#ffffff'
+    private colors: Colors = {
+        debug: '#95a5a6',
+        info: '#2ecc71',
+        warn: '#e67e22',
+        error: '#ff0000',
     };
 
     constructor(options: LogOptions = {}) {
+        // this.namespace = namespace;
         this.options = {
             level: options.level || 'info',
             prefix: options.prefix || '',
@@ -20,26 +19,11 @@ export default class Logger {
         };
     }
 
-    private formatMessage(level: LogLevel, message: any[]): string {
-        const timestamp = this.options.timestamp ? `[${getCurrentTimeDate()}]` : '';
-        const prefix = this.options.prefix ? `[${this.options.prefix}]` : '';
-        const levelStr = `[${level.toUpperCase()}]`;
-        return `${timestamp}${prefix}${levelStr} -> ${message.join(' ')}`;
-    }
-
-    private shouldLog(level: LogLevel): boolean {
-        const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-        return levels.indexOf(level) >= levels.indexOf(this.options.level);
-    }
-
     private log(level: LogLevel, ...args: any[]) {
-        if (!this.shouldLog(level)) {
-            return new Error(`【Easy-Log-Plus】- ${level} level is not allowed to log, debug < info < warn < error. `); // 
-        };
-
-        const message = this.formatMessage(level, args);
+        if (!shouldLog(level, this.options)) return
+        const message = formatMessage(level, args, this.options);
         if (this.options.color) {
-            console.log(`%c${message}`, `color: ${typeof this.options.color === 'string' ? this.options.color : this.colors[level]} `);
+            console.log(`%c${message}`, `color: ${typeof this.options.color === 'string' ? this.options.color === 'auto' ? getColor(level) : this.options.color : this.colors[level]} `);
         } else {
             console.log(message);
         }
@@ -65,6 +49,13 @@ export default class Logger {
         this.options = {
             ...this.options,
             ...options
+        };
+    }
+
+    setColors(colors: Colors) {
+        this.colors = {
+            ...this.colors,
+            ...colors
         };
     }
 }

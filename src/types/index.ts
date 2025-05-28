@@ -16,3 +16,10 @@ export interface EasyLogWebpackOptions {
   enabled?: boolean;
   config?: LogOptions;
 }
+
+export interface Colors {
+  debug?: string;
+  info?: string;
+  warn?: string;
+  error?: string;
+}

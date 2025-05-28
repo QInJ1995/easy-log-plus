@@ -8,7 +8,7 @@ export default defineConfig({
     sourcemap: false, // 生成完整的 Sourcemap
     lib: {
       entry: 'src/index.ts',
-      name: 'EasyCheckVersion',
+      name: 'EasyLogPlus',
       formats: ['es', 'cjs', 'umd'], // 生成ESModule和CommonJS格式
       fileName: (format) => getFileName(format),
     },
