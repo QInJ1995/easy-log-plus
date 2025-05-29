@@ -8,7 +8,7 @@ const install = (
     app: any,
     options?: LogOptions
 ): void => {
-    const logger = createLogger(options)
+    const logger = createLogger('', options)
     if ('provide' in app) {
         // Vue 3 方式
         app.config.globalProperties.$logger = logger;

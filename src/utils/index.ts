@@ -1,6 +1,12 @@
 import { LogLevel, LogOptions, Colors } from '../types/index'
 
-const globals: any = typeof window !== 'undefined' ? window : global;
+export const globals: any = typeof window !== 'undefined' ? window : global;
+
+export let namespaceLength = 0;
+
+export function setNamespaceLength(length: number): void {
+    namespaceLength = length;
+}
 
 /**
  * 获取当前的日期和时间
@@ -47,24 +53,34 @@ export function getColor(namespace: string = ''): string {
  */
 export function shouldLog(level: LogLevel, options: LogOptions): boolean {
     const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    return levels.indexOf(level) >= levels.indexOf(options.level || 'info');
+    return level === 'silent' ? true : levels.indexOf(level) >= levels.indexOf(options.level || 'info');
 }
 
 
-export function formatMessage(level: LogLevel, message: any[], options: LogOptions, colors: Colors): any[] {
+export function formatMessage(
+    level: LogLevel, // 日志级别
+    message: any[], // 日志消息
+    namespace: string, // 命名空间
+    prefix: string, // 前缀
+    options: LogOptions, // 日志选项
+    color: string | undefined, // 日志颜色
+    colors: Colors, // 颜色配置
+): any[] {
+    namespace.length > namespaceLength && setNamespaceLength(namespace.length);
+    namespace = namespace.toString().padStart(namespaceLength, ' ')
+    namespace = namespace.length !== 0 ? `${namespace} | ` : '';
+    prefix = prefix ? `[${prefix}]` : '';;
+    const timestamp = options.isTime ? `[${getCurrentTimeDate()}]` : '';
+    const levelStr = options.isLevel && level !== 'silent' ? `[${level.toUpperCase()}]` : '';
+    prefix = `${namespace}${timestamp}${prefix}${levelStr}`;
     const fileName = options.isFileName ? theFileName() : ''
     const functionName = options.isFunctionName ? theFunctionName() : ''
     const lineNumber = options.isLineNumber ? theLineNumber() : ''
     const logTraceBar = options.isFileName || options.isFunctionName || options.isLineNumber ? ' |' : ''
     const logTrace = `${logTraceBar}${functionName}${fileName}${lineNumber}`
-    const useArrow = message.length === 0 ? '' : '->'
-    const timestamp = options.isTime ? `[${getCurrentTimeDate()}]` : '';
-    const prefix = options.prefix ? `[${options.prefix}]` : '';
-    const levelStr = options.isLevel ? `[${level.toUpperCase()}]` : '';
-    const title = `${timestamp}${prefix}${levelStr}${logTrace} ${useArrow} `
-    const color = options.isColor ? colors[level] : '#fff'
-    // const background = options.isColor ? colors[level] : 'transparent'
-    // const labelStyle = `background:${background};border:1px solid ${background}; padding: 1px; border-radius: 2px 0 0 2px; color: #fff;`
+    const useArrow = message.length === 0 ? '' : ' -> '
+    const title = `${prefix}${logTrace}${useArrow}`
+    color = options.isColor ? color || colors[level] || getColor(namespace) : '#fff'
     const stringStyle = `padding: 1px; border-radius: 0 2px 2px 0; color: ${color};`
     message = message.map(item => typeof item === 'string' ? { label: `%c${item}`, style: stringStyle } : { label: '%o', value: item, });
     message = [{ label: `%c${title}`, style: stringStyle }, ...message]
@@ -77,6 +93,39 @@ export function formatMessage(level: LogLevel, message: any[], options: LogOptio
         return { firstParam, params, }
     }, { firstParam: '', params: [] })
     return [firstParam, ...params]
+}
+
+export function print(
+    level: LogLevel,
+    message: any[],
+    namespace: string,
+    prefix: string,
+    options: LogOptions,
+    color: string,
+    colors: Colors): void {
+    const logParams = formatMessage(level, message, namespace, prefix, options, color, colors);
+    console.log(...logParams)
+}
+
+/**
+ * @description: 判断是否生产环境 node环境不做判断
+ * @return {*}
+ */
+export const isShowLog = function (showLog: boolean,): boolean {
+    if (globals === window) {
+        if (!showLog) {
+            let curWindow = globals
+            while (!curWindow.showLog && curWindow !== curWindow.parent) {
+                curWindow = curWindow.parent
+            }
+            return curWindow.showLog
+        } else {
+            return showLog
+        }
+    } else {
+        return true
+    }
+
 }
 
 /**

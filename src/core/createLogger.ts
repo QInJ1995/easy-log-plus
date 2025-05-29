@@ -1,7 +1,7 @@
 
 import { LogOptions } from '../types';
 import Logger from './Logger';
-const createLogger = (options?: LogOptions) => new Logger(options);
+const createLogger = (namespace?: string, options?: LogOptions) => new Logger(namespace, options);
 
 
 export default createLogger;
