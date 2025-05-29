@@ -6,7 +6,4 @@ export const createLogger = _createLogger;
 export const EasyLogVuePlugin = _EasyLogVuePlugin;
 
 // 默认导出保持原有结构
-export default {
-    createLogger: _createLogger,
-    EasyLogVuePlugin: _EasyLogVuePlugin,
-};
+export default createLogger 

@@ -27,3 +27,21 @@ export interface Colors {
   error?: string;
   silent?: string;
 }
+
+export interface Emojis {
+  debug?: string;
+  info?: string;
+  warn?: string;
+  error?: string;
+  silent?: string;
+  rocket?: string;
+  success?: string;
+}
+
+export interface EasyLogVuePluginOptions extends LogOptions {
+  namespace?: string; // 命名空间
+  isWindow?: boolean; // 是否挂载到 window 对象
+  isVue?: boolean; // 是否 挂载到 Vue 实例
+  isProvide?: boolean; // 是否使用 provide/inject 只支持vue3
+  enabled?: boolean; // 是否启用插件
+}

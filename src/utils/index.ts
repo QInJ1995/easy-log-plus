@@ -1,4 +1,4 @@
-import { LogLevel, LogOptions, Colors } from '../types/index'
+import { LogLevel, LogOptions, Colors, Emojis } from '../types/index'
 
 export const globals: any = typeof window !== 'undefined' ? window : global;
 
@@ -6,6 +6,22 @@ export let namespaceLength = 0;
 
 export function setNamespaceLength(length: number): void {
     namespaceLength = length;
+}
+
+const emojis: Emojis = {
+    debug: '🐞',
+    info: 'ℹ️',
+    warn: '⚠️',
+    error: '❌',
+    rocket: '🚀',
+    success: '✅',
+};
+
+/**
+ * 格式化日志消息
+ * @param {LogLevel} level - 日志级别
+ * @param {any[]} message - 日志消息
+ * @param {string
 }
 
 /**
@@ -78,10 +94,10 @@ export function formatMessage(
     const lineNumber = options.isLineNumber ? theLineNumber() : ''
     const logTraceBar = options.isFileName || options.isFunctionName || options.isLineNumber ? ' |' : ''
     const logTrace = `${logTraceBar}${functionName}${fileName}${lineNumber}`
-    const useArrow = message.length === 0 ? '' : ' -> '
+    const useArrow = message.length === 0 ? '' : ` ${emojis[level] || emojis.rocket} → `;
     const title = `${prefix}${logTrace}${useArrow}`
     color = options.isColor ? color || colors[level] || getColor(namespace) : '#fff'
-    const stringStyle = `padding: 1px; border-radius: 0 2px 2px 0; color: ${color};`
+    const stringStyle = `padding: 5px 0;  font-weight: 500; font-size: 12px; color: ${color};`
     message = message.map(item => typeof item === 'string' ? { label: `%c${item}`, style: stringStyle } : { label: '%o', value: item, });
     message = [{ label: `%c${title}`, style: stringStyle }, ...message]
     const { firstParam, params } = message.reduce((acc, cur, index) => {

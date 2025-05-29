@@ -12,7 +12,7 @@ export default class Logger {
     };
 
     constructor(namespace: string = '', options: LogOptions = {}) {
-        namespace = namespace || '';
+        namespace = namespace || 'Easy-Log-Plus';
         namespace.length > namespaceLength && setNamespaceLength(namespace.length);
         this.namespace = namespace;
         this.options = {

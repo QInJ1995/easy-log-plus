@@ -1,22 +1,31 @@
 // vue插件
 
-import { LogOptions } from '../types/index'
+import { EasyLogVuePluginOptions, } from '../types/index'
+import { globals } from '../utils/index';
 import createLogger from './createLogger';
 
 // 插件安装函数
 const install = (
     app: any,
-    options?: LogOptions
+    options?: EasyLogVuePluginOptions
 ): void => {
-    const logger = createLogger('', options)
+    options = {
+        isVue: true,
+        isProvide: false,
+        isWindow: false,
+        enabled: true,
+        ...options,
+    };
+    if (!options?.enabled) return; // 防止重复安装
+    const logger = createLogger(options?.namespace, options)
+    options?.isWindow && globals === window && (globals.logger = logger);
     if ('provide' in app) {
         // Vue 3 方式
-        app.config.globalProperties.$logger = logger;
-        app.provide('$test', logger);
+        options?.isVue && (app.config.globalProperties.$logger = logger);
+        options?.isProvide && (app.provide('$logger', logger));
     } else {
         // Vue 2 兼容方式
-        app.prototype.$logger = logger;
-
+        options?.isVue && (app.prototype.$logger = logger);
     }
 };
 
