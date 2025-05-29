@@ -3,8 +3,12 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export interface LogOptions {
   level?: LogLevel;
   prefix?: string;
-  timestamp?: boolean;
-  color?: boolean | string;
+  isTime?: boolean;
+  isColor?: boolean
+  isLevel?: boolean
+  isFileName?: boolean
+  isFunctionName?: boolean
+  isLineNumber?: boolean
 }
 
 export interface EasyLogViteOptions {

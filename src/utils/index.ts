@@ -1,4 +1,6 @@
-import { LogLevel, LogOptions } from '../types/index'
+import { LogLevel, LogOptions, Colors } from '../types/index'
+
+const globals: any = typeof window !== 'undefined' ? window : global;
 
 /**
  * 获取当前的日期和时间
@@ -49,15 +51,94 @@ export function shouldLog(level: LogLevel, options: LogOptions): boolean {
 }
 
 
-export function formatMessage(level: LogLevel, message: any[], options: LogOptions): string {
-    const timestamp = options.timestamp ? `[${getCurrentTimeDate()}]` : '';
+export function formatMessage(level: LogLevel, message: any[], options: LogOptions, colors: Colors): any[] {
+    const fileName = options.isFileName ? theFileName() : ''
+    const functionName = options.isFunctionName ? theFunctionName() : ''
+    const lineNumber = options.isLineNumber ? theLineNumber() : ''
+    const logTraceBar = options.isFileName || options.isFunctionName || options.isLineNumber ? ' |' : ''
+    const logTrace = `${logTraceBar}${functionName}${fileName}${lineNumber}`
+    const useArrow = message.length === 0 ? '' : '->'
+    const timestamp = options.isTime ? `[${getCurrentTimeDate()}]` : '';
     const prefix = options.prefix ? `[${options.prefix}]` : '';
-    const levelStr = `[${level.toUpperCase()}]`;
-    message = message.map(item => {
-        if (typeof item === 'object') {
-            return JSON.stringify(item);
-        }
-        return item;
-    });
-    return `${timestamp}${prefix}${levelStr} ==> ${message.join(' ')}`;
+    const levelStr = options.isLevel ? `[${level.toUpperCase()}]` : '';
+    const title = `${timestamp}${prefix}${levelStr}${logTrace} ${useArrow} `
+    const color = options.isColor ? colors[level] : '#fff'
+    // const background = options.isColor ? colors[level] : 'transparent'
+    // const labelStyle = `background:${background};border:1px solid ${background}; padding: 1px; border-radius: 2px 0 0 2px; color: #fff;`
+    const stringStyle = `padding: 1px; border-radius: 0 2px 2px 0; color: ${color};`
+    message = message.map(item => typeof item === 'string' ? { label: `%c${item}`, style: stringStyle } : { label: '%o', value: item, });
+    message = [{ label: `%c${title}`, style: stringStyle }, ...message]
+    const { firstParam, params } = message.reduce((acc, cur, index) => {
+        let { firstParam, params } = acc;
+        const { label, style, value } = cur;
+        firstParam += ((firstParam && index > 1 ? ' ' : '') + label)
+        style && params.push(style)
+        value && params.push(value)
+        return { firstParam, params, }
+    }, { firstParam: '', params: [] })
+    return [firstParam, ...params]
 }
+
+/**
+ * 获取当前文件名
+ * @returns {string} - 返回当前文件名
+ */
+function theFileName(): string {
+    // 获取调用栈信息中的文件名
+    const filePath = globals.currentStack[2].getFileName();
+    const filePathArray = filePath.split('/');
+    const simpleFileName = filePathArray[filePathArray.length - 1];
+    return ' ' + simpleFileName;
+}
+
+/**
+ * 获取当前函数名
+ * @returns {string} - 返回当前函数名
+ */
+function theFunctionName(): string {
+    // 获取调用栈信息中的函数名
+    return globals.currentStack[2].getFunctionName() ? ' ' + globals.currentStack[2].getFunctionName() + '()' : ' Top Level';
+}
+
+/**
+ * 获取当前行号
+ * @returns {string} - 返回当前行号
+ */
+function theLineNumber(): string {
+    // 获取调用栈信息中的行号
+    return ':' + globals.currentStack[2].getLineNumber();
+}
+
+
+// 定义全局变量 currentStack 以获取当前调用栈信息
+// 确定全局对象
+
+Object.defineProperty(globals, 'currentStack', {
+    get: function () {
+        const orig = Error.prepareStackTrace;
+        Error.prepareStackTrace = function (_, stack) {
+            return stack;
+        };
+        const err = new Error();
+        // 获取当前函数引用，不使用 arguments.callee
+        const currentFunction = this.get;
+        Error.captureStackTrace(err, currentFunction);
+        const stack = err.stack;
+        Error.prepareStackTrace = orig;
+        return stack;
+    }
+});
+
+// Object.defineProperty(globals, 'currentStack', {
+//     get: function () {
+//         var orig = Error.prepareStackTrace;
+//         Error.prepareStackTrace = function (_, stack) {
+//             return stack;
+//         };
+//         var err = new Error;
+//         Error.captureStackTrace(err, arguments.callee);
+//         var stack = err.stack;
+//         Error.prepareStackTrace = orig;
+//         return stack;
+//     }
+// });

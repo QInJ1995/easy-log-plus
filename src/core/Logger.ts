@@ -1,5 +1,5 @@
 import { LogLevel, LogOptions, Colors } from '../types';
-import { getColor, shouldLog, formatMessage } from '../utils';
+import { shouldLog, formatMessage } from '../utils';
 export default class Logger {
     private options: Required<LogOptions>;
     private colors: Colors = {
@@ -10,23 +10,23 @@ export default class Logger {
     };
 
     constructor(options: LogOptions = {}) {
-        // this.namespace = namespace;
         this.options = {
             level: options.level || 'info',
             prefix: options.prefix || '',
-            timestamp: options.timestamp ?? true,
-            color: options.color ?? true
+            isTime: options.isTime ?? true,
+            isColor: options.isColor ?? true,
+            isLevel: options.isLevel ?? true,
+            isFileName: options.isFileName ?? true,
+            isFunctionName: options.isFunctionName ?? true,
+            isLineNumber: options.isLineNumber ?? true,
         };
     }
 
     private log(level: LogLevel, ...args: any[]) {
         if (!shouldLog(level, this.options)) return
-        const message = formatMessage(level, args, this.options);
-        if (this.options.color) {
-            console.log(`%c${message}`, `color: ${typeof this.options.color === 'string' ? this.options.color === 'auto' ? getColor(level) : this.options.color : this.colors[level]} `);
-        } else {
-            console.log(message);
-        }
+
+        const logParams = formatMessage(level, args, this.options, this.colors);
+        console.log(...logParams)
     }
 
     debug(...args: any[]) {

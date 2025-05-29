@@ -17,7 +17,9 @@ export default defineConfig({
       // 配置外部依赖，不打包模块
       external: [],
       // 配置输出选项，指定全局变量名称
-      output: {}
+      output: {
+        exports: 'named',
+      },
     }
   },
   plugins: [

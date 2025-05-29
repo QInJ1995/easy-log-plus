@@ -18,8 +18,9 @@ import createLogger from 'easy-log-plus';
 const logger = createLogger({
   level: 'debug',
   prefix: 'MyApp',
-  timestamp: true,
-  color: true || 'red'
+  isTime: true,
+  isColor: true,
+  isLevel: true,
 });
 
 logger.debug('这是一条调试信息');
@@ -45,8 +46,9 @@ logger.info('Hello World');
 
 - `level`: 日志级别 ('debug' | 'info' | 'warn' | 'error')
 - `prefix`: 日志前缀
-- `timestamp`: 是否显示时间戳
-- `colors`: 是否启用彩色输出
+- `isTime`: 是否显示时间
+- `isColor`: 是否启用彩色输出
+- `isLevel`: 是否显示日志级别
 
 ## 特性
 
