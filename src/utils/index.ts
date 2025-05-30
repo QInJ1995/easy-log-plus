@@ -1,7 +1,7 @@
-import { LogLevel, LogOptions, Colors, Emojis, Style, Globals, CallStackInfo } from '../types/index'
+import { LogLevel, LogOptions, Colors, Emojis, Style, CallStackInfo } from '../types/index'
 
 // 全局对象
-export const globals: Globals = getGlobalContext()
+export const globals: any = getGlobalContext()
 // 命名空间长度
 export let namespaceLength = 0;
 // 默认样式
@@ -232,10 +232,10 @@ function theLineNumber(): string {
  * 获取全局上下文
  * @returns {Globals} 全局上下文
  */
-export function getGlobalContext(): Globals {
-    if (typeof window !== 'undefined') {
+export function getGlobalContext(): any {
+    if (typeof window as any !== 'undefined') {
         return window;
-    } else if (typeof global !== 'undefined') {
+    } else if (typeof global as any !== 'undefined') {
         return global;
     } else {
         throw new Error('无法识别的运行环境');

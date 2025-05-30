@@ -12,12 +12,6 @@
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent';
 
 /**
- * 全局对象
- * @description 全局对象
- */
-export type Globals = typeof window | typeof global | any;
-
-/**
  * 颜色配置
  * @description 颜色配置
  * @property {string} padding - 边距
