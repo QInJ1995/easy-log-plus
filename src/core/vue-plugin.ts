@@ -1,7 +1,8 @@
 // vue插件
 
 import { EasyLogVuePluginOptions, } from '../types/index'
-import { globals } from '../utils/index';
+import { globals } from '../utils/constant';
+import { isBrowser } from '../utils/common';
 import createLogger from './createLogger';
 
 /**
@@ -24,7 +25,7 @@ const install = (
     };
     if (!options?.enabled) return;
     const logger = createLogger(options?.namespace, options)
-    options?.isWindow && globals === window as any && (globals.logger = logger);
+    options?.isWindow && isBrowser() && (globals.logger = logger);
     if ('provide' in app) {
         // Vue 3 方式
         options?.isVue && (app.config.globalProperties.$logger = logger);

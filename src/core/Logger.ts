@@ -1,5 +1,7 @@
 import { LogLevel, LogOptions, Colors, CallStackInfo } from '../types';
-import { shouldLog, print, isShowLog, globals, namespaceLength, setNamespaceLength, defaultStyle, getCallStackInfo } from '../utils';
+import { shouldLog, isShowLog, getCallStackInfo } from '../utils/common';
+import { globals, namespaceLength, defaultStyle, setNamespaceLength, setColors } from '../utils/constant';
+import { print } from '../utils/print';
 
 /**
  * 日志记录器类，用于按命名空间输出结构化日志。
@@ -15,7 +17,7 @@ export default class Logger {
      *
      * @type {string}
      */
-    private namespace: string = ''; 
+    private namespace: string = '';
 
     /**
      * 日志配置选项
@@ -31,17 +33,6 @@ export default class Logger {
      */
     private showLog: boolean = !globals.process || (globals.process && globals.process.env.NODE_ENV !== 'production') ? true : false;
 
-    /**
-     * 颜色配置
-     *
-     * @type {Colors}
-     */
-    private colors: Colors = {
-        debug: '#95a5a6',
-        info: '#2ecc71',
-        warn: '#e67e22',
-        error: '#ff0000',
-    };
 
     constructor(namespace: string = '', options: LogOptions = {}) {
         namespace = namespace || 'Easy-Log-Plus';
@@ -71,7 +62,7 @@ export default class Logger {
      */
     private print(level: LogLevel, prefix: string, color: string, callStackInfo: CallStackInfo, ...args: any[]): void {
         if (isShowLog(this.showLog) && !shouldLog(level, this.options)) return
-        print(level, args, this.namespace, prefix, this.options, color, this.colors, callStackInfo)
+        print(level, args, this.namespace, prefix, this.options, color, callStackInfo)
     }
 
     /**
@@ -201,10 +192,7 @@ export default class Logger {
      * @returns {void}
      */
     setOptions(options: LogOptions): void {
-        this.options = {
-            ...this.options,
-            ...options
-        };
+        Object.assign(this.options, options);
     }
 
     /**
@@ -214,9 +202,6 @@ export default class Logger {
      * @returns {void}
      */
     setColors(colors: Colors): void {
-        this.colors = {
-            ...this.colors,
-            ...colors
-        };
+        setColors(colors);
     }
 }

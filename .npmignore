@@ -8,6 +8,8 @@ yarn.lock
 package.json
 db.json
 analysis.html
+test.html
+test.js
 tsconfig.json
 vite.config.dev.ts
 vite.config.prod.ts
