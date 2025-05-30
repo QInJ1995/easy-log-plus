@@ -1,4 +1,4 @@
-import { LogLevel, LogOptions, Colors, Emojis, Style, Globals, TrackInfo } from '../types/index'
+import { LogLevel, LogOptions, Colors, Emojis, Style, Globals, CallStackInfo } from '../types/index'
 
 export const globals: Globals = getGlobalContext()
 
@@ -88,7 +88,7 @@ export function formatMessage(
     options: LogOptions, // 日志选项
     color: string | undefined, // 日志颜色
     colors: Colors, // 颜色配置
-    trackInfo: TrackInfo // 跟踪信息
+    callStackInfo: CallStackInfo // 跟踪信息
 ): any[] {
     namespace.length > namespaceLength && setNamespaceLength(namespace.length);
     namespace = namespace.toString().padStart(namespaceLength, ' ')
@@ -97,9 +97,9 @@ export function formatMessage(
     const timestamp = options.isTime ? `[${getCurrentTimeDate()}]` : '';
     const levelStr = options.isLevel && level !== 'silent' ? `[${level.toUpperCase()}]` : '';
     prefix = `${namespace}${timestamp}${prefix}${levelStr}`;
-    const fileName = options.isFileName ? trackInfo.fileName : ''
-    const functionName = options.isFunctionName ? trackInfo.functionName : ''
-    const lineNumber = options.isLineNumber ? trackInfo.lineNumber : ''
+    const fileName = options.isFileName ? callStackInfo.fileName : ''
+    const functionName = options.isFunctionName ? callStackInfo.functionName : ''
+    const lineNumber = options.isLineNumber ? callStackInfo.lineNumber : ''
     const logTraceBar = options.isFileName || options.isFunctionName || options.isLineNumber ? ' |' : ''
     const logTrace = `${logTraceBar}${functionName}${fileName}${lineNumber}`
     const useArrow = message.length === 0 ? '' : ` ${options.isEmoji ? emojis[level] || emojis.rocket : ''} → `;
@@ -127,9 +127,9 @@ export function print(
     options: LogOptions,
     color: string,
     colors: Colors,
-    trackInfo: TrackInfo
+    callStackInfo: CallStackInfo
 ): void {
-    const logParams = formatMessage(level, message, namespace, prefix, options, color, colors, trackInfo);
+    const logParams = formatMessage(level, message, namespace, prefix, options, color, colors, callStackInfo);
     globals['con' + 'sole']['log'](...logParams);
 }
 
@@ -158,7 +158,7 @@ export const isShowLog = function (showLog: boolean,): boolean {
  * 获取当追踪信息
  */
 
-export function getTrackInfo(): TrackInfo {
+export function getCallStackInfo(): CallStackInfo {
     const fileName = theFileName()
     const functionName = theFunctionName()
     const lineNumber = theLineNumber()

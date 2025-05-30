@@ -57,7 +57,7 @@ export interface EasyLogVuePluginOptions extends LogOptions {
   enabled?: boolean; // 是否启用插件
 }
 
-export interface TrackInfo {
+export interface CallStackInfo {
   fileName?: string;
   functionName?: string;
   lineNumber?: string;
