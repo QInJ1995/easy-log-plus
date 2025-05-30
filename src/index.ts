@@ -1,9 +1,8 @@
-import _createLogger from './core/createLogger';
-import _EasyLogVuePlugin from './core/vue-plugin';
+import createLogger from './core/createLogger';
+import EasyLogVuePlugin from './core/vue-plugin';
 
-// 导出 createLogger 函数
-export const createLogger = _createLogger;
-export const EasyLogVuePlugin = _EasyLogVuePlugin;
+// 具名导出
+export { createLogger, EasyLogVuePlugin };
 
 // 默认导出保持原有结构
-export default createLogger 
+export default createLogger

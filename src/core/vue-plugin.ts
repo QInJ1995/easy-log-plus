@@ -18,7 +18,7 @@ const install = (
     };
     if (!options?.enabled) return; // 防止重复安装
     const logger = createLogger(options?.namespace, options)
-    options?.isWindow && globals === window && (globals.logger = logger);
+    options?.isWindow && globals === typeof window && (globals.logger = logger);
     if ('provide' in app) {
         // Vue 3 方式
         options?.isVue && (app.config.globalProperties.$logger = logger);

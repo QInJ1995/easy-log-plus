@@ -1,6 +1,7 @@
-import { LogLevel, LogOptions, Colors, Emojis, Style } from '../types/index'
+import { LogLevel, LogOptions, Colors, Emojis, Style, Globals } from '../types/index'
 
-export const globals: any = typeof window !== 'undefined' ? window : global;
+export const globals: Globals = getGlobalContext()
+
 
 export const defaultStyle: Style = {
     padding: '5px',
@@ -134,7 +135,7 @@ export function print(
  * @return {*}
  */
 export const isShowLog = function (showLog: boolean,): boolean {
-    if (globals === window) {
+    if (globals === typeof window) {
         if (!showLog) {
             let curWindow = globals
             while (!curWindow.showLog && curWindow !== curWindow.parent) {
@@ -199,4 +200,14 @@ Object.defineProperty(globals, 'currentStack', {
         return stack;
     }
 });
+
+export function getGlobalContext(): Globals {
+    if (typeof window !== 'undefined') {
+        return window ;
+    } else if (typeof global !== 'undefined') {
+        return global;
+    } else {
+        throw new Error('无法识别的运行环境');
+    }
+}
 

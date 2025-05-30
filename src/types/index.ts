@@ -1,5 +1,8 @@
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent';
 
+export type Globals = typeof window | typeof global | any;
+
+
 export interface Style {
   padding?: string;
   fontWeight?: 'normal' | 'bold' | 'lighter' | 'bolder' | number;
