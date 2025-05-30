@@ -1,4 +1,4 @@
-import { LogLevel, LogOptions, Colors, Emojis, Style, Globals } from '../types/index'
+import { LogLevel, LogOptions, Colors, Emojis, Style, Globals, TrackInfo } from '../types/index'
 
 export const globals: Globals = getGlobalContext()
 
@@ -88,6 +88,7 @@ export function formatMessage(
     options: LogOptions, // 日志选项
     color: string | undefined, // 日志颜色
     colors: Colors, // 颜色配置
+    trackInfo: TrackInfo // 跟踪信息
 ): any[] {
     namespace.length > namespaceLength && setNamespaceLength(namespace.length);
     namespace = namespace.toString().padStart(namespaceLength, ' ')
@@ -96,9 +97,9 @@ export function formatMessage(
     const timestamp = options.isTime ? `[${getCurrentTimeDate()}]` : '';
     const levelStr = options.isLevel && level !== 'silent' ? `[${level.toUpperCase()}]` : '';
     prefix = `${namespace}${timestamp}${prefix}${levelStr}`;
-    const fileName = options.isFileName ? theFileName() : ''
-    const functionName = options.isFunctionName ? theFunctionName() : ''
-    const lineNumber = options.isLineNumber ? theLineNumber() : ''
+    const fileName = options.isFileName ? trackInfo.fileName : ''
+    const functionName = options.isFunctionName ? trackInfo.functionName : ''
+    const lineNumber = options.isLineNumber ? trackInfo.lineNumber : ''
     const logTraceBar = options.isFileName || options.isFunctionName || options.isLineNumber ? ' |' : ''
     const logTrace = `${logTraceBar}${functionName}${fileName}${lineNumber}`
     const useArrow = message.length === 0 ? '' : ` ${options.isEmoji ? emojis[level] || emojis.rocket : ''} → `;
@@ -125,8 +126,10 @@ export function print(
     prefix: string,
     options: LogOptions,
     color: string,
-    colors: Colors): void {
-    const logParams = formatMessage(level, message, namespace, prefix, options, color, colors);
+    colors: Colors,
+    trackInfo: TrackInfo
+): void {
+    const logParams = formatMessage(level, message, namespace, prefix, options, color, colors, trackInfo);
     globals['con' + 'sole']['log'](...logParams);
 }
 
@@ -152,12 +155,29 @@ export const isShowLog = function (showLog: boolean,): boolean {
 }
 
 /**
+ * 获取当追踪信息
+ */
+
+export function getTrackInfo(): TrackInfo {
+    const fileName = theFileName()
+    const functionName = theFunctionName()
+    const lineNumber = theLineNumber()
+    return {
+        fileName,
+        functionName,
+        lineNumber,
+    }
+}
+
+/**
  * 获取当前文件名
  * @returns {string} - 返回当前文件名
  */
 function theFileName(): string {
     // 获取调用栈信息中的文件名
-    const filePath = globals.currentStack[2].getFileName();
+    if (!globals.currentStack || !globals.currentStack.length) return ''
+    const filePath = globals.currentStack[4].getFileName();
+    if (!filePath) return ''
     const filePathArray = filePath.split('/');
     const simpleFileName = filePathArray[filePathArray.length - 1];
     return ' ' + simpleFileName;
@@ -168,8 +188,10 @@ function theFileName(): string {
  * @returns {string} - 返回当前函数名
  */
 function theFunctionName(): string {
+    if (!globals.currentStack || !globals.currentStack.length) return ''
+    const functionName = globals.currentStack[4].getFunctionName();
     // 获取调用栈信息中的函数名
-    return globals.currentStack[2].getFunctionName() ? ' ' + globals.currentStack[2].getFunctionName() + '()' : ' Top Level';
+    return functionName ? ' ' + functionName + '()' : ' Top Level';
 }
 
 /**
@@ -177,8 +199,11 @@ function theFunctionName(): string {
  * @returns {string} - 返回当前行号
  */
 function theLineNumber(): string {
+    if (!globals.currentStack || !globals.currentStack.length) return ''
+    const lineNumber = globals.currentStack[4].getLineNumber()
+    if ([undefined, ''].includes(lineNumber)) return ''
     // 获取调用栈信息中的行号
-    return ':' + globals.currentStack[2].getLineNumber();
+    return ':' + lineNumber;
 }
 
 
@@ -203,7 +228,7 @@ Object.defineProperty(globals, 'currentStack', {
 
 export function getGlobalContext(): Globals {
     if (typeof window !== 'undefined') {
-        return window ;
+        return window;
     } else if (typeof global !== 'undefined') {
         return global;
     } else {

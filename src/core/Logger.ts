@@ -1,5 +1,5 @@
-import { LogLevel, LogOptions, Colors } from '../types';
-import { shouldLog, print, isShowLog, globals, namespaceLength, setNamespaceLength, defaultStyle } from '../utils';
+import { LogLevel, LogOptions, Colors, TrackInfo } from '../types';
+import { shouldLog, print, isShowLog, globals, namespaceLength, setNamespaceLength, defaultStyle, getTrackInfo } from '../utils';
 export default class Logger {
     private namespace: string = ''; // 命名空间
     private options: Required<LogOptions>; // 日志选项
@@ -23,105 +23,110 @@ export default class Logger {
             isFileName: options.isFileName ?? true,
             isFunctionName: options.isFunctionName ?? true,
             isLineNumber: options.isLineNumber ?? true,
-            isEmoji:  options.isEmoji ?? true,
+            isEmoji: options.isEmoji ?? true,
             style: options.style ? { ...defaultStyle, ...options.style } : defaultStyle,
         };
     }
 
-    private print(level: LogLevel, prefix: string, color: string, ...args: any[]) {
+    private print(level: LogLevel, prefix: string, color: string, trackInfo: TrackInfo, ...args: any[]) {
         if (isShowLog(this.showLog) && !shouldLog(level, this.options)) return
-        print(level, args, this.namespace, prefix, this.options, color, this.colors)
+        print(level, args, this.namespace, prefix, this.options, color, this.colors, trackInfo)
     }
 
     log(...args: any[]) {
+        const trackInfo = getTrackInfo()
         if (arguments.length === 0) {
             const _this = this;
             return function (prefix: string, ...args: any[]) {
                 if (arguments.length === 0) {
                     return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('silent', prefix, color, ...args);
+                        _this.print('silent', prefix, color, trackInfo, ...args);
                     };
                 } else {
-                    _this.print('silent', prefix, '', ...args);
+                    _this.print('silent', prefix, '', trackInfo, ...args);
                 }
 
             };
         } else {
-            this.print('silent', '', '', ...args);
+            this.print('silent', '', '', trackInfo, ...args);
         }
     }
 
 
 
     debug(...args: any[]) {
+        const trackInfo = getTrackInfo()
         if (arguments.length === 0) {
             const _this = this;
             return function (prefix: string, ...args: any[]) {
                 if (arguments.length === 0) {
                     return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('debug', prefix, color, ...args);
+                        _this.print('debug', prefix, color, trackInfo, ...args);
                     };
                 } else {
-                    _this.print('debug', prefix, '', ...args);
+                    _this.print('debug', prefix, '', trackInfo, ...args);
                 }
 
             };
         } else {
-            this.print('debug', '', '', ...args);
+            this.print('debug', '', '', trackInfo, ...args);
         }
     }
 
     info(...args: any[]) {
+        const trackInfo = getTrackInfo()
         if (arguments.length === 0) {
             const _this = this;
             return function (prefix: string, ...args: any[]) {
                 if (arguments.length === 0) {
                     return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('info', prefix, color, ...args);
+                        _this.print('info', prefix, color, trackInfo, ...args);
                     };
                 } else {
-                    _this.print('info', prefix, '', ...args);
+                    _this.print('info', prefix, '', trackInfo, ...args);
                 }
 
             };
         } else {
-            this.print('info', '', '', ...args);
+            this.print('info', '', '', trackInfo, ...args);
         }
     }
 
     warn(...args: any[]) {
+        const trackInfo = getTrackInfo()
         if (arguments.length === 0) {
             const _this = this;
             return function (prefix: string, ...args: any[]) {
                 if (arguments.length === 0) {
                     return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('warn', prefix, color, ...args);
+                        _this.print('warn', prefix, color, trackInfo, ...args);
                     };
                 } else {
-                    _this.print('warn', prefix, '', ...args);
+                    _this.print('warn', prefix, '', trackInfo, ...args);
                 }
 
             };
         } else {
-            this.print('warn', '', '', ...args);
+            this.print('warn', '', '', trackInfo, ...args);
         }
     }
 
     error(...args: any[]) {
+        const trackInfo = getTrackInfo()
         if (arguments.length === 0) {
             const _this = this;
             return function (prefix: string, ...args: any[]) {
                 if (arguments.length === 0) {
                     return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('error', prefix, color, ...args);
+                        _this.print('error', prefix, color, trackInfo, ...args);
                     };
                 } else {
-                    _this.print('error', prefix, '', ...args);
+                    _this.print('error', prefix, '', trackInfo, ...args);
                 }
 
             };
         } else {
-            this.print('error', '', '', ...args);
+            this.print('error', '', '', trackInfo, ...args);
         }
     }
 

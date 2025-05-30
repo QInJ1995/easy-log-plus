@@ -56,3 +56,9 @@ export interface EasyLogVuePluginOptions extends LogOptions {
   isProvide?: boolean; // 是否使用 provide/inject 只支持vue3
   enabled?: boolean; // 是否启用插件
 }
+
+export interface TrackInfo {
+  fileName?: string;
+  functionName?: string;
+  lineNumber?: string;
+}
