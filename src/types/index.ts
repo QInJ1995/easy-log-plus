@@ -1,5 +1,11 @@
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent';
 
+export interface Style {
+  padding?: string;
+  fontWeight?: 'normal' | 'bold' | 'lighter' | 'bolder' | number;
+  fontSize?: number;
+}
+
 export interface LogOptions {
   level?: LogLevel; // 日志级别
   isTime?: boolean; // 是否显示时间戳
@@ -8,6 +14,8 @@ export interface LogOptions {
   isFileName?: boolean // 是否显示文件名
   isFunctionName?: boolean // 是否显示函数名
   isLineNumber?: boolean, // 是否显示行号
+  isEmoji?: boolean; // 是否显示emoji
+  style?: Style, // 日志样式
 }
 
 export interface EasyLogViteOptions {

@@ -1,5 +1,5 @@
 import { LogLevel, LogOptions, Colors } from '../types';
-import { shouldLog, print, isShowLog, globals, namespaceLength, setNamespaceLength } from '../utils';
+import { shouldLog, print, isShowLog, globals, namespaceLength, setNamespaceLength, defaultStyle } from '../utils';
 export default class Logger {
     private namespace: string = ''; // 命名空间
     private options: Required<LogOptions>; // 日志选项
@@ -23,6 +23,8 @@ export default class Logger {
             isFileName: options.isFileName ?? true,
             isFunctionName: options.isFunctionName ?? true,
             isLineNumber: options.isLineNumber ?? true,
+            isEmoji:  options.isEmoji ?? true,
+            style: options.style ? { ...defaultStyle, ...options.style } : defaultStyle,
         };
     }
 

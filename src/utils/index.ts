@@ -1,6 +1,12 @@
-import { LogLevel, LogOptions, Colors, Emojis } from '../types/index'
+import { LogLevel, LogOptions, Colors, Emojis, Style } from '../types/index'
 
 export const globals: any = typeof window !== 'undefined' ? window : global;
+
+export const defaultStyle: Style = {
+    padding: '5px',
+    fontWeight: 500,
+    fontSize: 12,
+};
 
 export let namespaceLength = 0;
 
@@ -94,10 +100,10 @@ export function formatMessage(
     const lineNumber = options.isLineNumber ? theLineNumber() : ''
     const logTraceBar = options.isFileName || options.isFunctionName || options.isLineNumber ? ' |' : ''
     const logTrace = `${logTraceBar}${functionName}${fileName}${lineNumber}`
-    const useArrow = message.length === 0 ? '' : ` ${emojis[level] || emojis.rocket} → `;
+    const useArrow = message.length === 0 ? '' : ` ${options.isEmoji ? emojis[level] || emojis.rocket : ''} → `;
     const title = `${prefix}${logTrace}${useArrow}`
     color = options.isColor ? color || colors[level] || getColor(namespace) : '#fff'
-    const stringStyle = `padding: 5px 0;  font-weight: 500; font-size: 12px; color: ${color};`
+    const stringStyle = `padding: ${options.style?.padding || '5px'};  font-weight: ${options.style?.fontWeight || 500}; font-size: ${options.style?.fontSize || 12}px; color: ${color};`
     message = message.map(item => typeof item === 'string' ? { label: `%c${item}`, style: stringStyle } : { label: '%o', value: item, });
     message = [{ label: `%c${title}`, style: stringStyle }, ...message]
     const { firstParam, params } = message.reduce((acc, cur, index) => {
@@ -120,7 +126,7 @@ export function print(
     color: string,
     colors: Colors): void {
     const logParams = formatMessage(level, message, namespace, prefix, options, color, colors);
-    console.log(...logParams)
+    globals['con' + 'sole']['log'](...logParams);
 }
 
 /**
@@ -194,16 +200,3 @@ Object.defineProperty(globals, 'currentStack', {
     }
 });
 
-// Object.defineProperty(globals, 'currentStack', {
-//     get: function () {
-//         var orig = Error.prepareStackTrace;
-//         Error.prepareStackTrace = function (_, stack) {
-//             return stack;
-//         };
-//         var err = new Error;
-//         Error.captureStackTrace(err, arguments.callee);
-//         var stack = err.stack;
-//         Error.prepareStackTrace = orig;
-//         return stack;
-//     }
-// });
