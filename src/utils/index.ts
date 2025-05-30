@@ -1,20 +1,16 @@
 import { LogLevel, LogOptions, Colors, Emojis, Style, Globals, CallStackInfo } from '../types/index'
 
+// 全局对象
 export const globals: Globals = getGlobalContext()
-
-
+// 命名空间长度
+export let namespaceLength = 0;
+// 默认样式
 export const defaultStyle: Style = {
     padding: '5px',
     fontWeight: 500,
     fontSize: 12,
 };
-
-export let namespaceLength = 0;
-
-export function setNamespaceLength(length: number): void {
-    namespaceLength = length;
-}
-
+// Emoji
 const emojis: Emojis = {
     debug: '🐞',
     info: 'ℹ️',
@@ -25,10 +21,12 @@ const emojis: Emojis = {
 };
 
 /**
- * 格式化日志消息
- * @param {LogLevel} level - 日志级别
- * @param {any[]} message - 日志消息
- * @param {string
+ * 设置命名空间长度
+ * @param {number} length 命名空间长度
+ * @returns {void}
+ */
+export function setNamespaceLength(length: number): void {
+    namespaceLength = length;
 }
 
 /**
@@ -79,7 +77,18 @@ export function shouldLog(level: LogLevel, options: LogOptions): boolean {
     return level === 'silent' ? true : levels.indexOf(level) >= levels.indexOf(options.level || 'info');
 }
 
-
+/**
+ * 格式化日志消息
+ * @param {LogLevel} level 日志级别
+ * @param {any[]} message 日志内容
+ * @param {string} namespace 命名空间
+ * @param {string} prefix 日志前缀
+ * @param {CallStackInfo} callStackInfo 调用栈信息
+ * @param {LogOptions} options 日志配置
+ * @param {Colors} colors 日志颜色
+ * @param {string} color 日志颜色 
+ * @returns {any[]} 格式化后的日志消息
+ */
 export function formatMessage(
     level: LogLevel, // 日志级别
     message: any[], // 日志消息
@@ -119,6 +128,18 @@ export function formatMessage(
     return [firstParam, ...params]
 }
 
+/**
+ * 打印日志处理 避免打包被删除
+ * @param {LogLevel} level 日志级别
+ * @param {any[]} message 日志内容
+ * @param {string} namespace 命名空间
+ * @param {string} prefix 日志前缀
+ * @param {CallStackInfo} callStackInfo 调用栈信息
+ * @param {LogOptions} options 日志配置
+ * @param {Colors} colors 日志颜色
+ * @param {string} color 日志颜色 
+ * @returns {void}
+ */
 export function print(
     level: LogLevel,
     message: any[],
@@ -134,8 +155,9 @@ export function print(
 }
 
 /**
- * @description: 判断是否生产环境 node环境不做判断
- * @return {*}
+ * 
+ * @param {boolean} showLog 是否显示日志：true 显示日志，false 不显示日志
+ * @returns {boolean} 显示日志
  */
 export const isShowLog = function (showLog: boolean,): boolean {
     if (globals === typeof window) {
@@ -156,8 +178,8 @@ export const isShowLog = function (showLog: boolean,): boolean {
 
 /**
  * 获取当追踪信息
+ * @returns {CallStackInfo}
  */
-
 export function getCallStackInfo(): CallStackInfo {
     const fileName = theFileName()
     const functionName = theFunctionName()
@@ -206,10 +228,21 @@ function theLineNumber(): string {
     return ':' + lineNumber;
 }
 
+/**
+ * 获取全局上下文
+ * @returns {Globals} 全局上下文
+ */
+export function getGlobalContext(): Globals {
+    if (typeof window !== 'undefined') {
+        return window;
+    } else if (typeof global !== 'undefined') {
+        return global;
+    } else {
+        throw new Error('无法识别的运行环境');
+    }
+}
 
 // 定义全局变量 currentStack 以获取当前调用栈信息
-// 确定全局对象
-
 Object.defineProperty(globals, 'currentStack', {
     get: function () {
         const orig = Error.prepareStackTrace;
@@ -225,14 +258,4 @@ Object.defineProperty(globals, 'currentStack', {
         return stack;
     }
 });
-
-export function getGlobalContext(): Globals {
-    if (typeof window !== 'undefined') {
-        return window;
-    } else if (typeof global !== 'undefined') {
-        return global;
-    } else {
-        throw new Error('无法识别的运行环境');
-    }
-}
 

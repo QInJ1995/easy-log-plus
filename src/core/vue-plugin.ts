@@ -4,6 +4,12 @@ import { EasyLogVuePluginOptions, } from '../types/index'
 import { globals } from '../utils/index';
 import createLogger from './createLogger';
 
+/**
+ * 插件安装函数
+ * @param {any} app Vue 应用实例
+ * @param {EasyLogVuePluginOptions} options 插件配置选项
+ * @returns {void}
+ */
 // 插件安装函数
 const install = (
     app: any,

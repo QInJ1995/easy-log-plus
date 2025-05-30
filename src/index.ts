@@ -1,10 +1,8 @@
 import createLogger from './core/createLogger';
 import EasyLogVuePlugin from './core/vue-plugin';
 
-// 具名导出
+// 支持 ES Module
 export { createLogger, EasyLogVuePlugin };
-
-// 默认导出
 const EasyLogPlus = createLogger;
 
 // 支持 CommonJS

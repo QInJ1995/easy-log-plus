@@ -1,9 +1,41 @@
 import { LogLevel, LogOptions, Colors, CallStackInfo } from '../types';
 import { shouldLog, print, isShowLog, globals, namespaceLength, setNamespaceLength, defaultStyle, getCallStackInfo } from '../utils';
+
+/**
+ * 日志记录器类，用于按命名空间输出结构化日志。
+ *
+ * @class Logger
+ * @constructor
+ * @param {string} [namespace='Easy-Log-Plus'] - 命名空间名称
+ * @param {LogOptions} [options] - 日志配置选项
+ */
 export default class Logger {
-    private namespace: string = ''; // 命名空间
-    private options: Required<LogOptions>; // 日志选项
-    private showLog: boolean = !globals.process || (globals.process && globals.process.env.NODE_ENV !== 'production') ? true : false; // 是否显示日志，默认在非生产环境下显示
+    /**
+     * 当前命名空间，默认为 Easy-Log-Plus
+     *
+     * @type {string}
+     */
+    private namespace: string = ''; 
+
+    /**
+     * 日志配置选项
+     *
+     * @type {Required<LogOptions>}
+     */
+    private options: Required<LogOptions>;
+
+    /**
+     * 是否显示日志，默认在非生产环境下显示
+     *
+     * @type {boolean}
+     */
+    private showLog: boolean = !globals.process || (globals.process && globals.process.env.NODE_ENV !== 'production') ? true : false;
+
+    /**
+     * 颜色配置
+     *
+     * @type {Colors}
+     */
     private colors: Colors = {
         debug: '#95a5a6',
         info: '#2ecc71',
@@ -28,12 +60,26 @@ export default class Logger {
         };
     }
 
+    /**
+     * 
+     * @param {LogLevel} level 日志级别
+     * @param {string} prefix 前缀
+     * @param {string} color 日志颜色
+     * @param {CallStackInfo} callStackInfo 调用栈信息
+     * @param {any[]} args 日志参数
+     * @returns {void}
+     */
     private print(level: LogLevel, prefix: string, color: string, callStackInfo: CallStackInfo, ...args: any[]) {
         if (isShowLog(this.showLog) && !shouldLog(level, this.options)) return
         print(level, args, this.namespace, prefix, this.options, color, this.colors, callStackInfo)
     }
 
-    log(...args: any[]) {
+    /**
+     * 输出日志
+     * @param {any[]} args 日志参数
+     * @returns {void | Function}
+     */
+    log(...args: any[]): void | Function {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
@@ -52,9 +98,12 @@ export default class Logger {
         }
     }
 
-
-
-    debug(...args: any[]) {
+    /**
+     * 
+     * @param args debug日志参数
+     * @returns {void | Function}
+     */
+    debug(...args: any[]): void | Function {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
@@ -73,7 +122,12 @@ export default class Logger {
         }
     }
 
-    info(...args: any[]) {
+    /**
+     * 
+     * @param args info日志参数
+     * @returns {void | Function}
+     */
+    info(...args: any[]): void | Function {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
@@ -92,7 +146,12 @@ export default class Logger {
         }
     }
 
-    warn(...args: any[]) {
+    /**
+     * 
+     * @param args warn日志参数
+     * @returns {void | Function}
+     */
+    warn(...args: any[]): void | Function {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
@@ -111,7 +170,12 @@ export default class Logger {
         }
     }
 
-    error(...args: any[]) {
+    /**
+     * 
+     * @param args error日志参数
+     * @returns {void | Function}
+     */
+    error(...args: any[]): void | Function {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
@@ -130,14 +194,26 @@ export default class Logger {
         }
     }
 
-    setOptions(options: LogOptions) {
+    /**
+     * 设置日志配置选项
+     *
+     * @param {LogOptions} options - 需要更新的日志选项
+     * @returns {void}
+     */
+    setOptions(options: LogOptions): void {
         this.options = {
             ...this.options,
             ...options
         };
     }
-
-    setColors(colors: Colors) {
+    
+    /**
+     * 设置颜色
+     *
+     * @param {Colors} colors - 需要更新的颜色选项
+     * @returns {void}
+     */
+    setColors(colors: Colors): void {
         this.colors = {
             ...this.colors,
             ...colors
