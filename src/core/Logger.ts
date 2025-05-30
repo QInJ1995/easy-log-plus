@@ -69,7 +69,7 @@ export default class Logger {
      * @param {any[]} args 日志参数
      * @returns {void}
      */
-    private print(level: LogLevel, prefix: string, color: string, callStackInfo: CallStackInfo, ...args: any[]) {
+    private print(level: LogLevel, prefix: string, color: string, callStackInfo: CallStackInfo, ...args: any[]): void {
         if (isShowLog(this.showLog) && !shouldLog(level, this.options)) return
         print(level, args, this.namespace, prefix, this.options, color, this.colors, callStackInfo)
     }
@@ -206,7 +206,7 @@ export default class Logger {
             ...options
         };
     }
-    
+
     /**
      * 设置颜色
      *
