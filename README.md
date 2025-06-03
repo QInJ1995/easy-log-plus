@@ -18,7 +18,7 @@ npm install easy-log-plus
 import createLogger from 'easy-log-plus';
 
 const logger = createLogger('MyApp', {
-  level: 'debug',
+  level: 'debug', // 日志级别 默认为 'debug'：  'debug' <= 'info' <= 'warn' <= 'error' 
   isTime: true, // 是否显示时间戳 默认为 true
   isColor: true, // 是否启用彩色输出 默认为 true
   isLevel: true, // 是否显示日志级别 默认为 true
@@ -34,7 +34,7 @@ const logger = createLogger('MyApp', {
 });
 
 // 基本使用
-logger.log('这是一条调试信息'); // 不受  level 控制
+logger.log('这是一条调试信息'); // 不受  level 控制 颜色为静默颜色
 logger.debug('这是一条调试信息'); // level >= 'debug' 
 logger.info('这是一条普通信息'); // level >= 'info'
 logger.warn('这是一条警告信息'); // level >= 'warn'
@@ -78,7 +78,7 @@ app.use(EasyLogVuePlugin, {
   isProvide: true,    // 是否使用 provide/inject 方式 默认为 false
   isWindow: true,     // 是否在 window 对象上挂载 logger 默认为 false
   enabled: true,       // 是否启用插件 默认为 true
-  ...LogOptions       // 日志配置项
+  //...LogOptions       // 日志配置项
 })
 
 // 在组件中使用
@@ -104,6 +104,12 @@ logger.info('这是一条日志')
 - `isFunctionName`: 是否显示函数名
 - `isLineNumber`: 是否显示行号
 - `isEmoji`: 是否显示表情符号
+- `colors`: 自定义颜色配置
+  - `debug`: 调试级别颜色
+  - `info`: 普通级别颜色
+  - `warn`: 警告级别颜色
+  - `error`: 错误级别颜色
+  - `silent`: 静默级别颜色
 - `style`: 自定义样式配置
   - `padding`: 内边距
   - `fontWeight`: 字体粗细
@@ -127,10 +133,11 @@ logger.setOptions({
 
 // 自定义日志颜色
 logger.setColors({
-  debug: '#95a5a6',
-  info: '#2ecc71',
-  warn: '#e67e22',
-  error: '#ff0000'
+  debug: '#95a5a6', // 默认为 '#87CEFA'
+  info: '#2ecc71', // 默认为 '#90EE90'
+  warn: '#e67e22', // 默认为 '#FF7F00'
+  error: '#ff0000' // 默认为 '#ff0000'
+  silent: '#000000' // 默认为 '#A7B0C4'
 });
 ```
 

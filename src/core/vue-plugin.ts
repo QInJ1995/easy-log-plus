@@ -1,6 +1,6 @@
 // vue插件
 
-import { EasyLogVuePluginOptions, } from '../types/index'
+import { EasyLogVuePluginOptions, IEasyLogVuePlugin } from '../types/index'
 import { globals } from '../utils/constant';
 import { isBrowser } from '../utils/common';
 import createLogger from './createLogger';
@@ -37,7 +37,7 @@ const install = (
 };
 
 // 插件对象
-const EasyLogVuePlugin: any = {
+const EasyLogVuePlugin: IEasyLogVuePlugin = {
     install
 };
 

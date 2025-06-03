@@ -47,6 +47,7 @@ export interface LogOptions {
   isLineNumber?: boolean,
   isEmoji?: boolean;
   style?: Style,
+  colors?: Colors;
 }
 
 /**
@@ -120,4 +121,8 @@ export interface CallStackInfo {
   fileName?: string;
   functionName?: string;
   lineNumber?: string;
+}
+
+export interface IEasyLogVuePlugin {
+  install: (app: any, options?: EasyLogVuePluginOptions) => void;
 }

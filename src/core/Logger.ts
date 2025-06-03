@@ -24,7 +24,7 @@ export default class Logger {
      *
      * @type {Required<LogOptions>}
      */
-    private options: Required<LogOptions>;
+    private options: LogOptions;
 
     /**
      * 是否显示日志，默认在非生产环境下显示
@@ -37,8 +37,9 @@ export default class Logger {
     constructor(namespace: string | null | undefined, options: LogOptions = {}) {
         namespace = namespace == null ? 'Easy-Log-Plus' : namespace;
         this.namespace = namespace as string;
+        options.colors && setColors(options.colors);
         this.options = {
-            level: options.level || 'info',
+            level: options.level || 'debug',
             isTime: options.isTime ?? true,
             isColor: options.isColor ?? true,
             isLevel: options.isLevel ?? true,
