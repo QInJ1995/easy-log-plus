@@ -1,8 +1,7 @@
 import chalk from 'chalk';
-// import styles from 'ansi-styles';
 import { LogLevel, LogOptions, CallStackInfo } from '../types/index'
-import { emojis, colors, globals, namespaceLength, setNamespaceLength } from './constant'
-import { getCurrentTimeDate, getColor, isBrowser } from './common'
+import { emojis, colors, globals, } from './constant'
+import { getCurrentTimeDate, isBrowser } from './common'
 
 
 /**
@@ -60,21 +59,17 @@ export function printInBrowser(
     color: string | undefined, // 日志颜色
     callStackInfo: CallStackInfo // 跟踪信息
 ): any[] {
-    namespace.length > namespaceLength && setNamespaceLength(namespace.length);
-    namespace = namespace.toString().padStart(namespaceLength, ' ')
-    namespace = namespace.length !== 0 ? `${namespace} | ` : '';
-    prefix = prefix ? `[${prefix}]` : '';;
-    const timestamp = options.isTime ? `[${getCurrentTimeDate()}]` : '';
-    const levelStr = options.isLevel && level !== 'silent' ? `[${level.toUpperCase()}]` : '';
-    prefix = `${namespace}${timestamp}${prefix}${levelStr}`;
+    namespace = namespace.length !== 0 ? `[${namespace}] ` : '';
+    prefix = prefix ? `[${prefix}] ` : '';;
+    const timestamp = options.isTime ? `[${getCurrentTimeDate()}] ` : '';
+    const levelStr = options.isLevel && level !== 'silent' ? `[${level.toUpperCase()}] ` : '';
     const fileName = options.isFileName ? callStackInfo.fileName : ''
     const functionName = options.isFunctionName ? callStackInfo.functionName : ''
     const lineNumber = options.isLineNumber ? callStackInfo.lineNumber : ''
-    const logTraceBar = options.isFileName || options.isFunctionName || options.isLineNumber ? ' |' : ''
-    const logTrace = `${logTraceBar}${functionName}${fileName}${lineNumber}`
-    const useArrow = message.length === 0 ? '' : ` ${options.isEmoji ? emojis[level] || emojis.rocket : ''} -> `;
-    const title = `${prefix}${logTrace}${useArrow}`
-    color = options.isColor ? color || colors[level] || getColor(namespace) : '#fff'
+    const logTrace = getLogTrace(fileName, functionName, lineNumber)
+    const useArrow = message.length === 0 ? '' : `${options.isEmoji ? (emojis[level] || emojis.rocket) + ' ->' : '->'}`;
+    const title = `${options.isEmoji ? '✨ ' : ''}${namespace}${timestamp}${levelStr}${logTrace}${prefix}${useArrow}`
+    color = options.isColor ? color || colors[level] : '#fff'
     const stringStyle = `padding: ${options.style?.padding || '5px'};  font-weight: ${options.style?.fontWeight || 500}; font-size: ${options.style?.fontSize || 12}px; color: ${color};`
     message = message.map(item => typeof item === 'string' ? { label: `%c${item}`, style: stringStyle } : { label: '%o', value: item, });
     message = [{ label: `%c${title}`, style: stringStyle }, ...message]
@@ -87,4 +82,24 @@ export function printInBrowser(
         return { firstParam, params, }
     }, { firstParam: '', params: [] })
     return [firstParam, ...params]
+}
+
+function getLogTrace(fileName: string | undefined, functionName: string | undefined, lineNumber: string | undefined) {
+    if (functionName && fileName && lineNumber) {
+        return `[${functionName} ${fileName}:${lineNumber}] `
+    } else if (!functionName && fileName && lineNumber) {
+        return `[${fileName}:${lineNumber}] `
+    } else if (functionName && !fileName && lineNumber) {
+        return `[${functionName}:${lineNumber}] `
+    } else if (!functionName && !fileName && lineNumber) {
+        return `[${lineNumber}] `
+    } else if (functionName && fileName && !lineNumber) {
+        return `[${functionName} ${fileName}] `
+    } else if (!functionName && fileName && !lineNumber) {
+        return `[${fileName}] `
+    } else if (functionName && !fileName && !lineNumber) {
+        return `[${functionName}] `
+    } else {
+        return ''
+    }
 }

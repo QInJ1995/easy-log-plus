@@ -1,5 +1,5 @@
 import { LogLevel, LogOptions, CallStackInfo } from '../types/index'
-import { globals } from './constant'
+import { globals, } from './constant'
 
 
 /**
@@ -20,23 +20,6 @@ export function getCurrentTimeDate(): string {
     const seconds = String(now.getUTCSeconds()).padStart(2, '0');
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
-
-/**
- * 根据命名空间生成随机颜色
- * @param {string} namespace - 命名空间字符串
- * @returns {string} - 返回16进制颜色代码（如 #FF0000）
- */
-export function getColor(namespace: string = ''): string {
-    // 使用 djb2 哈希算法
-    let hash = 5381;
-    for (let i = 0; i < namespace.length; i++) {
-        hash = ((hash << 5) + hash) + namespace.charCodeAt(i);
-    }
-
-    // 生成一个随机的颜色代码并转换为16进制
-    const color = Math.abs(hash) % 16777216;
-    return `#${color.toString(16).padStart(6, '0')}`;
 }
 
 /**
@@ -105,7 +88,7 @@ function theFileName(): string {
     if (!filePath) return ''
     const filePathArray = filePath.split('/');
     const simpleFileName = filePathArray[filePathArray.length - 1];
-    return ' ' + simpleFileName;
+    return simpleFileName;
 }
 
 /**
@@ -116,7 +99,7 @@ function theFunctionName(): string {
     if (!globals.currentStack || !globals.currentStack.length) return ''
     const functionName = globals.currentStack[4].getFunctionName();
     // 获取调用栈信息中的函数名
-    return functionName ? ' ' + functionName + '()' : ' Top Level';
+    return functionName ? functionName + '()' : 'Top Level';
 }
 
 /**
@@ -128,7 +111,7 @@ function theLineNumber(): string {
     const lineNumber = globals.currentStack[4].getLineNumber()
     if ([undefined, ''].includes(lineNumber)) return ''
     // 获取调用栈信息中的行号
-    return ':' + lineNumber;
+    return lineNumber + '';
 }
 
 // 定义全局变量 currentStack 以获取当前调用栈信息

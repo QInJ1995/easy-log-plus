@@ -34,10 +34,11 @@ const logger = createLogger('MyApp', {
 });
 
 // 基本使用
-logger.debug('这是一条调试信息');
-logger.info('这是一条普通信息');
-logger.warn('这是一条警告信息');
-logger.error('这是一条错误信息');
+logger.log('这是一条调试信息'); // 不受  level 控制
+logger.debug('这是一条调试信息'); // level >= 'debug' 
+logger.info('这是一条普通信息'); // level >= 'info'
+logger.warn('这是一条警告信息'); // level >= 'warn'
+logger.error('这是一条错误信息'); // level >= 'error'
 
 // 带前缀的日志
 logger.debug()('CustomPrefix','这是一条带前缀的调试信息');

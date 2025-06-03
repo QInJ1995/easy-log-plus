@@ -3,9 +3,6 @@ import { Colors, Emojis, Style, } from '../types/index'
 // 全局对象
 export const globals: any = getGlobalContext()
 
-// 命名空间长度
-export let namespaceLength = 0;
-
 // Emoji
 export const emojis: Emojis = {
     debug: '🐞',
@@ -25,21 +22,13 @@ export const defaultStyle: Style = {
 
 // 日志level颜色
 export const colors: Colors = {
-    debug: '#95a5a6',
-    info: '#2ecc71',
-    warn: '#e67e22',
+    debug: '#87CEFA',
+    info: '#90EE90',
+    warn: '#FF7F00',
     error: '#ff0000',
+    silent: '#A7B0C4',
 };
 
-
-/**
- * 设置命名空间长度
- * @param {number} length 命名空间长度
- * @returns {void}
- */
-export function setNamespaceLength(length: number): void {
-    namespaceLength = length;
-}
 
 /**
  *  设置日志颜色

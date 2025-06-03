@@ -1,6 +1,6 @@
 import { LogLevel, LogOptions, Colors, CallStackInfo } from '../types';
 import { shouldLog, isShowLog, getCallStackInfo } from '../utils/common';
-import { globals, namespaceLength, defaultStyle, setNamespaceLength, setColors } from '../utils/constant';
+import { globals, defaultStyle, setColors } from '../utils/constant';
 import { print } from '../utils/print';
 
 /**
@@ -17,7 +17,7 @@ export default class Logger {
      *
      * @type {string}
      */
-    private namespace: string = '';
+    private namespace: string;
 
     /**
      * 日志配置选项
@@ -34,10 +34,9 @@ export default class Logger {
     private showLog: boolean = !globals.process || (globals.process && globals.process.env.NODE_ENV !== 'production') ? true : false;
 
 
-    constructor(namespace: string = '', options: LogOptions = {}) {
-        namespace = namespace || 'Easy-Log-Plus';
-        namespace.length > namespaceLength && setNamespaceLength(namespace.length);
-        this.namespace = namespace;
+    constructor(namespace: string | null | undefined, options: LogOptions = {}) {
+        namespace = namespace == null ? 'Easy-Log-Plus' : namespace;
+        this.namespace = namespace as string;
         this.options = {
             level: options.level || 'info',
             isTime: options.isTime ?? true,

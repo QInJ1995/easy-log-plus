@@ -35,7 +35,6 @@
     "vite-plugin-progress": "^0.0.7"
   },
   "dependencies": {
-    "ansi-styles": "^6.2.1",
     "chalk": "^5.4.1"
   }
 }
