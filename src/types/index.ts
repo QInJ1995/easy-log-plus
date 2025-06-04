@@ -39,15 +39,11 @@ export interface Style {
  */
 export interface LogOptions {
   level?: LogLevel;
-  isTime?: boolean;
   isColor?: boolean
-  isLevel?: boolean
-  isFileName?: boolean
-  isFunctionName?: boolean
-  isLineNumber?: boolean,
   isEmoji?: boolean;
   style?: Style,
   colors?: Colors;
+  formatter?: string
 }
 
 /**

@@ -41,12 +41,12 @@ logger.warn('这是一条警告信息'); // level >= 'warn'
 logger.error('这是一条错误信息'); // level >= 'error'
 
 // 带前缀的日志
-logger.debug()('CustomPrefix','这是一条带前缀的调试信息');
-logger.info()('CustomPrefix', '这是一条带前缀的普通信息');
+logger.debug()('CustomInfo','这是一条带前缀的调试信息');
+logger.info()('CustomInfo', '这是一条带前缀的普通信息');
 
 // 带颜色和前缀的日志
-logger.debug()()('CustomPrefix', '#ff0000', '这是一条红色的调试信息');
-logger.info()()('CustomPrefix', '#00ff00', '这是一条绿色的普通信息');
+logger.debug()()('CustomInfo', '#ff0000', '这是一条红色的调试信息');
+logger.info()()('CustomInfo', '#00ff00', '这是一条绿色的普通信息');
 ```
 
 ### CommonJS 方式

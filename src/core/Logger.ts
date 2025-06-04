@@ -1,5 +1,5 @@
 import { LogLevel, LogOptions, Colors, CallStackInfo } from '../types';
-import { shouldLog, isShowLog, getCallStackInfo } from '../utils/common';
+import { shouldLog, isShowLog, getCallStackInfo, } from '../utils/common';
 import { globals, defaultStyle, setColors } from '../utils/constant';
 import { print } from '../utils/print';
 
@@ -40,29 +40,25 @@ export default class Logger {
         options.colors && setColors(options.colors);
         this.options = {
             level: options.level || 'debug',
-            isTime: options.isTime ?? true,
             isColor: options.isColor ?? true,
-            isLevel: options.isLevel ?? true,
-            isFileName: options.isFileName ?? true,
-            isFunctionName: options.isFunctionName ?? true,
-            isLineNumber: options.isLineNumber ?? true,
             isEmoji: options.isEmoji ?? true,
             style: options.style ? { ...defaultStyle, ...options.style } : defaultStyle,
+            formatter: options.formatter || '[$namespace$] [$time$] [$level$] [$tracker$] [$info$] ->',
         };
     }
 
     /**
      * 
      * @param {LogLevel} level 日志级别
-     * @param {string} prefix 前缀
+     * @param {string} info 前缀
      * @param {string} color 日志颜色
      * @param {CallStackInfo} callStackInfo 调用栈信息
      * @param {any[]} args 日志参数
      * @returns {void}
      */
-    private print(level: LogLevel, prefix: string, color: string, callStackInfo: CallStackInfo, ...args: any[]): void {
+    private print(level: LogLevel, info: string, color: string, callStackInfo: CallStackInfo, ...args: any[]): void {
         if (isShowLog(this.showLog) && !shouldLog(level, this.options)) return
-        print(level, args, this.namespace, prefix, this.options, color, callStackInfo)
+        print(level, args, this.namespace, info, this.options, color, callStackInfo)
     }
 
     /**
@@ -74,13 +70,13 @@ export default class Logger {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
-            return function (prefix: string, ...args: any[]) {
+            return function (info: string, ...args: any[]) {
                 if (arguments.length === 0) {
-                    return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('silent', prefix, color, callStackInfo, ...args);
+                    return function (info: string, color: string, ...args: any[]) {
+                        _this.print('silent', info, color, callStackInfo, ...args);
                     };
                 } else {
-                    _this.print('silent', prefix, '', callStackInfo, ...args);
+                    _this.print('silent', info, '', callStackInfo, ...args);
                 }
 
             };
@@ -98,13 +94,13 @@ export default class Logger {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
-            return function (prefix: string, ...args: any[]) {
+            return function (info: string, ...args: any[]) {
                 if (arguments.length === 0) {
-                    return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('debug', prefix, color, callStackInfo, ...args);
+                    return function (info: string, color: string, ...args: any[]) {
+                        _this.print('debug', info, color, callStackInfo, ...args);
                     };
                 } else {
-                    _this.print('debug', prefix, '', callStackInfo, ...args);
+                    _this.print('debug', info, '', callStackInfo, ...args);
                 }
 
             };
@@ -122,13 +118,13 @@ export default class Logger {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
-            return function (prefix: string, ...args: any[]) {
+            return function (info: string, ...args: any[]) {
                 if (arguments.length === 0) {
-                    return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('info', prefix, color, callStackInfo, ...args);
+                    return function (info: string, color: string, ...args: any[]) {
+                        _this.print('info', info, color, callStackInfo, ...args);
                     };
                 } else {
-                    _this.print('info', prefix, '', callStackInfo, ...args);
+                    _this.print('info', info, '', callStackInfo, ...args);
                 }
 
             };
@@ -146,13 +142,13 @@ export default class Logger {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
-            return function (prefix: string, ...args: any[]) {
+            return function (info: string, ...args: any[]) {
                 if (arguments.length === 0) {
-                    return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('warn', prefix, color, callStackInfo, ...args);
+                    return function (info: string, color: string, ...args: any[]) {
+                        _this.print('warn', info, color, callStackInfo, ...args);
                     };
                 } else {
-                    _this.print('warn', prefix, '', callStackInfo, ...args);
+                    _this.print('warn', info, '', callStackInfo, ...args);
                 }
 
             };
@@ -170,13 +166,13 @@ export default class Logger {
         const callStackInfo = getCallStackInfo()
         if (arguments.length === 0) {
             const _this = this;
-            return function (prefix: string, ...args: any[]) {
+            return function (info: string, ...args: any[]) {
                 if (arguments.length === 0) {
-                    return function (prefix: string, color: string, ...args: any[]) {
-                        _this.print('error', prefix, color, callStackInfo, ...args);
+                    return function (info: string, color: string, ...args: any[]) {
+                        _this.print('error', info, color, callStackInfo, ...args);
                     };
                 } else {
-                    _this.print('error', prefix, '', callStackInfo, ...args);
+                    _this.print('error', info, '', callStackInfo, ...args);
                 }
 
             };
@@ -184,6 +180,27 @@ export default class Logger {
             this.print('error', '', '', callStackInfo, ...args);
         }
     }
+
+    /**
+     * 计时
+     * 
+     * @param label 时间标签
+     * @returns {void}
+     */
+    time(label: string): void {
+        console.time(label);
+    }
+
+    /**
+     * 结束计时
+     *
+     * @param {string} label - 时间标签
+     * @returns {void}
+     */
+    timeEnd(label: string): void {
+        console.timeEnd(label);
+    }
+
 
     /**
      * 设置日志配置选项

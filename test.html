@@ -13,12 +13,13 @@
 
         const { createLogger } = window.EasyLogPlus
 
-        const logger2 = createLogger('', {
+        const logger2 = createLogger('aaaa', {
             level: 'debug',
+            formatter: '$namespace$ | [$time$] [$level$] [$tracker$] $info$ ->',
             style: {
-                fontSize: 28,
-                fontWeight: 900,
-                padding: '50px 0 10px 0'
+                // fontSize: 28,
+                // fontWeight: 900,
+                // padding: '50px 0 10px 0'
             },
             // isLevel: false,
             // isTime: false,
@@ -34,6 +35,7 @@
         logger3.log('log', 'blue', 'hello world2')
         logger.log()()('log', 'blue', 'hello world')
         logger2.log(111)
+        logger2.log()('测试', 222)
         logger.debug('debug', 'dads', {}, 111, true)
         logger.info()('打印信息', 1, 2)
         logger.info()()('打印信息2', 'red', 2, 4)

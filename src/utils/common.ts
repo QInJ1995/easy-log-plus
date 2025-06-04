@@ -1,5 +1,5 @@
 import { LogLevel, LogOptions, CallStackInfo } from '../types/index'
-import { globals, } from './constant'
+import { globals, callStackIndex } from './constant'
 
 
 /**
@@ -84,11 +84,16 @@ export function getCallStackInfo(): CallStackInfo {
 function theFileName(): string {
     // 获取调用栈信息中的文件名
     if (!globals.currentStack || !globals.currentStack.length) return ''
-    const filePath = globals.currentStack[4].getFileName();
+    let filePath = null
+    let curCallStackIndex: number = callStackIndex
+    while (!filePath && curCallStackIndex < globals.currentStack.length) {
+        filePath = globals.currentStack[curCallStackIndex]?.getFileName();
+        curCallStackIndex++
+    }
     if (!filePath) return ''
     const filePathArray = filePath.split('/');
     const simpleFileName = filePathArray[filePathArray.length - 1];
-    return simpleFileName;
+    return simpleFileName || '';
 }
 
 /**
@@ -97,9 +102,14 @@ function theFileName(): string {
  */
 function theFunctionName(): string {
     if (!globals.currentStack || !globals.currentStack.length) return ''
-    const functionName = globals.currentStack[4].getFunctionName();
+    let functionName = null
+    let curCallStackIndex: number = callStackIndex
+    while (!functionName && curCallStackIndex < globals.currentStack.length) {
+        functionName = globals.currentStack[curCallStackIndex]?.getFunctionName();
+        curCallStackIndex++
+    }
     // 获取调用栈信息中的函数名
-    return functionName ? functionName + '()' : 'Top Level';
+    return functionName || '';
 }
 
 /**
@@ -108,10 +118,35 @@ function theFunctionName(): string {
  */
 function theLineNumber(): string {
     if (!globals.currentStack || !globals.currentStack.length) return ''
-    const lineNumber = globals.currentStack[4].getLineNumber()
-    if ([undefined, ''].includes(lineNumber)) return ''
+    let lineNumber
+    let curCallStackIndex: number = callStackIndex
+    while (!lineNumber && curCallStackIndex < globals.currentStack.length) {
+        lineNumber = globals.currentStack[curCallStackIndex]?.getLineNumber();
+        curCallStackIndex++
+    }
+    if ([undefined, null, ''].includes(lineNumber)) return ''
     // 获取调用栈信息中的行号
     return lineNumber + '';
+}
+
+/**
+ * 格式化字符串
+ * @param {string} template - 模板字符串
+ * @param {object} replacements - 替换项
+ * @returns {string} - 格式化后的字符串
+ */
+export function formatString(
+    template: string,
+    replacements: { [key: string]: any }
+): string {
+    return template.replace(/\$(\w+)\$/g, (_, key) => {
+        return key in replacements ? replacements[key] : `$${key}$`;
+    });
+};
+
+export function removeEmptyBrackets(str: string): string {
+    // 正则表达式匹配空的方括号或包含占位符的方括号
+    return str.replace(/\[\s*\]|【\s*】/g, '').replace(/\s+/g, ' ').trim();
 }
 
 // 定义全局变量 currentStack 以获取当前调用栈信息

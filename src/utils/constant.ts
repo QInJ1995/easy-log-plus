@@ -3,6 +3,9 @@ import { Colors, Emojis, Style, } from '../types/index'
 // 全局对象
 export const globals: any = getGlobalContext()
 
+// 调用栈索引
+export const callStackIndex: number = 4
+
 // Emoji
 export const emojis: Emojis = {
     debug: '🐞',
@@ -29,6 +32,8 @@ export const colors: Colors = {
     silent: '#A7B0C4',
 };
 
+// 替换字符
+export const replaceCharacters: string[] = ['[]', '【】']
 
 /**
  *  设置日志颜色
