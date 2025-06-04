@@ -3,6 +3,7 @@ import { Colors, Emojis, Style, } from '../types/index'
 // 全局对象
 export const globals: any = getGlobalContext()
 
+// chalk等级
 export const chalkLevel = 3
 
 // 调用栈索引
