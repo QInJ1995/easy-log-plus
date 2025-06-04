@@ -3,6 +3,8 @@ import { Colors, Emojis, Style, } from '../types/index'
 // 全局对象
 export const globals: any = getGlobalContext()
 
+export const chalkLevel = 3
+
 // 调用栈索引
 export const callStackIndex: number = 4
 

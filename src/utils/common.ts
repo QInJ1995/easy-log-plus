@@ -97,6 +97,25 @@ function theFileName(): string {
 }
 
 /**
+ * 获取日志追踪信息
+ * @param {string} fileName - 文件名
+ * @param {string} functionName - 函数名
+ * @param {string} lineNumber - 行号
+ * @returns {string} - 返回日志追踪信息
+ */
+export function getLogTrace(fileName: string | undefined, functionName: string | undefined, lineNumber: string | undefined): string {
+    if (functionName && fileName && lineNumber) {
+        return `${functionName ? functionName + '()' : ''} ${fileName}${lineNumber ? ':' + 'lineNumber' : ''}`
+    } else if (!functionName && fileName && lineNumber) {
+        return `${fileName}${lineNumber ? ':' + 'lineNumber' : ''}`
+    } else if (functionName && !fileName && lineNumber) {
+        return `${functionName ? functionName + '()' : ''}${lineNumber ? ':' + 'lineNumber' : ''}`
+    } else {
+        return ''
+    }
+}
+
+/**
  * 获取当前函数名
  * @returns {string} - 返回当前函数名
  */
@@ -144,6 +163,11 @@ export function formatString(
     });
 };
 
+/**
+ * 移除空方括号和包含占位符的方括号
+ * @param {string} str - 待处理的字符串
+ * @returns {string} - 处理后的字符串
+ */
 export function removeEmptyBrackets(str: string): string {
     // 正则表达式匹配空的方括号或包含占位符的方括号
     return str.replace(/\[\s*\]|【\s*】/g, '').replace(/\s+/g, ' ').trim();

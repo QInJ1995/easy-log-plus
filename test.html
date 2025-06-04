@@ -21,17 +21,14 @@
                 // fontWeight: 900,
                 // padding: '50px 0 10px 0'
             },
-            // isLevel: false,
-            // isTime: false,
             // isColor: false,
         })
         const logger3 = createLogger()
         const logger = createLogger('hit-emr', {
             level: 'debug',
-            // isLevel: false,
-            // isTime: false,
             // isColor: false,
         })
+        logger.time('test')
         logger3.log('log', 'blue', 'hello world2')
         logger.log()()('log', 'blue', 'hello world')
         logger2.log(111)
@@ -42,6 +39,7 @@
         logger.warn('warn')
         logger.error('error', 111)
         logger.error('a->', { a: 1, b: { c: 2 } }, [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }])
+        logger.timeEnd('test')
     </script>
 </body>
 

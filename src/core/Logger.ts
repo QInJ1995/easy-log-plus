@@ -1,7 +1,8 @@
 import { LogLevel, LogOptions, Colors, CallStackInfo } from '../types';
 import { shouldLog, isShowLog, getCallStackInfo, } from '../utils/common';
-import { globals, defaultStyle, setColors } from '../utils/constant';
+import { globals, defaultStyle, setColors, chalkLevel } from '../utils/constant';
 import { print } from '../utils/print';
+import chalk from 'chalk';
 
 /**
  * 日志记录器类，用于按命名空间输出结构化日志。
@@ -35,6 +36,7 @@ export default class Logger {
 
 
     constructor(namespace: string | null | undefined, options: LogOptions = {}) {
+        chalk.level = chalkLevel;
         namespace = namespace == null ? 'Easy-Log-Plus' : namespace;
         this.namespace = namespace as string;
         options.colors && setColors(options.colors);
@@ -58,7 +60,7 @@ export default class Logger {
      */
     private print(level: LogLevel, info: string, color: string, callStackInfo: CallStackInfo, ...args: any[]): void {
         if (isShowLog(this.showLog) && !shouldLog(level, this.options)) return
-        print(level, args, this.namespace, info, this.options, color, callStackInfo)
+        print('log', args, color, level, this.namespace, info, this.options, callStackInfo)
     }
 
     /**
@@ -187,8 +189,8 @@ export default class Logger {
      * @param label 时间标签
      * @returns {void}
      */
-    time(label: string): void {
-        console.time(label);
+    time(label: string, color: string): void {
+        print('time', label, color,)
     }
 
     /**
@@ -197,8 +199,8 @@ export default class Logger {
      * @param {string} label - 时间标签
      * @returns {void}
      */
-    timeEnd(label: string): void {
-        console.timeEnd(label);
+    timeEnd(label: string, color: string): void {
+        print('timeEnd', label, color,)
     }
 
 
