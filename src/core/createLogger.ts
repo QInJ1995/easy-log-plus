@@ -8,7 +8,7 @@ import Logger from './Logger';
  * @param {LogOptions} options 日志选项
  * @returns {Logger} 日志实例
  */
-const createLogger = (namespace?: string | null | undefined, options?: LogOptions): Logger => new Logger(namespace, options);
+const createLogger = (namespace?: string | null, options?: LogOptions): Logger => new Logger(namespace, options);
 
 
 export default createLogger;

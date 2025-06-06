@@ -1,6 +1,6 @@
 import { LogLevel, LogOptions, Colors, CallStackInfo } from '../types';
 import { shouldLog, isShowLog, getCallStackInfo, } from '../utils/common';
-import { globals, defaultStyle, setColors, chalkLevel } from '../utils/constant';
+import { globals, defaultStyle, setColors, chalkLevel, setCallStackIndex } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
 
@@ -35,11 +35,11 @@ export default class Logger {
     private showLog: boolean = !globals.process || (globals.process && globals.process.env.NODE_ENV !== 'production') ? true : false;
 
 
-    constructor(namespace: string | null | undefined, options: LogOptions = {}) {
+    constructor(namespace?: string | null, options: LogOptions = {}) {
         chalk.level = chalkLevel;
-        namespace = namespace == null ? 'Easy-Log-Plus' : namespace;
-        this.namespace = namespace as string;
+        this.namespace = namespace == null ? 'Easy-Log-Plus' : namespace;
         options.colors && setColors(options.colors);
+        typeof options.depth === 'number' && setCallStackIndex(options.depth);
         this.options = {
             level: options.level || 'debug',
             isColor: options.isColor ?? true,

@@ -28,14 +28,12 @@ export interface Style {
  * 日志选项
  * @description 日志选项
  * @property {LogLevel} level - 日志级别
- * @property {boolean} isTime - 是否显示时间
  * @property {boolean} isColor - 是否显示颜色
- * @property {boolean} isLevel - 是否显示日志级别
- * @property {boolean} isFileName - 是否显示文件名
- * @property {boolean} isFunctionName - 是否显示函数名
- * @property {boolean} isLineNumber - 是否显示行号
  * @property {boolean} isEmoji - 是否显示emoji
  * @property {Style} style - 日志样式
+ * @property {Colors} colors - 日志颜色
+ * @property {string} formatter - 日志格式
+ * @property {number} depth - 日志深度
  */
 export interface LogOptions {
   level?: LogLevel;
@@ -44,6 +42,7 @@ export interface LogOptions {
   style?: Style,
   colors?: Colors;
   formatter?: string
+  depth?: number;
 }
 
 /**

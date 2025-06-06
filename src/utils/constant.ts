@@ -7,7 +7,8 @@ export const globals: any = getGlobalContext()
 export const chalkLevel = 3
 
 // 调用栈索引
-export const callStackIndex: number = 4
+export let callStackIndex: number = 4
+
 
 // Emoji
 export const emojis: Emojis = {
@@ -44,6 +45,14 @@ export const replaceCharacters: string[] = ['[]', '【】']
  */
 export function setColors(newColors: Colors): void {
     Object.assign(colors, newColors);
+}
+
+/**
+ * 设置调用栈索引
+ * @param depth 
+ */
+export function setCallStackIndex(depth: number): void {
+    callStackIndex = callStackIndex + depth || 0
 }
 
 /**
