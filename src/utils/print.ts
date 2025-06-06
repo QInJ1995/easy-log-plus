@@ -3,6 +3,8 @@ import { LogLevel, LogOptions, CallStackInfo } from '../types/index'
 import { emojis, colors, globals, } from './constant'
 import { getCurrentTimeDate, formatString, removeEmptyBrackets, getLogTrace } from './common'
 
+// https://www.npmjs.com/package/chalk
+
 
 /**
  * 打印日志处理 避免打包被删除
@@ -82,7 +84,9 @@ export function formatLog(
     title = removeEmptyBrackets(title)
     options.isEmoji && (title = `${emojis[level] || emojis.rocket} ${title}`)
     color = options.isColor ? color || colors[level] : '#fff'
-    return [chalk.hex(color!)(title), ...message]
+    // const name = 'Sindre';
+    // console.log(chalk.green('Hello %s'), { a: 1, b: 2 });
+    return [chalk.strikethrough.hex(color!)(title), ...message]
 }
 
 /**
