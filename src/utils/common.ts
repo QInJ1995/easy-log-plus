@@ -105,11 +105,11 @@ function theFileName(): string {
  */
 export function getLogTrace(fileName: string | undefined, functionName: string | undefined, lineNumber: string | undefined): string {
     if (functionName && fileName && lineNumber) {
-        return `${functionName ? functionName + '()' : ''} ${fileName}${lineNumber ? ':' + 'lineNumber' : ''}`
+        return `${functionName ? functionName + '()' : ''} ${fileName}${lineNumber ? ':' + lineNumber : ''}`
     } else if (!functionName && fileName && lineNumber) {
-        return `${fileName}${lineNumber ? ':' + 'lineNumber' : ''}`
+        return `${fileName}${lineNumber ? ':' + lineNumber : ''}`
     } else if (functionName && !fileName && lineNumber) {
-        return `${functionName ? functionName + '()' : ''}${lineNumber ? ':' + 'lineNumber' : ''}`
+        return `${functionName ? functionName + '()' : ''}${lineNumber ? ':' + lineNumber : ''}`
     } else {
         return ''
     }

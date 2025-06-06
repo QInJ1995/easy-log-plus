@@ -27,10 +27,10 @@ export function print(
 ): void {
     switch (type) {
         case 'time':
-            globals['con' + 'sole']['time'](formatInBrowserTime(message as string, color));
+            globals['con' + 'sole']['time'](formatTime(message as string, color));
             break;
         case 'timeEnd':
-            globals['con' + 'sole']['timeEnd'](formatInBrowserTime(message as string, color));
+            globals['con' + 'sole']['timeEnd'](formatTime(message as string, color));
             break;
         default:
             globals['con' + 'sole']['log'](...formatLog(level!, message as [], namespace!, info, options!, color, callStackInfo!));
@@ -47,7 +47,7 @@ export function print(
     // }
 }
 
-function formatInBrowserTime(message: string, color: string | undefined = colors.info): string {
+function formatTime(message: string, color: string | undefined = colors.info): string {
     return chalk.hex(color!)(message)
 }
 
