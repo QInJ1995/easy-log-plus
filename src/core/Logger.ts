@@ -1,5 +1,5 @@
-import { LogLevel, LogOptions, Colors, CallStackInfo } from '../types';
-import { shouldLog, isShowLog, getCallStackInfo, } from '../utils/common';
+import { LogLevel, LogOptions, Colors, PrintOptions, PrintCustomStyle } from '../types';
+import { shouldLog, isShowLog, getCallStackInfo, getPrintCustomStyle } from '../utils/common';
 import { globals, defaultStyle, setColors, chalkLevel, setCallStackIndex } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
@@ -34,6 +34,8 @@ export default class Logger {
      */
     private showLog: boolean = !globals.process || (globals.process && globals.process.env.NODE_ENV !== 'production') ? true : false;
 
+    private printMap: Map<string, any> = new Map();
+
 
     constructor(namespace?: string | null, options: LogOptions = {}) {
         chalk.level = chalkLevel;
@@ -45,22 +47,94 @@ export default class Logger {
             isColor: options.isColor ?? true,
             isEmoji: options.isEmoji ?? true,
             style: options.style ? { ...defaultStyle, ...options.style } : defaultStyle,
-            formatter: options.formatter || '[$namespace$] [$time$] [$level$] [$tracker$] [$info$] ->',
+            formatter: options.formatter || '[$namespace$] [$time$] [$level$] [$tracker$] [$label$] ->',
         };
     }
 
     /**
      * 
      * @param {LogLevel} level 日志级别
-     * @param {string} info 前缀
-     * @param {string} color 日志颜色
+     * @param {string} label 前缀
+     * @param {string | BaseColors} color 日志颜色
      * @param {CallStackInfo} callStackInfo 调用栈信息
      * @param {any[]} args 日志参数
      * @returns {void}
      */
-    private print(level: LogLevel, info: string, color: string, callStackInfo: CallStackInfo, ...args: any[]): void {
+    private print(level: LogLevel, messages: any[], label: string, printCustomStyle: PrintCustomStyle): void {
         if (isShowLog(this.showLog) && !shouldLog(level, this.options)) return
-        print('log', args, color, level, this.namespace, info, this.options, callStackInfo)
+        const callStackInfo = getCallStackInfo()
+        const printOptions: PrintOptions = {
+            level: 'silent',
+            namespace: this.namespace,
+            label,
+            messages,
+            logOptions: this.options,
+            callStackInfo,
+            printCustomStyle
+        }
+        print('log', printOptions)
+    }
+
+    /**
+     * 输出日志自定义颜色
+     * 
+     * @param color 颜色
+     * @returns 
+     */
+    color(color: string): Logger {
+        this.printMap.set('color', color)
+        return this
+    }
+
+    /**
+     * 输出日志自定义信息
+     * 
+     * @param info 信息
+     * @returns 
+     */
+    label(label: string): Logger {
+        this.printMap.set('label', label)
+        return this
+    }
+
+    /**
+     * 输出日志删除线
+     * 
+     * @returns 
+     */
+    strikethrough(): Logger {
+        this.printMap.set('strikethrough', true)
+        return this
+    }
+
+    /**
+     * 输出日志下划线
+     * 
+     * @returns 
+     */
+    underline(): Logger {
+        this.printMap.set('underline', true)
+        return this
+    }
+
+    /**
+     * 输出日志倾斜
+     * 
+     * @returns 
+     */
+    italic(): Logger {
+        this.printMap.set('italic', true)
+        return this
+    }
+
+    /**
+     * 输出日志加粗
+     * 
+     * @returns 
+     */
+    bold(): Logger {
+        this.printMap.set('bold', true)
+        return this
     }
 
     /**
@@ -68,23 +142,29 @@ export default class Logger {
      * @param {any[]} args 日志参数
      * @returns {void | Function}
      */
-    log(...args: any[]): void | Function {
-        const callStackInfo = getCallStackInfo()
-        if (arguments.length === 0) {
-            const _this = this;
-            return function (info: string, ...args: any[]) {
-                if (arguments.length === 0) {
-                    return function (info: string, color: string, ...args: any[]) {
-                        _this.print('silent', info, color, callStackInfo, ...args);
-                    };
-                } else {
-                    _this.print('silent', info, '', callStackInfo, ...args);
-                }
+    log(...args: any[]): Logger {
+        const printCustomStyle = getPrintCustomStyle(this.printMap)
+        const label = this.printMap.get('label')
+        console.log("🚀 ~ Logger ~ log ~ printCustomStyle:", printCustomStyle)
+        console.log("🚀 ~ Logger ~ log ~ deletedMap:", this.printMap)
+        this.printMap.clear()
+        this.print('silent', args,label, printCustomStyle)
+        return this;
+        // if (arguments.length === 0) {
+        //     const _this = this;
+        //     return function (info: string, ...args: any[]) {
+        //         if (arguments.length === 0) {
+        //             return function (info: string, color: string | BaseColors, ...args: any[]) {
+        //                 _this.print('silent', info, color, callStackInfo, ...args);
+        //             };
+        //         } else {
+        //             _this.print('silent', info, '', callStackInfo, ...args);
+        //         }
 
-            };
-        } else {
-            this.print('silent', '', '', callStackInfo, ...args);
-        }
+        //     };
+        // } else {
+        //     this.print('silent', '', '', callStackInfo, ...args);
+        // }
     }
 
     /**
@@ -92,116 +172,116 @@ export default class Logger {
      * @param args debug日志参数
      * @returns {void | Function}
      */
-    debug(...args: any[]): void | Function {
-        const callStackInfo = getCallStackInfo()
-        if (arguments.length === 0) {
-            const _this = this;
-            return function (info: string, ...args: any[]) {
-                if (arguments.length === 0) {
-                    return function (info: string, color: string, ...args: any[]) {
-                        _this.print('debug', info, color, callStackInfo, ...args);
-                    };
-                } else {
-                    _this.print('debug', info, '', callStackInfo, ...args);
-                }
+    // debug(...args: any[]): void | Function {
+    //     const callStackInfo = getCallStackInfo()
+    //     if (arguments.length === 0) {
+    //         const _this = this;
+    //         return function (info: string, ...args: any[]) {
+    //             if (arguments.length === 0) {
+    //                 return function (info: string, color: string, ...args: any[]) {
+    //                     _this.print('debug', info, color, callStackInfo, ...args);
+    //                 };
+    //             } else {
+    //                 _this.print('debug', info, '', callStackInfo, ...args);
+    //             }
 
-            };
-        } else {
-            this.print('debug', '', '', callStackInfo, ...args);
-        }
-    }
+    //         };
+    //     } else {
+    //         this.print('debug', '', '', callStackInfo, ...args);
+    //     }
+    // }
 
-    /**
-     * 
-     * @param args info日志参数
-     * @returns {void | Function}
-     */
-    info(...args: any[]): void | Function {
-        const callStackInfo = getCallStackInfo()
-        if (arguments.length === 0) {
-            const _this = this;
-            return function (info: string, ...args: any[]) {
-                if (arguments.length === 0) {
-                    return function (info: string, color: string, ...args: any[]) {
-                        _this.print('info', info, color, callStackInfo, ...args);
-                    };
-                } else {
-                    _this.print('info', info, '', callStackInfo, ...args);
-                }
+    // /**
+    //  * 
+    //  * @param args info日志参数
+    //  * @returns {void | Function}
+    //  */
+    // info(...args: any[]): void | Function {
+    //     const callStackInfo = getCallStackInfo()
+    //     if (arguments.length === 0) {
+    //         const _this = this;
+    //         return function (info: string, ...args: any[]) {
+    //             if (arguments.length === 0) {
+    //                 return function (info: string, color: string, ...args: any[]) {
+    //                     _this.print('info', info, color, callStackInfo, ...args);
+    //                 };
+    //             } else {
+    //                 _this.print('info', info, '', callStackInfo, ...args);
+    //             }
 
-            };
-        } else {
-            this.print('info', '', '', callStackInfo, ...args);
-        }
-    }
+    //         };
+    //     } else {
+    //         this.print('info', '', '', callStackInfo, ...args);
+    //     }
+    // }
 
-    /**
-     * 
-     * @param args warn日志参数
-     * @returns {void | Function}
-     */
-    warn(...args: any[]): void | Function {
-        const callStackInfo = getCallStackInfo()
-        if (arguments.length === 0) {
-            const _this = this;
-            return function (info: string, ...args: any[]) {
-                if (arguments.length === 0) {
-                    return function (info: string, color: string, ...args: any[]) {
-                        _this.print('warn', info, color, callStackInfo, ...args);
-                    };
-                } else {
-                    _this.print('warn', info, '', callStackInfo, ...args);
-                }
+    // /**
+    //  * 
+    //  * @param args warn日志参数
+    //  * @returns {void | Function}
+    //  */
+    // warn(...args: any[]): void | Function {
+    //     const callStackInfo = getCallStackInfo()
+    //     if (arguments.length === 0) {
+    //         const _this = this;
+    //         return function (info: string, ...args: any[]) {
+    //             if (arguments.length === 0) {
+    //                 return function (info: string, color: string, ...args: any[]) {
+    //                     _this.print('warn', info, color, callStackInfo, ...args);
+    //                 };
+    //             } else {
+    //                 _this.print('warn', info, '', callStackInfo, ...args);
+    //             }
 
-            };
-        } else {
-            this.print('warn', '', '', callStackInfo, ...args);
-        }
-    }
+    //         };
+    //     } else {
+    //         this.print('warn', '', '', callStackInfo, ...args);
+    //     }
+    // }
 
-    /**
-     * 
-     * @param args error日志参数
-     * @returns {void | Function}
-     */
-    error(...args: any[]): void | Function {
-        const callStackInfo = getCallStackInfo()
-        if (arguments.length === 0) {
-            const _this = this;
-            return function (info: string, ...args: any[]) {
-                if (arguments.length === 0) {
-                    return function (info: string, color: string, ...args: any[]) {
-                        _this.print('error', info, color, callStackInfo, ...args);
-                    };
-                } else {
-                    _this.print('error', info, '', callStackInfo, ...args);
-                }
+    // /**
+    //  * 
+    //  * @param args error日志参数
+    //  * @returns {void | Function}
+    //  */
+    // error(...args: any[]): void | Function {
+    //     const callStackInfo = getCallStackInfo()
+    //     if (arguments.length === 0) {
+    //         const _this = this;
+    //         return function (info: string, ...args: any[]) {
+    //             if (arguments.length === 0) {
+    //                 return function (info: string, color: string, ...args: any[]) {
+    //                     _this.print('error', info, color, callStackInfo, ...args);
+    //                 };
+    //             } else {
+    //                 _this.print('error', info, '', callStackInfo, ...args);
+    //             }
 
-            };
-        } else {
-            this.print('error', '', '', callStackInfo, ...args);
-        }
-    }
+    //         };
+    //     } else {
+    //         this.print('error', '', '', callStackInfo, ...args);
+    //     }
+    // }
 
-    /**
-     * 计时
-     * 
-     * @param label 时间标签
-     * @returns {void}
-     */
-    time(label: string, color: string): void {
-        print('time', label, color,)
-    }
+    // /**
+    //  * 计时
+    //  * 
+    //  * @param label 时间标签
+    //  * @returns {void}
+    //  */
+    // time(label: string, color: string): void {
+    //     print('time', label, color,)
+    // }
 
-    /**
-     * 结束计时
-     *
-     * @param {string} label - 时间标签
-     * @returns {void}
-     */
-    timeEnd(label: string, color: string): void {
-        print('timeEnd', label, color,)
-    }
+    // /**
+    //  * 结束计时
+    //  *
+    //  * @param {string} label - 时间标签
+    //  * @returns {void}
+    //  */
+    // timeEnd(label: string, color: string): void {
+    //     print('timeEnd', label, color,)
+    // }
 
 
     /**

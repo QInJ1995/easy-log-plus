@@ -27,6 +27,33 @@ export interface Style {
 /**
  * 日志选项
  * @description 日志选项
+ * @property {string} level - 日志级别
+ * @property {boolean} isColor - 是否启用颜色
+ * @property {boolean} isEmoji - 是否启用表情
+ * @property {Style} style - 日志样式
+ * @property {string} formatter - 日志格式
+ */
+export interface PrintOptions {
+  level: LogLevel;
+  messages: any[];
+  namespace: string;
+  label?: string;
+  logOptions: LogOptions;
+  callStackInfo: CallStackInfo;
+  printCustomStyle: PrintCustomStyle;
+}
+
+export interface PrintCustomStyle {
+  color?: string | BaseColors;
+  bold? : boolean;
+  italic? : boolean;
+  underline? : boolean;
+  strikethrough? : boolean;
+}
+
+/**
+ * 日志选项
+ * @description 日志选项
  * @property {LogLevel} level - 日志级别
  * @property {boolean} isColor - 是否显示颜色
  * @property {boolean} isEmoji - 是否显示emoji
@@ -118,6 +145,34 @@ export interface CallStackInfo {
   lineNumber?: string;
 }
 
+/**
+ * easy-log-vue 插件接口
+ * @interface
+ * @property {Function} install - 安装方法
+ */
 export interface IEasyLogVuePlugin {
   install: (app: any, options?: EasyLogVuePluginOptions) => void;
 }
+
+/**
+ * 基础颜色
+ * @description 基础颜色
+ * @enum {string}
+ * @property {string} black - 黑色
+ * @property {string} red - 红色
+ * @property {string} green - 绿色
+ * @property {string} yellow - 黄色
+ * @property {string} blue - 蓝色
+ * @property {string} magenta - 品红色
+ * @property {string} cyan - 青色
+ * @property {string} white - 白色
+ * @property {string} blackBright - 暗黑色
+ * @property {string} redBright - 亮红色
+ * @property {string} greenBright - 亮绿色
+ * @property {string} yellowBright - 亮黄色
+ * @property {string} blueBright - 亮蓝色
+ * @property {string} magentaBright - 亮品红色
+ * @property {string} cyanBright - 亮青色
+ * @property {string} whiteBright - 亮白色
+ */
+export type BaseColors = 'black' | 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan' | 'white' | 'blackBright' | 'redBright' | 'greenBright' | 'yellowBright' | 'blueBright' | 'magentaBright' | 'cyanBright' | 'whiteBright' 

@@ -1,4 +1,4 @@
-import { LogLevel, LogOptions, CallStackInfo } from '../types/index'
+import { LogLevel, LogOptions, CallStackInfo, PrintCustomStyle } from '../types/index'
 import { globals, callStackIndex } from './constant'
 
 
@@ -28,9 +28,9 @@ export function getCurrentTimeDate(): string {
  * @param {LogOptions} options - 日志选项
  * @returns {boolean} - 如果日志级别应该被记录，则返回true，否则返回false
  */
-export function shouldLog(level: LogLevel, options: LogOptions): boolean {
+export function shouldLog(level?: LogLevel, options?: LogOptions): boolean {
     const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    return level === 'silent' ? true : levels.indexOf(level) >= levels.indexOf(options.level || 'info');
+    return !level || level === 'silent' ? true : levels.indexOf(level) >= levels.indexOf(options?.level || 'debug');
 }
 
 /**
@@ -172,6 +172,58 @@ export function removeEmptyBrackets(str: string): string {
     // 正则表达式匹配空的方括号或包含占位符的方括号
     return str.replace(/\[\s*\]|【\s*】/g, '').replace(/\s+/g, ' ').trim();
 }
+
+
+/**
+ * 获取自定义打印样式
+ * @param {Map<string, any>} printMap - 打印样式映射表
+ * @returns {PrintCustomStyle} - 打印样式对象
+ */
+export function getPrintCustomStyle(printMap: Map<string, any>): PrintCustomStyle {
+    return {
+        color: printMap.get('color'),
+        bold: printMap.get('bold'),
+        italic: printMap.get('italic'),
+        underline: printMap.get('underline'),
+        strikethrough: printMap.get('strikethrough'),
+    }
+ }
+
+
+/**
+ * 从 Map 中删除指定 key 及其前面插入的所有键值对，并返回包含这些数据的新 Map
+ *
+ * @param map - 原始 Map
+ * @param targetKey - 要匹配的目标 key
+ * @returns {Map<K, V>} - 包含被删除数据的新 Map
+ */
+export function extractAndRemoveUpToKey<K, V>(map: Map<K, V>, targetKey: K): Map<K, V> {
+    const deletedEntries = new Map<K, V>();
+    const keys = map.keys();
+    let currentKey: IteratorResult<K>;
+    let found = false;
+
+    while ((currentKey = keys.next()) && !currentKey.done) {
+        const key = currentKey.value;
+        const value = map.get(key)!;
+        deletedEntries.set(key, value);
+
+        if (key === targetKey) {
+            found = true;
+            break;
+        }
+    }
+
+    // 如果找到了目标 key，才执行删除操作
+    if (found) {
+        for (const key of deletedEntries.keys()) {
+            map.delete(key);
+        }
+    }
+
+    return deletedEntries;
+}
+
 
 // 定义全局变量 currentStack 以获取当前调用栈信息
 Object.defineProperty(globals, 'currentStack', {

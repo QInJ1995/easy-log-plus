@@ -7,7 +7,7 @@ export const globals: any = getGlobalContext()
 export const chalkLevel = 3
 
 // 调用栈索引
-export let callStackIndex: number = 4
+export let callStackIndex: number = 5
 
 
 // Emoji
