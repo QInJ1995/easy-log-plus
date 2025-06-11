@@ -11,42 +11,47 @@
 <body>
     <script>
 
-        const { createLogger } = window.EasyLogPlus
+        const { createLogger, envs } = window.EasyLogPlus
+        // envs.prod = '1111'
 
         const logger2 = createLogger('aaaa', {
             level: 'debug',
-            formatter: '$namespace$ | [$time$] [$level$] [$tracker$] $info$ ->',
+            formatter: '$namespace$ | [$time$] [$level$] [$tracker$] $label$',
             style: {
-                // fontSize: 28,
-                // fontWeight: 900,
-                // padding: '50px 0 10px 0'
-            },
-            // isColor: false,
+                // color: 'red',
+                // bgColor: 'blue',
+                // bold: true,
+                // italic: true,
+                // underline: true,
+                // overline: true,
+                // strikethrough: true,
+                // dim: true,
+                // inverse: true,
+            }
+            // env: envs.prod
         })
         const logger3 = createLogger()
         const logger = createLogger('hit-emr', {
             level: 'debug',
-            // isColor: false,
         })
-        logger2.color('red').label('info1').log(111)
-        logger2.color('blue').label('info2').log(222)
-        // logger.time('test')
-        // logger3.log('log', 'blue', 'hello world2')
-        // logger.log()()('log', 'blue', 'hello world')
-        // logger2.log(111)
-        // logger2.log()('测试', 222)
-        // logger.debug('debug', 'dads', {}, 111, true)
-        // logger.info()('打印信息', 1, 2)
-        // logger.info()()('打印信息2', 'red', 2, 4)
-        // logger.warn('warn')
-        // logger.error('error', 111, 'sdasdasd')
-        // logger.error('a->', { a: 1, b: { c: 2 } }, [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }])
-        // logger.timeEnd('test')
+        logger2.color('red').label('info1').bgColor('green').log(111)
+        // logger2.color('blue').label('info2').log(45454222)
+        logger2.log(222)
+        logger2.bold.italic.underline.strikethrough.color('green').label('info3').log(333)
+        function qqqq() {
+            logger2.bold.italic.underline.strikethrough.color('#FFA500').label('打印信息wwwwww').log('wwwwwwwwwwwwwwwww')
+        }
+        qqqq()
 
-        // function qqqq() {
-        //     logger.info()()('打印信息wwwwww', '#FFA500', 'wwwwwwwwwwwwwwwww') 
-        // }
-        // qqqq()
+        logger.label('测试').time('test')
+        logger.debug('debug', 'dads', {}, 111, true)
+        logger.info('打印信息', 1, 2)
+        logger.warn('warn')
+        logger.error('error', 111, 'sdasdasd')
+        logger.error('aaaa', { a: 1, b: { c: 2 } }, [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }])
+        logger.label('测试').timeEnd('test')
+
+
     </script>
 </body>
 

@@ -37,7 +37,7 @@ const install = (
 };
 
 // 插件对象
-const EasyLogVuePlugin: IEasyLogVuePlugin = {
+const EasyLogVuePlugin: Readonly<IEasyLogVuePlugin> = {
     install
 };
 

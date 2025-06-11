@@ -1,4 +1,4 @@
-import { Colors, Emojis, Style, } from '../types/index'
+import { Colors, Emojis, } from '../types/index'
 
 // 全局对象
 export const globals: any = getGlobalContext()
@@ -9,6 +9,8 @@ export const chalkLevel = 3
 // 调用栈索引
 export let callStackIndex: number = 5
 
+// 环境
+export const envs: Readonly<{ dev: string, prod: string, test: string }> = { dev: 'development', prod: 'production', test: 'test' }
 
 // Emoji
 export const emojis: Emojis = {
@@ -18,13 +20,8 @@ export const emojis: Emojis = {
     error: '❌',
     rocket: '🚀',
     success: '✅',
-};
-
-// 默认样式
-export const defaultStyle: Style = {
-    padding: '5px',
-    fontWeight: 500,
-    fontSize: 12,
+    clock: '⏱️',
+    new: '✨',
 };
 
 // 日志level颜色

@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { LogLevel, LogOptions, CallStackInfo, PrintCustomStyle } from '../types/index'
 import { globals, callStackIndex } from './constant'
 
@@ -42,16 +43,13 @@ export const isShowLog = function (showLog: boolean,): boolean {
     if (isBrowser()) {
         if (!showLog) {
             let curWindow = globals
-            while (!curWindow.showLog && curWindow !== curWindow.parent) {
+            while (curWindow && !curWindow.showLog && curWindow !== curWindow.parent) {
                 curWindow = curWindow.parent
             }
-            return curWindow.showLog
-        } else {
-            return showLog
+            return curWindow?.showLog ?? showLog
         }
-    } else {
-        return true
     }
+    return showLog
 }
 
 /**
@@ -78,25 +76,6 @@ export function getCallStackInfo(): CallStackInfo {
 }
 
 /**
- * 获取当前文件名
- * @returns {string} - 返回当前文件名
- */
-function theFileName(): string {
-    // 获取调用栈信息中的文件名
-    if (!globals.currentStack || !globals.currentStack.length) return ''
-    let filePath = null
-    let curCallStackIndex: number = callStackIndex
-    while (!filePath && curCallStackIndex < globals.currentStack.length) {
-        filePath = globals.currentStack[curCallStackIndex]?.getFileName();
-        curCallStackIndex++
-    }
-    if (!filePath) return ''
-    const filePathArray = filePath.split('/');
-    const simpleFileName = filePathArray[filePathArray.length - 1];
-    return simpleFileName || '';
-}
-
-/**
  * 获取日志追踪信息
  * @param {string} fileName - 文件名
  * @param {string} functionName - 函数名
@@ -113,6 +92,25 @@ export function getLogTrace(fileName: string | undefined, functionName: string |
     } else {
         return ''
     }
+}
+
+/**
+ * 获取当前文件名
+ * @returns {string} - 返回当前文件名
+ */
+function theFileName(): string {
+    // 获取调用栈信息中的文件名
+    if (!globals.currentStack || !globals.currentStack.length) return ''
+    let filePath = null
+    let curCallStackIndex: number = callStackIndex
+    while (!filePath && curCallStackIndex < globals.currentStack.length) {
+        filePath = globals.currentStack[curCallStackIndex]?.getFileName();
+        curCallStackIndex++
+    }
+    if (!filePath) return ''
+    const filePathArray = filePath.split('/');
+    const simpleFileName = filePathArray[filePathArray.length - 1];
+    return simpleFileName || '';
 }
 
 /**
@@ -182,46 +180,77 @@ export function removeEmptyBrackets(str: string): string {
 export function getPrintCustomStyle(printMap: Map<string, any>): PrintCustomStyle {
     return {
         color: printMap.get('color'),
+        bgColor: printMap.get('bgColor'),
         bold: printMap.get('bold'),
         italic: printMap.get('italic'),
         underline: printMap.get('underline'),
+        overline: printMap.get('overline'),
         strikethrough: printMap.get('strikethrough'),
+        dim: printMap.get('dim'),
+        inverse: printMap.get('inverse'),
+        reset: printMap.get('reset'),
     }
- }
+}
 
 
 /**
- * 从 Map 中删除指定 key 及其前面插入的所有键值对，并返回包含这些数据的新 Map
- *
- * @param map - 原始 Map
- * @param targetKey - 要匹配的目标 key
- * @returns {Map<K, V>} - 包含被删除数据的新 Map
+ * 获取 chalk 实例
+ * @param {PrintCustomStyle} printCustomStyle - 打印样式对象
+ * @returns {Function} - chalk 实例
  */
-export function extractAndRemoveUpToKey<K, V>(map: Map<K, V>, targetKey: K): Map<K, V> {
-    const deletedEntries = new Map<K, V>();
-    const keys = map.keys();
-    let currentKey: IteratorResult<K>;
-    let found = false;
-
-    while ((currentKey = keys.next()) && !currentKey.done) {
-        const key = currentKey.value;
-        const value = map.get(key)!;
-        deletedEntries.set(key, value);
-
-        if (key === targetKey) {
-            found = true;
-            break;
+export function getChalk(printCustomStyle: PrintCustomStyle): Function {
+    return Object.entries(printCustomStyle).reduce((acc, cur) => {
+        let [key, value] = cur
+        const isColor = ['color', 'bgColor'].includes(key)
+        const curKey = isColor ? capitalizeFirstLetter(value, false) : key
+        if (value) {
+            if (Reflect.has(acc, curKey)) {
+                if (key === 'bgColor') {
+                    return Reflect.get(acc, 'bg' + capitalizeFirstLetter(curKey))
+                }
+                return Reflect.get(acc, curKey)
+            } else {
+                if (isColor) {
+                    switch (key) {
+                        case 'color':
+                            return acc.hex(value)
+                        default:
+                            return acc.bgHex(value)
+                    }
+                }
+            }
         }
-    }
+        return acc
+    }, chalk.reset)
+}
 
-    // 如果找到了目标 key，才执行删除操作
-    if (found) {
-        for (const key of deletedEntries.keys()) {
-            map.delete(key);
+/**
+ * 合并对象
+ * @param target
+ * @param source
+ * @returns
+ */
+export function mergeObjects<T extends object, U extends object>(target: T, source: U): T & U {
+    return Object.entries(source).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+            (acc as any)[key] = value;
         }
-    }
+        return acc;
+    }, { ...target }) as T & U;
+}
 
-    return deletedEntries;
+/**
+ * 将字符串的首字母转为大写或小写
+ * @param {string} str - 输入字符串
+ * @param {boolean} isUpperCase - 是否转为大写，默认 true
+ * @returns {string} 首字母处理后的字符串
+ */
+function capitalizeFirstLetter(str: string, isUpperCase: boolean = true): string {
+    if (!str) return str; // 处理空字符串
+    const firstChar = isUpperCase
+        ? str.charAt(0).toUpperCase()
+        : str.charAt(0).toLowerCase();
+    return firstChar + str.slice(1);
 }
 
 

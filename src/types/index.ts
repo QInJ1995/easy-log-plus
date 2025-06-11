@@ -12,43 +12,50 @@
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent';
 
 /**
- * 颜色配置
- * @description 颜色配置
- * @property {string} padding - 边距
- * @property {number} fontSize - 字体大小
- * @property {'normal' | 'bold' | 'lighter' | 'bolder' | number} fontWeight - 字体粗细
- */
-export interface Style {
-  padding?: string;
-  fontWeight?: 'normal' | 'bold' | 'lighter' | 'bolder' | number;
-  fontSize?: number;
-}
-
-/**
- * 日志选项
- * @description 日志选项
- * @property {string} level - 日志级别
- * @property {boolean} isColor - 是否启用颜色
- * @property {boolean} isEmoji - 是否启用表情
- * @property {Style} style - 日志样式
- * @property {string} formatter - 日志格式
+ * 打印选项
+ * @description 打印选项
+ * @property {LogLevel} level - 日志等级
+ * @property {any[]} messages - 日志消息
+ * @property {string} label - 标签
+ * @property {string} namespace - 命名空间
+ * @property {LogOptions} logOptions - 日志配置
+ * @property {CallStackInfo} callStackInfo - 调用栈信息
+ * @property {PrintCustomStyle} printCustomStyle - 打印自定义样式
  */
 export interface PrintOptions {
-  level: LogLevel;
+  level?: LogLevel;
   messages: any[];
-  namespace: string;
+  namespace?: string;
   label?: string;
   logOptions: LogOptions;
   callStackInfo: CallStackInfo;
   printCustomStyle: PrintCustomStyle;
 }
 
+/**
+ * @typedef {Object} PrintCustomStyle - 日志样式
+ * @property {string} [color] - 日志颜色
+ * @property {string} [bgColor] - 日志背景颜色
+ * @property {boolean} [bold] - 是否加粗
+ * @property {boolean} [italic] - 是否斜体
+ * @property {boolean} [underline] - 是否下划线
+ * @property {boolean} [strikethrough] - 是否删除线
+ * @property {boolean} [reset] - 是否重置样式
+ * @property {boolean} [overline] - 是否上划线 不支持浏览器
+ * @property {boolean} [dim] - 是否变暗 不支持浏览器 
+ * @property {boolean} [inverse] - 是否反转颜色 不支持浏览器
+ */
 export interface PrintCustomStyle {
   color?: string | BaseColors;
-  bold? : boolean;
-  italic? : boolean;
-  underline? : boolean;
-  strikethrough? : boolean;
+  bgColor?: string | BaseColors;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  overline?: boolean;
+  strikethrough?: boolean;
+  dim?: boolean;
+  inverse?: boolean;
+  reset?: boolean;
 }
 
 /**
@@ -57,19 +64,42 @@ export interface PrintCustomStyle {
  * @property {LogLevel} level - 日志级别
  * @property {boolean} isColor - 是否显示颜色
  * @property {boolean} isEmoji - 是否显示emoji
- * @property {Style} style - 日志样式
+ * @property {
+ * * @property {string} [style.bgColor] - 日志背景颜色
+ * * @property {boolean} [style.bold] - 是否显示粗体
+ * * @property {boolean} [style.italic] - 是否显示斜体
+ * * @property {boolean} [style.underline] - 是否显示下划线
+ * * @property {boolean} [style.overline] - 是否显示上划线 不支持浏览器
+ * * @property {boolean} [style.strikethrough] - 是否显示删除线
+ * * @property {string} [style.color] - 日志颜色
+ * * @property {string} [style.dim] - 是否变暗 不支持浏览器
+ * * @property {string} [style.reset] - 重置样式
+ * * @property {string} [style.inverse] - 反转颜色 不支持浏览器
+ * } style - 日志样式
  * @property {Colors} colors - 日志颜色
  * @property {string} formatter - 日志格式
  * @property {number} depth - 日志深度
+ * @property {string} env - 环境变量(默认：development)
  */
 export interface LogOptions {
   level?: LogLevel;
   isColor?: boolean
   isEmoji?: boolean;
-  style?: Style,
+  style?: {
+    color?: string | BaseColors;
+    bgColor?: string | BaseColors;
+    bold?: boolean;
+    italic?: boolean;
+    underline?: boolean;
+    overline?: boolean;
+    strikethrough?: boolean;
+    dim?: boolean;
+    inverse?: boolean;
+  },
   colors?: Colors;
   formatter?: string
   depth?: number;
+  env?: 'development' | 'production' | 'test'
 }
 
 /**
@@ -106,6 +136,8 @@ export interface Emojis {
   silent?: string;
   rocket?: string;
   success?: string;
+  clock?: string;
+  new?: string;
 }
 
 /**
@@ -114,7 +146,6 @@ export interface Emojis {
  * @property {boolean} isWindow - 日志颜色
  * @property {boolean} isVue - 是否显示时间
  * @property {boolean} isProvide - 是否显示颜色
- * @property {boolean} enabled - emoji
  * @property {LogLevel} level - 日志级别
  * @property {boolean} isTime - 是否显示时间
  * @property {boolean} isColor - 是否显示颜色

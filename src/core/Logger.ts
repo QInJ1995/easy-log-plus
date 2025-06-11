@@ -1,6 +1,6 @@
-import { LogLevel, LogOptions, Colors, PrintOptions, PrintCustomStyle } from '../types';
-import { shouldLog, isShowLog, getCallStackInfo, getPrintCustomStyle } from '../utils/common';
-import { globals, defaultStyle, setColors, chalkLevel, setCallStackIndex } from '../utils/constant';
+import { LogLevel, LogOptions, Colors, PrintOptions, } from '../types';
+import { shouldLog, isShowLog, getCallStackInfo, getPrintCustomStyle, mergeObjects } from '../utils/common';
+import { envs, setColors, chalkLevel, setCallStackIndex } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
 
@@ -32,47 +32,61 @@ export default class Logger {
      *
      * @type {boolean}
      */
-    private showLog: boolean = !globals.process || (globals.process && globals.process.env.NODE_ENV !== 'production') ? true : false;
+    private showLog: boolean = true;
 
     private printMap: Map<string, any> = new Map();
 
 
     constructor(namespace?: string | null, options: LogOptions = {}) {
         chalk.level = chalkLevel;
-        this.namespace = namespace == null ? 'Easy-Log-Plus' : namespace;
+        this.namespace = namespace ?? 'Easy-Log-Plus';
         options.colors && setColors(options.colors);
+        this.showLog = options.env !== envs.prod ? true : false;
         typeof options.depth === 'number' && setCallStackIndex(options.depth);
         this.options = {
             level: options.level || 'debug',
             isColor: options.isColor ?? true,
             isEmoji: options.isEmoji ?? true,
-            style: options.style ? { ...defaultStyle, ...options.style } : defaultStyle,
-            formatter: options.formatter || '[$namespace$] [$time$] [$level$] [$tracker$] [$label$] ->',
+            style: options.style ?? {},
+            formatter: options.formatter || '[$namespace$] [$time$] [$level$] [$tracker$] [$label$]',
         };
     }
 
     /**
      * 
+     * @param {any[]} messages 日志参数
      * @param {LogLevel} level 日志级别
-     * @param {string} label 前缀
-     * @param {string | BaseColors} color 日志颜色
-     * @param {CallStackInfo} callStackInfo 调用栈信息
-     * @param {any[]} args 日志参数
      * @returns {void}
      */
-    private print(level: LogLevel, messages: any[], label: string, printCustomStyle: PrintCustomStyle): void {
-        if (isShowLog(this.showLog) && !shouldLog(level, this.options)) return
+    private print(type: string, level: LogLevel, messages?: any[],): void {
+        if (!isShowLog(this.showLog)) return
+        const printCustomStyle = mergeObjects(this.options.style!, getPrintCustomStyle(this.printMap))
+        const label = this.printMap.get('label')
         const callStackInfo = getCallStackInfo()
         const printOptions: PrintOptions = {
-            level: 'silent',
+            level,
             namespace: this.namespace,
             label,
-            messages,
+            messages: messages || [],
             logOptions: this.options,
             callStackInfo,
             printCustomStyle
         }
-        print('log', printOptions)
+        this.printMap.clear()
+        switch (type) {
+            case 'log':
+                if (!shouldLog(level, this.options)) return
+                print('log', printOptions)
+                break;
+            case 'time':
+                print('time', printOptions)
+                break;
+            case 'timeEnd':
+                print('timeEnd', printOptions)
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -83,6 +97,17 @@ export default class Logger {
      */
     color(color: string): Logger {
         this.printMap.set('color', color)
+        return this
+    }
+
+    /**
+     * 输出日志背景颜色
+     * 
+     * @param color 颜色
+     * @returns 
+     */
+    bgColor(color: string): Logger {
+        this.printMap.set('bgColor', color)
         return this
     }
 
@@ -102,7 +127,7 @@ export default class Logger {
      * 
      * @returns 
      */
-    strikethrough(): Logger {
+    get strikethrough(): Logger {
         this.printMap.set('strikethrough', true)
         return this
     }
@@ -112,8 +137,18 @@ export default class Logger {
      * 
      * @returns 
      */
-    underline(): Logger {
+    get underline(): Logger {
         this.printMap.set('underline', true)
+        return this
+    }
+
+    /**
+     * 输出日志上划线
+     * 
+     * @returns 
+     */
+    get overline(): Logger {
+        this.printMap.set('overline', true)
         return this
     }
 
@@ -122,7 +157,7 @@ export default class Logger {
      * 
      * @returns 
      */
-    italic(): Logger {
+    get italic(): Logger {
         this.printMap.set('italic', true)
         return this
     }
@@ -132,8 +167,37 @@ export default class Logger {
      * 
      * @returns 
      */
-    bold(): Logger {
+    get bold(): Logger {
         this.printMap.set('bold', true)
+        return this
+    }
+
+    /**
+     * 输出日志文本的不透明度降低
+     * 
+     * @returns 
+     */
+    get dim(): Logger {
+        this.printMap.set('dim', true)
+        return this
+    }
+    /**
+    * 输出日志文本反转颜色
+    * 
+    * @returns 
+    */
+    get inverse(): Logger {
+        this.printMap.set('inverse', true)
+        return this
+    }
+
+    /**
+     * 输出日志文本重置样式
+     * 
+     * @returns 
+     */
+    get reset(): Logger {
+        this.printMap.set('reset', true)
         return this
     }
 
@@ -143,145 +207,69 @@ export default class Logger {
      * @returns {void | Function}
      */
     log(...args: any[]): Logger {
-        const printCustomStyle = getPrintCustomStyle(this.printMap)
-        const label = this.printMap.get('label')
-        console.log("🚀 ~ Logger ~ log ~ printCustomStyle:", printCustomStyle)
-        console.log("🚀 ~ Logger ~ log ~ deletedMap:", this.printMap)
-        this.printMap.clear()
-        this.print('silent', args,label, printCustomStyle)
+        this.print('log', 'silent', args,)
         return this;
-        // if (arguments.length === 0) {
-        //     const _this = this;
-        //     return function (info: string, ...args: any[]) {
-        //         if (arguments.length === 0) {
-        //             return function (info: string, color: string | BaseColors, ...args: any[]) {
-        //                 _this.print('silent', info, color, callStackInfo, ...args);
-        //             };
-        //         } else {
-        //             _this.print('silent', info, '', callStackInfo, ...args);
-        //         }
-
-        //     };
-        // } else {
-        //     this.print('silent', '', '', callStackInfo, ...args);
-        // }
     }
 
     /**
      * 
      * @param args debug日志参数
-     * @returns {void | Function}
+     * @returns {Logger}
      */
-    // debug(...args: any[]): void | Function {
-    //     const callStackInfo = getCallStackInfo()
-    //     if (arguments.length === 0) {
-    //         const _this = this;
-    //         return function (info: string, ...args: any[]) {
-    //             if (arguments.length === 0) {
-    //                 return function (info: string, color: string, ...args: any[]) {
-    //                     _this.print('debug', info, color, callStackInfo, ...args);
-    //                 };
-    //             } else {
-    //                 _this.print('debug', info, '', callStackInfo, ...args);
-    //             }
+    debug(...args: any[]): Logger {
+        this.print('log', 'debug', args,)
+        return this;
+    }
 
-    //         };
-    //     } else {
-    //         this.print('debug', '', '', callStackInfo, ...args);
-    //     }
-    // }
+    /**
+     * 
+     * @param args info日志参数
+     * @returns {Logger}
+     */
+    info(...args: any[]): Logger {
+        this.print('log', 'info', args,)
+        return this;
+    }
 
-    // /**
-    //  * 
-    //  * @param args info日志参数
-    //  * @returns {void | Function}
-    //  */
-    // info(...args: any[]): void | Function {
-    //     const callStackInfo = getCallStackInfo()
-    //     if (arguments.length === 0) {
-    //         const _this = this;
-    //         return function (info: string, ...args: any[]) {
-    //             if (arguments.length === 0) {
-    //                 return function (info: string, color: string, ...args: any[]) {
-    //                     _this.print('info', info, color, callStackInfo, ...args);
-    //                 };
-    //             } else {
-    //                 _this.print('info', info, '', callStackInfo, ...args);
-    //             }
+    /**
+     * 
+     * @param args warn日志参数
+     * @returns {Logger}
+     */
+    warn(...args: any[]): Logger {
+        this.print('log', 'warn', args,)
+        return this;
+    }
 
-    //         };
-    //     } else {
-    //         this.print('info', '', '', callStackInfo, ...args);
-    //     }
-    // }
+    /**
+     * 
+     * @param args error日志参数
+     * @returns {Logger}
+     */
+    error(...args: any[]): Logger {
+        this.print('log', 'error', args,)
+        return this;
+    }
 
-    // /**
-    //  * 
-    //  * @param args warn日志参数
-    //  * @returns {void | Function}
-    //  */
-    // warn(...args: any[]): void | Function {
-    //     const callStackInfo = getCallStackInfo()
-    //     if (arguments.length === 0) {
-    //         const _this = this;
-    //         return function (info: string, ...args: any[]) {
-    //             if (arguments.length === 0) {
-    //                 return function (info: string, color: string, ...args: any[]) {
-    //                     _this.print('warn', info, color, callStackInfo, ...args);
-    //                 };
-    //             } else {
-    //                 _this.print('warn', info, '', callStackInfo, ...args);
-    //             }
+    /**
+     * 计时
+     * 
+     * @returns {Logger}
+     */
+    time(): Logger {
+        this.print('time', 'silent',)
+        return this;
+    }
 
-    //         };
-    //     } else {
-    //         this.print('warn', '', '', callStackInfo, ...args);
-    //     }
-    // }
-
-    // /**
-    //  * 
-    //  * @param args error日志参数
-    //  * @returns {void | Function}
-    //  */
-    // error(...args: any[]): void | Function {
-    //     const callStackInfo = getCallStackInfo()
-    //     if (arguments.length === 0) {
-    //         const _this = this;
-    //         return function (info: string, ...args: any[]) {
-    //             if (arguments.length === 0) {
-    //                 return function (info: string, color: string, ...args: any[]) {
-    //                     _this.print('error', info, color, callStackInfo, ...args);
-    //                 };
-    //             } else {
-    //                 _this.print('error', info, '', callStackInfo, ...args);
-    //             }
-
-    //         };
-    //     } else {
-    //         this.print('error', '', '', callStackInfo, ...args);
-    //     }
-    // }
-
-    // /**
-    //  * 计时
-    //  * 
-    //  * @param label 时间标签
-    //  * @returns {void}
-    //  */
-    // time(label: string, color: string): void {
-    //     print('time', label, color,)
-    // }
-
-    // /**
-    //  * 结束计时
-    //  *
-    //  * @param {string} label - 时间标签
-    //  * @returns {void}
-    //  */
-    // timeEnd(label: string, color: string): void {
-    //     print('timeEnd', label, color,)
-    // }
+    /**
+     * 结束计时
+     *
+     * @returns {Logger}
+     */
+    timeEnd(): Logger {
+        this.print('timeEnd', 'silent',)
+        return this;
+    }
 
 
     /**
