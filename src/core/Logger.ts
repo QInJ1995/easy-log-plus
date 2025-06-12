@@ -34,8 +34,12 @@ export default class Logger {
      */
     private showLog: boolean = true;
 
+    /**
+     * 存储打印样式的 Map 对象
+     *
+     * @type {Map<string, any>}
+     */
     private printMap: Map<string, any> = new Map();
-
 
     constructor(namespace?: string | null, options: LogOptions = {}) {
         chalk.level = chalkLevel;
@@ -206,9 +210,8 @@ export default class Logger {
      * @param {any[]} args 日志参数
      * @returns {void | Function}
      */
-    log(...args: any[]): Logger {
+    log(...args: any[]): void {
         this.print('log', 'silent', args,)
-        return this;
     }
 
     /**
@@ -216,9 +219,8 @@ export default class Logger {
      * @param args debug日志参数
      * @returns {Logger}
      */
-    debug(...args: any[]): Logger {
+    debug(...args: any[]): void {
         this.print('log', 'debug', args,)
-        return this;
     }
 
     /**
@@ -226,9 +228,8 @@ export default class Logger {
      * @param args info日志参数
      * @returns {Logger}
      */
-    info(...args: any[]): Logger {
+    info(...args: any[]): void {
         this.print('log', 'info', args,)
-        return this;
     }
 
     /**
@@ -236,9 +237,8 @@ export default class Logger {
      * @param args warn日志参数
      * @returns {Logger}
      */
-    warn(...args: any[]): Logger {
+    warn(...args: any[]): void {
         this.print('log', 'warn', args,)
-        return this;
     }
 
     /**
@@ -246,9 +246,8 @@ export default class Logger {
      * @param args error日志参数
      * @returns {Logger}
      */
-    error(...args: any[]): Logger {
+    error(...args: any[]): void {
         this.print('log', 'error', args,)
-        return this;
     }
 
     /**
@@ -256,9 +255,8 @@ export default class Logger {
      * 
      * @returns {Logger}
      */
-    time(): Logger {
+    time(): void {
         this.print('time', 'silent',)
-        return this;
     }
 
     /**
@@ -266,9 +264,8 @@ export default class Logger {
      *
      * @returns {Logger}
      */
-    timeEnd(): Logger {
+    timeEnd(): void {
         this.print('timeEnd', 'silent',)
-        return this;
     }
 
 
