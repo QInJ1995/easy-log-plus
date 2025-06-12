@@ -24,12 +24,47 @@ export async function print(
         case 'image':
             globals['con' + 'sole']['log'](...(await formatImage(options)));
             break;
+        case 'table':
+            const { table, groupCollapsed } = formatTable(options)
+            globals['con' + 'sole']['groupCollapsed'](groupCollapsed);
+            globals['con' + 'sole']['table'](table);
+            globals['con' + 'sole']['groupEnd']();
+            break;
         default:
             globals['con' + 'sole']['log'](...formatLog(options));
             break;
     }
 }
 
+/**
+ * 格式化表格打印
+ * @param options
+ * @returns
+ */
+function formatTable(options: PrintOptions) {
+    let { level, messages, namespace, label, logOptions, callStackInfo, printCustomStyle } = options;
+    const table = messages[0] ?? {}
+    let color = printCustomStyle.color
+    let title = formatString(logOptions.formatter!, {
+        namespace: namespace || '',
+        time: getCurrentTimeDate(),
+        level: level !== 'silent' ? `${level!.toUpperCase()}` : '',
+        tracker: getLogTrace(callStackInfo.fileName, callStackInfo.functionName, callStackInfo.lineNumber) || '',
+        label: label || '',
+    })
+    title = removeEmptyBrackets(title)
+    logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis.down}`)
+    title = `${title}`
+    color = logOptions.isColor ? color || colors[level!] : '#fff'
+    printCustomStyle.color = color
+    return { table, groupCollapsed: getChalk(printCustomStyle)(title) }
+}
+
+/**
+ * 格式化图片打印
+ * @param options
+ * @returns
+ */
 function formatImage(options: PrintOptions): Promise<any[]> {
     return new Promise((resolve) => {
         const { messages, label, logOptions, namespace, level, callStackInfo, printCustomStyle } = options
@@ -85,7 +120,7 @@ function formatImage(options: PrintOptions): Promise<any[]> {
 }
 
 /**
- * 格式化输出时间
+ * 格式化时间打印
  * @param options
  * @returns string
  */
@@ -109,7 +144,7 @@ function formatTime(options: PrintOptions): string {
 
 
 /**
- * 格式化日志消息
+ * 格式化常用日志打印
  * @param {PrintOptions} options 日志参数
  * @param options.level 日志级别
  * @param options.messages 日志消息

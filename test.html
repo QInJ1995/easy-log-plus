@@ -34,6 +34,7 @@
         const logger = createLogger('hit-emr', {
             level: 'debug',
         })
+        logger2.table([1,2])
         // logger2.image('https://lsky-pro.smartideahub.site:2083/qls/image-20210724174717647.png')
         logger2.label('图片').image('https://img2.baidu.com/it/u=2814429148,2262424695&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1730998800&t=e60940f39f2a1e0cf5e65c6df7b0227a',)
         logger2.color('red').label('info1').bgColor('green').log(111)

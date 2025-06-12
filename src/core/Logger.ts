@@ -78,10 +78,6 @@ export default class Logger {
         }
         this.printMap.clear()
         switch (type) {
-            case 'log':
-                if (!shouldLog(level, this.options)) return
-                print('log', printOptions)
-                break;
             case 'time':
                 print('time', printOptions)
                 break;
@@ -91,7 +87,12 @@ export default class Logger {
             case 'image':
                 print('image', printOptions)
                 break;
+            case 'table':
+                print('table', printOptions)
+                break;
             default:
+                if (!shouldLog(level, this.options)) return
+                print('log', printOptions)
                 break;
         }
     }
@@ -285,6 +286,16 @@ export default class Logger {
      */
     image(url: string, scale: number = 0.1): void {
         this.print('image', 'silent', [{ url, scale }])
+    }
+
+    /**
+     * 表格日志
+     *
+     * @param {Object | Array<any>} obj - 需要打印的对象或数组
+     * @returns {void}
+     */
+    table(obj: Object | Array<any>): void {
+        this.print('table', 'silent', [obj])
     }
 
     /**
