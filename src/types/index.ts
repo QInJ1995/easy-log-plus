@@ -138,6 +138,7 @@ export interface Emojis {
   success?: string;
   clock?: string;
   new?: string;
+  image?: string;
 }
 
 /**

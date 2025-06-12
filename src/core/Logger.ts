@@ -1,5 +1,5 @@
 import { LogLevel, LogOptions, Colors, PrintOptions, } from '../types';
-import { shouldLog, isShowLog, getCallStackInfo, getPrintCustomStyle, mergeObjects } from '../utils/common';
+import { shouldLog, isShowLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, } from '../utils/common';
 import { envs, setColors, chalkLevel, setCallStackIndex } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
@@ -87,6 +87,9 @@ export default class Logger {
                 break;
             case 'timeEnd':
                 print('timeEnd', printOptions)
+                break;
+            case 'image':
+                print('image', printOptions)
                 break;
             default:
                 break;
@@ -181,7 +184,7 @@ export default class Logger {
      * 
      * @returns 
      */
-    get dim(): Logger {
+    dim(): Logger {
         this.printMap.set('dim', true)
         return this
     }
@@ -206,7 +209,8 @@ export default class Logger {
     }
 
     /**
-     * 输出日志
+     * 通用日志
+     * 
      * @param {any[]} args 日志参数
      * @returns {void | Function}
      */
@@ -215,6 +219,7 @@ export default class Logger {
     }
 
     /**
+     * debug日志
      * 
      * @param args debug日志参数
      * @returns {Logger}
@@ -224,6 +229,7 @@ export default class Logger {
     }
 
     /**
+     * info日志
      * 
      * @param args info日志参数
      * @returns {Logger}
@@ -233,6 +239,7 @@ export default class Logger {
     }
 
     /**
+     * warn日志
      * 
      * @param args warn日志参数
      * @returns {Logger}
@@ -242,6 +249,7 @@ export default class Logger {
     }
 
     /**
+     * error日志
      * 
      * @param args error日志参数
      * @returns {Logger}
@@ -251,7 +259,7 @@ export default class Logger {
     }
 
     /**
-     * 计时
+     * 开始计时日志
      * 
      * @returns {Logger}
      */
@@ -260,7 +268,7 @@ export default class Logger {
     }
 
     /**
-     * 结束计时
+     * 结束计时日志
      *
      * @returns {Logger}
      */
@@ -268,6 +276,16 @@ export default class Logger {
         this.print('timeEnd', 'silent',)
     }
 
+    /**
+     *  图片日志
+     *
+     * @param {string} url - 图片地址
+     * @param {number} scale - 图片缩放比例 0-1
+     * @returns {void}
+     */
+    image(url: string, scale: number = 0.1): void {
+        this.print('image', 'silent', [{ url, scale }])
+    }
 
     /**
      * 设置日志配置选项

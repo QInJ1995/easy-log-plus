@@ -10,10 +10,10 @@ import { getCurrentTimeDate, formatString, removeEmptyBrackets, getLogTrace, get
  * @param {string} type 日志类型
  * @param {PrintOptions} options 打印参数
  */
-export function print(
+export async function print(
     type: string,
     options: PrintOptions
-): void {
+): Promise<void> {
     switch (type) {
         case 'time':
             globals['con' + 'sole']['time'](formatTime(options));
@@ -21,10 +21,67 @@ export function print(
         case 'timeEnd':
             globals['con' + 'sole']['timeEnd'](formatTime(options));
             break;
+        case 'image':
+            globals['con' + 'sole']['log'](...(await formatImage(options)));
+            break;
         default:
             globals['con' + 'sole']['log'](...formatLog(options));
             break;
     }
+}
+
+function formatImage(options: PrintOptions): Promise<any[]> {
+    return new Promise((resolve) => {
+        const { messages, label, logOptions, namespace, level, callStackInfo, printCustomStyle } = options
+        const { url, scale } = messages[0]
+        let title = formatString(logOptions.formatter!, {
+            namespace: namespace || '',
+            time: getCurrentTimeDate(),
+            level: '',
+            tracker: getLogTrace(callStackInfo.fileName, callStackInfo.functionName, callStackInfo.lineNumber) || '',
+            label: label || '',
+        })
+        title = removeEmptyBrackets(title)
+        logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis.image}`)
+        title = `${title} -> `
+        let color = printCustomStyle.color
+        color = logOptions.isColor ? color || colors[level!] : '#fff'
+        let img: HTMLImageElement | null = new Image()
+        img.crossOrigin = 'anonymous'
+        img.onload = () => {
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            if (ctx) {
+                canvas.width = img!.width
+                canvas.height = img!.height
+                ctx.fillStyle = 'red'
+                ctx.fillRect(0, 0, canvas.width, canvas.height)
+                ctx.drawImage(img!, 0, 0)
+                const dataUrl = canvas.toDataURL('image/png')
+                resolve([
+                    `%c${title}%c sup?`,
+                    `background: ${printCustomStyle.bgColor}; 
+                        border:1px solid ${printCustomStyle.bgColor}; 
+                        padding: 1px; 
+                        border-radius: 2px 0 0 2px;
+                        color: ${color};
+                        font-weight: ${printCustomStyle.bold ? 'bold' : 'normal'};
+                        text-decoration: ${printCustomStyle.underline ? 'underline' : 'none'};
+                        font-style: ${printCustomStyle.italic ? 'italic' : 'normal'};
+                        `,
+                    `font-size: 1px;
+                        padding: ${Math.floor((img!.height * scale) / 2)}px ${Math.floor((img!.width * scale) / 2)}px;
+                        background-image: url(${dataUrl});
+                        background-repeat: no-repeat;
+                        background-size: ${img!.width * scale}px ${img!.height * scale}px;
+                        color: transparent;
+                    `
+                ])
+                img = null
+            }
+        }
+        img.src = url
+    })
 }
 
 /**
@@ -35,9 +92,12 @@ export function print(
 function formatTime(options: PrintOptions): string {
     const { level, namespace, label, logOptions, printCustomStyle, } = options;
     let color = options.printCustomStyle.color
-    let title = formatString('[$namespace$] [$label$]', {
+    let title = formatString(logOptions.formatter!, {
         namespace: namespace || '',
+        time: '',
+        level: '',
         label: label || '',
+        tracker: '',
     })
     title = removeEmptyBrackets(title)
     logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis.clock}`)

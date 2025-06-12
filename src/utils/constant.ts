@@ -22,6 +22,7 @@ export const emojis: Emojis = {
     success: '✅',
     clock: '⏱️',
     new: '✨',
+    image: '🖼️',
 };
 
 // 日志level颜色
