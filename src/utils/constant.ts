@@ -1,7 +1,8 @@
 import { Colors, Emojis, } from '../types/index'
+import { getGlobal } from './globals'
 
 // 全局对象
-export const globals: any = getGlobalContext()
+export const globals: any = getGlobal()
 
 // chalk等级
 export const chalkLevel = 3
@@ -23,7 +24,7 @@ export const emojis: Emojis = {
     clock: '⏱️',
     new: '✨',
     image: '🖼️',
-    down:  '⬇️',
+    down: '⬇️',
 };
 
 // 日志level颜色
@@ -53,18 +54,3 @@ export function setColors(newColors: Colors): void {
 export function setCallStackIndex(depth: number): void {
     callStackIndex = callStackIndex + depth || 0
 }
-
-/**
- * 获取全局上下文
- * @returns {Globals} 全局上下文
- */
-function getGlobalContext(): any {
-    if (typeof window as any !== 'undefined') {
-        return window;
-    } else if (typeof global as any !== 'undefined') {
-        return global;
-    } else {
-        throw new Error('无法识别的运行环境');
-    }
-}
-

@@ -100,7 +100,6 @@ app.use(EasyLogVuePlugin, {
   level: 'debug',
   isVue: true,        // 是否在 Vue 实例上挂载 $logger 默认为 true
   isProvide: true,    // 是否使用 provide/inject 方式 默认为 false
-  isWindow: true,     // 是否在 window 对象上挂载 logger 默认为 false
   enabled: true,       // 是否启用插件 默认为 true
   // 日志配置项
   env: envs.prod, // 环境变量 默认为 'dev'
@@ -109,6 +108,7 @@ app.use(EasyLogVuePlugin, {
   depth: 0, // 堆栈深度 默认为0， 在封装打印时需要配置，目的为了准确获取 tracker 信息
   isColor: true, // 是否启用彩色输出 默认为 true
   isEmoji: true, // 是否显示表情符号 默认为 true
+  isGlobal:  true, // 是否在全局(window/global)挂载logger 默认为 false  
   colors: { // 自定义颜色
     debug: '#87CEFA', // 调试级别颜色 默认为 '#87CEFA'
     info: '#90EE90', // 普通级别颜色 默认为 '#90EE90'

@@ -1,6 +1,7 @@
 
 import { LogOptions } from '../types';
 import { isBrowser } from '../utils/common';
+import { setGlobalLogger } from '../utils/globals';
 import Logger from './Logger';
 
 /**
@@ -21,6 +22,9 @@ const createLogger = (namespace?: string | null, options?: LogOptions): Logger =
         }
     }
     const instance = new Logger(namespace, options);
+
+    // 挂载到全局对象上
+    options?.isGlobal && setGlobalLogger(instance);
 
     // 代理处理 在node和浏览器环境时需要隐藏方法
     return new Proxy(instance, {

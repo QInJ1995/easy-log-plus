@@ -1,3 +1,16 @@
+import Logger from "../core/Logger";
+
+declare global {
+  interface Window {
+    logger: Logger;
+  }
+
+  namespace NodeJS {
+    interface Global {
+      logger: Logger;
+    }
+  }
+}
 
 /**
  * 日志级别
@@ -64,6 +77,7 @@ export interface PrintCustomStyle {
  * @property {LogLevel} level - 日志级别
  * @property {boolean} isColor - 是否显示颜色
  * @property {boolean} isEmoji - 是否显示emoji
+ * @property {boolean} isGlobal - 是否全局注入
  * @property {
  * * @property {string} [style.bgColor] - 日志背景颜色
  * * @property {boolean} [style.bold] - 是否显示粗体
@@ -82,9 +96,11 @@ export interface PrintCustomStyle {
  * @property {string} env - 环境变量(默认：development)
  */
 export interface LogOptions {
+  env?: 'development' | 'production' | 'test'
   level?: LogLevel;
   isColor?: boolean
   isEmoji?: boolean;
+  isGlobal?: boolean;
   style?: {
     color?: string | BaseColors;
     bgColor?: string | BaseColors;
@@ -99,7 +115,6 @@ export interface LogOptions {
   colors?: Colors;
   formatter?: string
   depth?: number;
-  env?: 'development' | 'production' | 'test'
 }
 
 /**
@@ -144,23 +159,14 @@ export interface Emojis {
 
 /**
  * vue插件配置项
- * @property {string} namespace - emoji配置
- * @property {boolean} isWindow - 日志颜色
- * @property {boolean} isVue - 是否显示时间
- * @property {boolean} isProvide - 是否显示颜色
- * @property {LogLevel} level - 日志级别
- * @property {boolean} isTime - 是否显示时间
- * @property {boolean} isColor - 是否显示颜色
- * @property {boolean} isLevel - 是否显示日志级别
- * @property {boolean} isFileName - 是否显示文件名
- * @property {boolean} isFunctionName - 是否显示函数名
- * @property {boolean} isLineNumber - 是否显示行号
- * @property {boolean} isEmoji - 是否显示emoji
- * @property {Style} style - 日志样式
+ * @property {string} namespace - 命名空间
+ * @property {boolean} isVue - 是否挂载到 Vue 实例
+ * @property {boolean} isProvide - 是否使用 provide/inject 只支持vue3
+ * @property {boolean} enabled - 是否启用插件
+ * @extends  {LogOptions} - 日志选项
  */
 export interface EasyLogVuePluginOptions extends LogOptions {
   namespace?: string; // 命名空间
-  isWindow?: boolean; // 是否挂载到 window 对象
   isVue?: boolean; // 是否 挂载到 Vue 实例
   isProvide?: boolean; // 是否使用 provide/inject 只支持vue3
   enabled?: boolean; // 是否启用插件
@@ -208,4 +214,5 @@ export interface IEasyLogVuePlugin {
  * @property {string} cyanBright - 亮青色
  * @property {string} whiteBright - 亮白色
  */
-export type BaseColors = 'black' | 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan' | 'white' | 'blackBright' | 'redBright' | 'greenBright' | 'yellowBright' | 'blueBright' | 'magentaBright' | 'cyanBright' | 'whiteBright' 
+export type BaseColors = 'black' | 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan' | 'white' | 'blackBright' | 'redBright' | 'greenBright' | 'yellowBright' | 'blueBright' | 'magentaBright' | 'cyanBright' | 'whiteBright'
+

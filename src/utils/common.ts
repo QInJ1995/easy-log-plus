@@ -7,18 +7,18 @@ import { globals, callStackIndex } from './constant'
  * 获取当前的日期和时间
  * 
  * 此函数以字符串形式返回当前的日期和时间，格式为YYYY-MM-DD HH:MM:SS
- * 使用UTC时间来确保全球范围的时间一致性
+ * 使用本地时间来确保正确的小时数
  * 
  * @returns {string} 当前日期和时间的字符串表示
  */
 export function getCurrentTimeDate(): string {
     const now = new Date();
-    const year = now.getUTCFullYear();
-    const month = String(now.getUTCMonth() + 1).padStart(2, '0'); // 月份从0开始
-    const day = String(now.getUTCDate()).padStart(2, '0');
-    const hours = String(now.getUTCHours()).padStart(2, '0');
-    const minutes = String(now.getUTCMinutes()).padStart(2, '0');
-    const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // 月份从0开始
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
