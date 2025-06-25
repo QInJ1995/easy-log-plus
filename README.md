@@ -199,6 +199,12 @@ logger.setColors({
 });
 ```
 
+## 生成环境在浏览器的Console中查看日志
+
+```text
+window.showLog = true; // 开启日志
+```
+
 ## 特性
 
 - 支持多种日志级别（debug、info、warn、error、silent）

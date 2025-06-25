@@ -1,4 +1,4 @@
-import { Colors, Emojis, } from '../types/index'
+import { Colors, Emojis, Env } from '../types/index'
 import { getGlobal } from './globals'
 
 // 全局对象
@@ -11,7 +11,7 @@ export const chalkLevel = 3
 export let callStackIndex: number = 5
 
 // 环境
-export const envs: Readonly<{ dev: string, prod: string, test: string }> = { dev: 'development', prod: 'production', test: 'test' }
+export const envs: Readonly<{ dev: Env, prod: Env, }> = { dev: 'development', prod: 'production', }
 
 // Emoji
 export const emojis: Emojis = {

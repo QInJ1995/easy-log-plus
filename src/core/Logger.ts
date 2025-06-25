@@ -1,5 +1,5 @@
-import { LogLevel, LogOptions, Colors, PrintOptions, } from '../types';
-import { shouldLog, isShowLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, } from '../utils/common';
+import { LogLevel, LogOptions, Colors, PrintOptions, Env } from '../types';
+import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, getTopWindow, isEnable } from '../utils/common';
 import { envs, setColors, chalkLevel, setCallStackIndex } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
@@ -13,6 +13,16 @@ import chalk from 'chalk';
  * @param {LogOptions} [options] - 日志配置选项
  */
 export default class Logger {
+    /**
+     * 顶层对象
+     */
+    public topWindow: any = getTopWindow();
+
+    /**
+     * 当前环境
+     */
+    public env: Env = envs.dev;
+
     /**
      * 当前命名空间，默认为 Easy-Log-Plus
      *
@@ -28,13 +38,6 @@ export default class Logger {
     private options: LogOptions;
 
     /**
-     * 是否显示日志，默认在非生产环境下显示
-     *
-     * @type {boolean}
-     */
-    private showLog: boolean = true;
-
-    /**
      * 存储打印样式的 Map 对象
      *
      * @type {Map<string, any>}
@@ -45,7 +48,7 @@ export default class Logger {
         chalk.level = chalkLevel;
         this.namespace = namespace ?? 'Easy-Log-Plus';
         options.colors && setColors(options.colors);
-        this.showLog = options.env !== envs.prod ? true : false;
+        this.env = options.env ?? envs.dev
         typeof options.depth === 'number' && setCallStackIndex(options.depth);
         this.options = {
             level: options.level || 'debug',
@@ -63,7 +66,6 @@ export default class Logger {
      * @returns {void}
      */
     private print(type: string, level: LogLevel, messages?: any[],): void {
-        if (!isShowLog(this.showLog)) return
         const printCustomStyle = mergeObjects(this.options.style!, getPrintCustomStyle(this.printMap))
         const label = this.printMap.get('label')
         const callStackInfo = getCallStackInfo()
@@ -104,7 +106,7 @@ export default class Logger {
      * @returns 
      */
     color(color: string): Logger {
-        this.printMap.set('color', color)
+        isEnable(this) && this.printMap.set('color', color)
         return this
     }
 
@@ -115,7 +117,7 @@ export default class Logger {
      * @returns 
      */
     bgColor(color: string): Logger {
-        this.printMap.set('bgColor', color)
+        isEnable(this) && this.printMap.set('bgColor', color)
         return this
     }
 
@@ -126,7 +128,7 @@ export default class Logger {
      * @returns 
      */
     label(label: string): Logger {
-        this.printMap.set('label', label)
+        isEnable(this) && this.printMap.set('label', label)
         return this
     }
 
@@ -136,7 +138,7 @@ export default class Logger {
      * @returns 
      */
     get strikethrough(): Logger {
-        this.printMap.set('strikethrough', true)
+        isEnable(this) && this.printMap.set('strikethrough', true)
         return this
     }
 
@@ -146,7 +148,7 @@ export default class Logger {
      * @returns 
      */
     get underline(): Logger {
-        this.printMap.set('underline', true)
+        isEnable(this) && this.printMap.set('underline', true)
         return this
     }
 
@@ -156,7 +158,7 @@ export default class Logger {
      * @returns 
      */
     get overline(): Logger {
-        this.printMap.set('overline', true)
+        isEnable(this) && this.printMap.set('overline', true)
         return this
     }
 
@@ -166,7 +168,7 @@ export default class Logger {
      * @returns 
      */
     get italic(): Logger {
-        this.printMap.set('italic', true)
+        isEnable(this) && this.printMap.set('italic', true)
         return this
     }
 
@@ -176,7 +178,7 @@ export default class Logger {
      * @returns 
      */
     get bold(): Logger {
-        this.printMap.set('bold', true)
+        isEnable(this) && this.printMap.set('bold', true)
         return this
     }
 
@@ -186,7 +188,7 @@ export default class Logger {
      * @returns 
      */
     dim(): Logger {
-        this.printMap.set('dim', true)
+        isEnable(this) && this.printMap.set('dim', true)
         return this
     }
     /**
@@ -195,7 +197,7 @@ export default class Logger {
     * @returns 
     */
     get inverse(): Logger {
-        this.printMap.set('inverse', true)
+        isEnable(this) && this.printMap.set('inverse', true)
         return this
     }
 
@@ -205,7 +207,7 @@ export default class Logger {
      * @returns 
      */
     get reset(): Logger {
-        this.printMap.set('reset', true)
+        isEnable(this) && this.printMap.set('reset', true)
         return this
     }
 
@@ -216,7 +218,7 @@ export default class Logger {
      * @returns {void | Function}
      */
     log(...args: any[]): void {
-        this.print('log', 'silent', args,)
+        isEnable(this) && this.print('log', 'silent', args,)
     }
 
     /**
@@ -226,7 +228,7 @@ export default class Logger {
      * @returns {Logger}
      */
     debug(...args: any[]): void {
-        this.print('log', 'debug', args,)
+        isEnable(this) && this.print('log', 'debug', args,)
     }
 
     /**
@@ -236,7 +238,7 @@ export default class Logger {
      * @returns {Logger}
      */
     info(...args: any[]): void {
-        this.print('log', 'info', args,)
+        isEnable(this) && this.print('log', 'info', args,)
     }
 
     /**
@@ -246,7 +248,7 @@ export default class Logger {
      * @returns {Logger}
      */
     warn(...args: any[]): void {
-        this.print('log', 'warn', args,)
+        isEnable(this) && this.print('log', 'warn', args,)
     }
 
     /**
@@ -256,7 +258,7 @@ export default class Logger {
      * @returns {Logger}
      */
     error(...args: any[]): void {
-        this.print('log', 'error', args,)
+        isEnable(this) && this.print('log', 'error', args,)
     }
 
     /**
@@ -265,7 +267,7 @@ export default class Logger {
      * @returns {Logger}
      */
     time(): void {
-        this.print('time', 'silent',)
+        isEnable(this) && this.print('time', 'silent',)
     }
 
     /**
@@ -274,7 +276,7 @@ export default class Logger {
      * @returns {Logger}
      */
     timeEnd(): void {
-        this.print('timeEnd', 'silent',)
+        isEnable(this) && this.print('timeEnd', 'silent',)
     }
 
     /**
@@ -285,7 +287,7 @@ export default class Logger {
      * @returns {void}
      */
     image(url: string, scale: number = 0.1): void {
-        this.print('image', 'silent', [{ url, scale }])
+        isEnable(this) && this.print('image', 'silent', [{ url, scale }])
     }
 
     /**
@@ -295,7 +297,7 @@ export default class Logger {
      * @returns {void}
      */
     table(obj: Object | Array<any>): void {
-        this.print('table', 'silent', [obj])
+        isEnable(this) && this.print('table', 'silent', [obj])
     }
 
     /**
@@ -305,7 +307,7 @@ export default class Logger {
      * @returns {void}
      */
     setOptions(options: LogOptions): void {
-        Object.assign(this.options, options);
+        isEnable(this) && Object.assign(this.options, options);
     }
 
     /**
@@ -315,6 +317,6 @@ export default class Logger {
      * @returns {void}
      */
     setColors(colors: Colors): void {
-        setColors(colors);
+        isEnable(this) && setColors(colors);
     }
 }

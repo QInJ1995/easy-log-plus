@@ -13,6 +13,11 @@ declare global {
 }
 
 /**
+ * 环境
+ */
+export type Env = 'development' | 'production'
+
+/**
  * 日志级别
  * @description 日志级别
  * @enum {string}
@@ -96,7 +101,7 @@ export interface PrintCustomStyle {
  * @property {string} env - 环境变量(默认：development)
  */
 export interface LogOptions {
-  env?: 'development' | 'production' | 'test'
+  env?: Env;
   level?: LogLevel;
   isColor?: boolean
   isEmoji?: boolean;

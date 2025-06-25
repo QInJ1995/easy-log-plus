@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import { LogLevel, LogOptions, CallStackInfo, PrintCustomStyle } from '../types/index'
-import { globals, callStackIndex } from './constant'
-
+import { LogLevel, LogOptions, CallStackInfo, PrintCustomStyle } from '../types/index';
+import { globals, callStackIndex, envs, } from './constant';
+import Logger from '../core/Logger';
 
 /**
  * 获取当前的日期和时间
@@ -35,21 +35,28 @@ export function shouldLog(level?: LogLevel, options?: LogOptions): boolean {
 }
 
 /**
- * 
- * @param {boolean} showLog 是否显示日志：true 显示日志，false 不显示日志
- * @returns {boolean} 显示日志
+ * 是否启用日志
+ * @returns {boolean} - 如果启用日志，则返回true，否则返回false
  */
-export const isShowLog = function (showLog: boolean,): boolean {
+export function isEnable(logger: Logger): boolean {
+    if (logger.env === envs.prod) {
+        return logger.topWindow.showLog
+    }
+    return true
+}
+
+/**
+ * 获取顶层 Window
+ * @returns 
+ */
+export function getTopWindow() {
+    let curWindow = globals
     if (isBrowser()) {
-        if (!showLog) {
-            let curWindow = globals
-            while (curWindow && !curWindow.showLog && curWindow !== curWindow.parent) {
-                curWindow = curWindow.parent
-            }
-            return curWindow?.showLog ?? showLog
+        while (curWindow && curWindow.parent && curWindow !== curWindow.parent) {
+            curWindow = curWindow.parent
         }
     }
-    return showLog
+    return curWindow
 }
 
 /**
