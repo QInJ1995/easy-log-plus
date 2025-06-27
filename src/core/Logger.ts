@@ -13,10 +13,7 @@ import chalk from 'chalk';
  * @param {LogOptions} [options] - 日志配置选项
  */
 export default class Logger {
-    /**
-     * 唯一标识符，用于区分不同的日志实例。
-     */
-    public uniqueKey: Symbol = Symbol('Easy-Log-Plus');
+
     /**
      * 顶层对象
      */
@@ -39,7 +36,7 @@ export default class Logger {
      *
      * @type {Required<LogOptions>}
      */
-    private options: LogOptions;
+    public options: LogOptions;
 
     /**
      * 存储打印样式的 Map 对象
@@ -51,12 +48,11 @@ export default class Logger {
     constructor(namespace?: string | null, options: LogOptions = {}) {
         chalk.level = chalkLevel;
         this.namespace = namespace ?? 'Easy-Log-Plus'
-        this.uniqueKey = Symbol(namespace ?? Date.now() + Math.random().toString(36).substring(2, 15));
         options.colors && setColors(options.colors);
         this.env = options.env ?? envs.dev
         typeof options.depth === 'number' && setCallStackIndex(options.depth);
         this.options = {
-            level: options.env === envs.prod ? 'error' : options.level || 'debug',
+            level: options.level || 'debug',
             isColor: options.isColor ?? true,
             isEmoji: options.isEmoji ?? true,
             style: options.style ?? {},
@@ -71,7 +67,7 @@ export default class Logger {
      * @returns {void}
      */
     private print(type: string, level: LogLevel, messages?: any[],): void {
-        if (type === 'log' && !shouldLog(level, this.options)) return
+        if (type === 'log' && !shouldLog(this, level)) return
         const printCustomStyle = mergeObjects(this.options.style!, getPrintCustomStyle(this.printMap))
         const label = this.printMap.get('label')
         const callStackInfo = getCallStackInfo()

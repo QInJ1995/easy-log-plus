@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { LogLevel, LogOptions, CallStackInfo, PrintCustomStyle } from '../types/index';
+import { LogLevel, CallStackInfo, PrintCustomStyle, } from '../types/index';
 import { globals, callStackIndex, envs, } from './constant';
 import Logger from '../core/Logger';
 
@@ -47,9 +47,10 @@ export function getCurrentTimeDate(): string {
  * @param {LogOptions} options - 日志选项
  * @returns {boolean} - 如果日志级别应该被记录，则返回true，否则返回false
  */
-export function shouldLog(level?: LogLevel, options?: LogOptions): boolean {
+export function shouldLog(logger: Logger, level?: LogLevel,): boolean {
     const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    return !level || level === 'silent' ? true : levels.indexOf(level) >= levels.indexOf(options?.level || 'debug');
+    logger.env === envs.prod && (logger.options.level = logger.topWindow.__EASY_LOG_PLUS__?.level);
+    return !level || level === 'silent' ? true : levels.indexOf(level) >= levels.indexOf(logger.options.level || 'debug');
 }
 
 /**
@@ -58,7 +59,7 @@ export function shouldLog(level?: LogLevel, options?: LogOptions): boolean {
  */
 export function isEnable(logger: Logger): boolean {
     if (logger.env === envs.prod) {
-        return logger.topWindow._EASY_LOG_PLUS_[logger.uniqueKey.description!]?.showLog;
+        return logger.topWindow.__EASY_LOG_PLUS__?.showLog;
     }
     return true
 }

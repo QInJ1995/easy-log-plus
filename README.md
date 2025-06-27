@@ -202,8 +202,8 @@ logger.setColors({
 ## 生成环境在浏览器的Console中查看日志
 
 ```text
-_EASY_LOG_PLUS_['MyApp'].showLog = true; // 开启日志
-_EASY_LOG_PLUS_['MyApp'].level = 'debug'; // 设置日志级别 生成模式下默认为error
+__EASY_LOG_PLUS__.showLog = true; // 开启日志
+__EASY_LOG_PLUS__.level = 'debug'; // 设置日志级别 生成模式下默认为error
 ```
 
 ## 特性

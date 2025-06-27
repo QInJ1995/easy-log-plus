@@ -35,11 +35,9 @@ const createLogger = (namespace?: string | null, options?: LogOptions): Logger =
                 showLog: false,
                 level: 'error',
             };
-            // 如果 _EASY_LOG_PLUS_ 属性不存在，则创建一个空对象
-            topWindow._EASY_LOG_PLUS_ = topWindow._EASY_LOG_PLUS_ || {};
 
-            // 代理顶层 window._EASY_LOG_PLUS_[instance.uniqueKey.description!] 对象
-            topWindow._EASY_LOG_PLUS_[instance.uniqueKey.description!] = new Proxy(topWindowCfgProxyTarget, {
+            // 代理顶层 window 对象的 __EASY_LOG_PLUS__ 属性
+            topWindow.__EASY_LOG_PLUS__ = new Proxy(topWindowCfgProxyTarget, {
                 set(target, property, value, receiver) {
                     const allowedProperties = new Set(['showLog', 'level']);
                     // 检查属性是否在允许列表中
