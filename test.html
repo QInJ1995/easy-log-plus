@@ -32,7 +32,7 @@
             }
             // env: envs.prod
         })
-        const logger3 = createLogger('logger3', {
+        const logger3 = createLogger('qj-logger', {
             env: envs.prod
         })
         const logger = createLogger('hit-emr', {
@@ -49,6 +49,10 @@
         function qqqq() {
             logger2.bold.italic.underline.strikethrough.color('#FFA500').label('打印信息wwwwww').log('wwwwwwwwwwwwwwwww')
             logger3.label('logger3').log(logger3)
+            logger3.label('logger3').debug(logger3)
+            logger3.label('logger3').info(logger3)
+            logger3.label('logger3').warn(logger3)
+            logger3.label('logger3').error(logger3)
         }
         qqqq()
 

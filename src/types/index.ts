@@ -2,15 +2,32 @@ import Logger from "../core/Logger";
 
 declare global {
   interface Window {
-    logger: Logger;
+    logger: Logger; // 浏览器环境下的 logger 实例
+    "easy-log-plus": TopWindowCfgProxyTarget; // 顶层 window 配置代理目标
   }
 
   namespace NodeJS {
     interface Global {
-      logger: Logger;
+      logger: Logger; // Node.js 环境下的 logger 实例
+      "easy-log-plus": TopWindowCfgProxyTarget; // 顶层 global 配置代理目标
     }
   }
 }
+
+/** * 顶层 window 配置代理目标
+ * @description 用于在浏览器环境下
+ * 通过顶层 window 对象配置日志选项
+ * @property {boolean} showLog - 是否显示日志
+ * @property {string} level - 日志级别
+ * @property {any} [key: string] - 其他任意属性
+ * @property {any} [key: symbol] - 其他任意属性
+ */
+export type TopWindowCfgProxyTarget = {
+  showLog: boolean;
+  level: LogLevel;
+  [key: string]: any;
+  [key: symbol]: any;
+};
 
 /**
  * 环境

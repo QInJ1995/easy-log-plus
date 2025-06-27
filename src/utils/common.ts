@@ -4,6 +4,24 @@ import { globals, callStackIndex, envs, } from './constant';
 import Logger from '../core/Logger';
 
 /**
+ * 
+ * @param message 本地日志消息
+ * @param color 
+ */
+export function localConsoleLog(message: string, color: string = '#00bfff'): void {
+    globals['con' + 'sole']['log'](chalk.hex(color)(message));
+}
+
+/**
+ * 本地警告日志
+ * @param message 错误消息
+ * @param color 错误颜色
+ */
+export function localConsoleWarn(message: string): void {
+    globals['con' + 'sole']['warn'](message);
+}
+
+/**
  * 获取当前的日期和时间
  * 
  * 此函数以字符串形式返回当前的日期和时间，格式为YYYY-MM-DD HH:MM:SS
@@ -40,7 +58,7 @@ export function shouldLog(level?: LogLevel, options?: LogOptions): boolean {
  */
 export function isEnable(logger: Logger): boolean {
     if (logger.env === envs.prod) {
-        return logger.topWindow.showLog
+        return logger.topWindow._EASY_LOG_PLUS_[logger.uniqueKey.description!]?.showLog;
     }
     return true
 }
