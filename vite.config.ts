@@ -69,5 +69,5 @@ const formatToExtensionMap: Record<string, string> = {
 // 获取文件名的函数（可复用、可扩展）
 const getFileName = (format: string): string => {
   const ext = formatToExtensionMap[format] || 'js'; // 默认 fallback 到 js
-  return `index.${ext}`;
+  return `easy-log-plus.${ext}`;
 };

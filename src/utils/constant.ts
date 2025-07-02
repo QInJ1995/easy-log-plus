@@ -8,7 +8,7 @@ export const globals: any = getGlobal()
 export const chalkLevel = 3
 
 // 调用栈索引
-export let callStackIndex: number = 5
+export let callStackIndex: number = 3
 
 // 环境
 export const envs: Readonly<{ dev: Env, prod: Env, }> = { dev: 'development', prod: 'production', }

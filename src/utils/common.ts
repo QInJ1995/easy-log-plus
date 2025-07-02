@@ -86,20 +86,6 @@ export function isBrowser(): boolean {
     return typeof window as any !== 'undefined'
 }
 
-/**
- * 获取当追踪信息
- * @returns {CallStackInfo}
- */
-export function getCallStackInfo(): CallStackInfo {
-    const fileName = theFileName()
-    const functionName = theFunctionName()
-    const lineNumber = theLineNumber()
-    return {
-        fileName,
-        functionName,
-        lineNumber,
-    }
-}
 
 /**
  * 获取日志追踪信息
@@ -118,58 +104,6 @@ export function getLogTrace(fileName: string | undefined, functionName: string |
     } else {
         return ''
     }
-}
-
-/**
- * 获取当前文件名
- * @returns {string} - 返回当前文件名
- */
-function theFileName(): string {
-    // 获取调用栈信息中的文件名
-    if (!globals.currentStack || !globals.currentStack.length) return ''
-    let filePath = null
-    let curCallStackIndex: number = callStackIndex
-    while (!filePath && curCallStackIndex < globals.currentStack.length) {
-        filePath = globals.currentStack[curCallStackIndex]?.getFileName();
-        curCallStackIndex++
-    }
-    if (!filePath) return ''
-    const filePathArray = filePath.split('/');
-    const simpleFileName = filePathArray[filePathArray.length - 1];
-    return simpleFileName || '';
-}
-
-/**
- * 获取当前函数名
- * @returns {string} - 返回当前函数名
- */
-function theFunctionName(): string {
-    if (!globals.currentStack || !globals.currentStack.length) return ''
-    let functionName = null
-    let curCallStackIndex: number = callStackIndex
-    while (!functionName && curCallStackIndex < globals.currentStack.length) {
-        functionName = globals.currentStack[curCallStackIndex]?.getFunctionName();
-        curCallStackIndex++
-    }
-    // 获取调用栈信息中的函数名
-    return functionName || '';
-}
-
-/**
- * 获取当前行号
- * @returns {string} - 返回当前行号
- */
-function theLineNumber(): string {
-    if (!globals.currentStack || !globals.currentStack.length) return ''
-    let lineNumber
-    let curCallStackIndex: number = callStackIndex
-    while (!lineNumber && curCallStackIndex < globals.currentStack.length) {
-        lineNumber = globals.currentStack[curCallStackIndex]?.getLineNumber();
-        curCallStackIndex++
-    }
-    if ([undefined, null, ''].includes(lineNumber)) return ''
-    // 获取调用栈信息中的行号
-    return lineNumber + '';
 }
 
 /**
@@ -279,21 +213,97 @@ function capitalizeFirstLetter(str: string, isUpperCase: boolean = true): string
     return firstChar + str.slice(1);
 }
 
+/**
+ * 获取调用堆栈信息
+ * 
+ * @param {number} depth - 堆栈深度，默认为 0
+ */
 
-// 定义全局变量 currentStack 以获取当前调用栈信息
-Object.defineProperty(globals, 'currentStack', {
-    get: function () {
-        const orig = Error.prepareStackTrace;
-        Error.prepareStackTrace = function (_, stack) {
-            return stack;
+export function getCallStackInfo(): CallStackInfo {
+    try {
+        throw new Error();
+    } catch (e: any) {
+        // 解析调用栈信息
+        const stack = e.stack.split('\n').slice(1); // 去掉第一行"Error"信息
+        if (callStackIndex >= stack.length) {
+            return {
+                functionName: '',
+                fileName: '',
+                lineNumber: ''
+            };
+        }
+        const stackLine = stack[callStackIndex]; // 获取指定深度的调用栈行
+        let functionName = '';
+        let fileName = '';
+        let lineNumber = '';
+        // 统一的正则表达式，兼容浏览器和Node.js
+        // 浏览器格式: "at functionName (http://127.0.0.1:5500/test.html:15:9)"
+        // Node.js格式: "at functionName (/path/to/file.js:15:9)"
+        const namedFunctionMatch = stackLine.match(/at\s+([^\s(]+)\s+\((.+):(\d+):(\d+)\)/);
+        if (namedFunctionMatch) {
+            functionName = namedFunctionMatch[1];
+            const fullPath = namedFunctionMatch[2];
+            lineNumber = namedFunctionMatch[3];
+            // 提取文件名
+            fileName = _extractFileName(fullPath);
+        } else {
+            // 匹配匿名函数的情况
+            // 浏览器: "at http://127.0.0.1:5500/test.html:15:9"
+            // Node.js: "at /path/to/file.js:15:9"
+            const anonymousFunctionMatch = stackLine.match(/at\s+(.+):(\d+):(\d+)/);
+            if (anonymousFunctionMatch) {
+                const fullPath = anonymousFunctionMatch[1];
+                lineNumber = anonymousFunctionMatch[2];
+                fileName = _extractFileName(fullPath);
+                functionName = '';
+            }
+        }
+        return {
+            functionName,
+            fileName,
+            lineNumber
         };
-        const err = new Error();
-        // 获取当前函数引用，不使用 arguments.callee
-        const currentFunction = this.get;
-        Error.captureStackTrace(err, currentFunction);
-        const stack = err.stack;
-        Error.prepareStackTrace = orig;
-        return stack;
     }
-});
+}
+
+/**
+    * 提取文件名，兼容浏览器URL和Node.js文件路径
+    * @param {string} fullPath - 完整路径
+    * @returns {string} 文件名
+    */
+function _extractFileName(fullPath: string): string {
+    if (!fullPath || fullPath === '') {
+        return '';
+    }
+
+    try {
+        // 处理浏览器URL格式 (http://127.0.0.1:5500/test.html)
+        if (fullPath.startsWith('http://') || fullPath.startsWith('https://') || fullPath.startsWith('file://')) {
+            const url = new URL(fullPath);
+            const pathname = url.pathname;
+            return pathname.split('/').pop() || '';
+        }
+
+        // 处理Node.js文件路径
+        // 检查是否在Node.js环境
+        if (typeof require !== 'undefined') {
+            try {
+                const path = require('path');
+                return path.basename(fullPath);
+            } catch (error) {
+                return '';
+            }
+        }
+
+        // 通用处理方法（适用于各种路径格式）
+        // 处理Windows路径 (C:\path\to\file.js) 和 Unix路径 (/path/to/file.js)
+        const fileName = fullPath.split(/[\/\\]/).pop();
+        return fileName || '';
+
+    } catch (error) {
+        console.warn('提取文件名失败:', error);
+        // 降级处理：简单的字符串分割
+        return fullPath.split(/[\/\\]/).pop() || '';
+    }
+}
 

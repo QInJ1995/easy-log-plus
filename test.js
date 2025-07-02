@@ -1,4 +1,4 @@
-import { createLogger } from './dist/index.mjs'
+import { createLogger } from './dist/easy-log-plus.mjs'
 
 
 const logger2 = createLogger('EasyLogPlus3aS AAHSG ', {
@@ -20,11 +20,16 @@ const logger = createLogger('EasyLogPlus3', {
     // isColor: false,
 })
 logger3.log('log', 'blue', 'hello world2')
-logger.log()()('log', 'blue', 'hello world')
 logger2.log(111)
 logger.debug('debug', 'dads', {}, 111, true)
-logger.info()('打印信息', 1, 2)
-logger.info()()('打印信息2', 'red', 2, 4)
 logger.warn('warn')
 logger.error('error', 111)
 logger.error('a->', { a: 1, b: { c: 2 } }, [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }])
+
+function qqq() {
+    logger.debug('debug', 'dads', {}, 111, true)
+    logger.warn('warn')
+    logger.error('error', 111)
+}
+
+qqq()
