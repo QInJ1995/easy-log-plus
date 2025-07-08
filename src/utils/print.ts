@@ -1,4 +1,4 @@
-import { PrintOptions } from '../types/index'
+import type { PrintOptions } from '../types/index'
 import { emojis, colors, globals, } from './constant'
 import { getCurrentTimeDate, formatString, removeEmptyBrackets, getLogTrace, getChalk } from './common'
 

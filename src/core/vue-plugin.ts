@@ -1,6 +1,6 @@
 // vue插件
 
-import { EasyLogVuePluginOptions, IEasyLogVuePlugin } from '../types/index'
+import type { EasyLogVuePluginOptions, IEasyLogVuePlugin } from '../types/index'
 import createLogger from './createLogger';
 
 /**

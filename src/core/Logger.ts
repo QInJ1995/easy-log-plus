@@ -1,6 +1,6 @@
-import { LogLevel, LogOptions, Colors, PrintOptions, Env } from '../types';
-import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, getTopWindow, isEnable } from '../utils/common';
-import { envs, setColors, chalkLevel, setCallStackIndex } from '../utils/constant';
+import type { LogLevel, LogOptions, Colors, PrintOptions, Env } from '../types';
+import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable } from '../utils/common';
+import { envs, setColors, chalkLevel, setCallStackIndex, defaultNamespace, defaultLevel } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
 
@@ -13,12 +13,6 @@ import chalk from 'chalk';
  * @param {LogOptions} [options] - 日志配置选项
  */
 export default class Logger {
-
-    /**
-     * 顶层对象
-     */
-    public topWindow: any = getTopWindow();
-
     /**
      * 当前环境
      */
@@ -47,12 +41,12 @@ export default class Logger {
 
     constructor(namespace?: string | null, options: LogOptions = {}) {
         chalk.level = chalkLevel;
-        this.namespace = namespace ?? 'Easy-Log-Plus'
+        this.namespace = namespace ?? defaultNamespace
         options.colors && setColors(options.colors);
         this.env = options.env ?? envs.dev
         typeof options.depth === 'number' && setCallStackIndex(options.depth);
         this.options = {
-            level: options.level || 'debug',
+            level: options.level || defaultLevel,
             isColor: options.isColor ?? true,
             isEmoji: options.isEmoji ?? true,
             style: options.style ?? {},

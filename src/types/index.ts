@@ -25,6 +25,7 @@ declare global {
 export type TopWindowCfgProxyTarget = {
   showLog: boolean;
   level: LogLevel;
+  createLogs: Map<string, Logger>;
   [key: string]: any;
   [key: symbol]: any;
 };

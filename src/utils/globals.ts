@@ -14,3 +14,8 @@ export const setGlobalLogger = (logger: Logger): void => {
     const g = getGlobal();
     g.logger = logger;
 };
+
+export const getGlobalLogger = (): Logger | undefined => {
+    const g = getGlobal();
+    return g.logger;
+}

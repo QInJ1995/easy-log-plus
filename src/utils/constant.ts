@@ -1,4 +1,4 @@
-import { Colors, Emojis, Env } from '../types/index'
+import type { Colors, Emojis, Env, LogLevel } from '../types/index'
 import { getGlobal } from './globals'
 
 // 全局对象
@@ -12,6 +12,12 @@ export let callStackIndex: number = 3
 
 // 环境
 export const envs: Readonly<{ dev: Env, prod: Env, }> = { dev: 'development', prod: 'production', }
+
+// 默认命名空间
+export const defaultNamespace = 'Easy-Log-Plus'
+
+// 默认日志等级
+export const defaultLevel: LogLevel = 'debug'
 
 // Emoji
 export const emojis: Emojis = {

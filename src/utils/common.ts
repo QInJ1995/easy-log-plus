@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { LogLevel, CallStackInfo, PrintCustomStyle, } from '../types/index';
+import type { LogLevel, CallStackInfo, PrintCustomStyle, } from '../types/index';
 import { globals, callStackIndex, envs, } from './constant';
 import Logger from '../core/Logger';
 
@@ -49,7 +49,10 @@ export function getCurrentTimeDate(): string {
  */
 export function shouldLog(logger: Logger, level?: LogLevel,): boolean {
     const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    logger.env === envs.prod && (logger.options.level = logger.topWindow.__EASY_LOG_PLUS__?.level);
+    if (logger.env === envs.prod) {
+        const topWindow = getTopWindow()
+        logger.options.level = topWindow.__EASY_LOG_PLUS__?.level
+    }
     return !level || level === 'silent' ? true : levels.indexOf(level) >= levels.indexOf(logger.options.level || 'debug');
 }
 
@@ -59,7 +62,8 @@ export function shouldLog(logger: Logger, level?: LogLevel,): boolean {
  */
 export function isEnable(logger: Logger): boolean {
     if (logger.env === envs.prod) {
-        return logger.topWindow.__EASY_LOG_PLUS__?.showLog;
+        const topWindow = getTopWindow()
+        return topWindow.__EASY_LOG_PLUS__?.showLog;
     }
     return true
 }
