@@ -1,17 +1,7 @@
 import Logger from "../core/Logger";
-
 declare global {
-  interface Window {
-    logger: Logger; // 浏览器环境下的 logger 实例
-    "easy-log-plus": TopWindowCfgProxyTarget; // 顶层 window 配置代理目标
-  }
-
-  namespace NodeJS {
-    interface Global {
-      logger: Logger; // Node.js 环境下的 logger 实例
-      "easy-log-plus": TopWindowCfgProxyTarget; // 顶层 global 配置代理目标
-    }
-  }
+    // Extend the globalThis type to include logger
+    var logger: Logger | undefined;
 }
 
 /** * 顶层 window 配置代理目标

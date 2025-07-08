@@ -1,8 +1,4 @@
 import type { LevelColors, Emojis, Env, LogLevel } from '../types/index'
-import { getGlobal } from './globals'
-
-// 全局对象
-export const globals: any = getGlobal()
 
 // chalk等级
 export const chalkLevel = 3

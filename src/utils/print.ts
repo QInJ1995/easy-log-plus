@@ -1,5 +1,5 @@
 import type { PrintOptions } from '../types/index'
-import { emojis, colors, globals, } from './constant'
+import { emojis, colors, } from './constant'
 import { getCurrentTimeDate, formatString, removeEmptyBrackets, getLogTrace, getChalk } from './common'
 
 
@@ -16,22 +16,22 @@ export async function print(
 ): Promise<void> {
     switch (type) {
         case 'time':
-            globals['con' + 'sole']['time'](formatTime(options));
+            (globalThis as any)['con' + 'sole']['time'](formatTime(options));
             break;
         case 'timeEnd':
-            globals['con' + 'sole']['timeEnd'](formatTime(options));
+            (globalThis as any)['con' + 'sole']['timeEnd'](formatTime(options));
             break;
         case 'image':
-            globals['con' + 'sole']['log'](...(await formatImage(options)));
+            (globalThis as any)['con' + 'sole']['log'](...(await formatImage(options)));
             break;
         case 'table':
-            const { table, groupCollapsed } = formatTable(options)
-            globals['con' + 'sole']['groupCollapsed'](groupCollapsed);
-            globals['con' + 'sole']['table'](table);
-            globals['con' + 'sole']['groupEnd']();
+            const { table, groupCollapsed } = formatTable(options);
+            (globalThis as any)['con' + 'sole']['groupCollapsed'](groupCollapsed);
+            (globalThis as any)['con' + 'sole']['table'](table);
+            (globalThis as any)['con' + 'sole']['groupEnd']();
             break;
         default:
-            globals['con' + 'sole']['log'](...formatLog(options));
+            (globalThis as any)['con' + 'sole']['log'](...formatLog(options));
             break;
     }
 }
@@ -41,7 +41,7 @@ export async function print(
  * @param options
  * @returns
  */
-function formatTable(options: PrintOptions) {
+function formatTable(options: PrintOptions): { table: any; groupCollapsed: any } {
     let { level, messages, namespace, label, logOptions, callStackInfo, printCustomStyle } = options;
     const table = messages[0] ?? {}
     let color = printCustomStyle.color

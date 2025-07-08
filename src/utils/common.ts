@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import type { LogLevel, CallStackInfo, PrintCustomStyle, } from '../types/index';
-import { globals, callStackIndex, envs, } from './constant';
+import { callStackIndex, envs, } from './constant';
 import Logger from '../core/Logger';
 
 /**
@@ -9,7 +9,7 @@ import Logger from '../core/Logger';
  * @param color 
  */
 export function localConsoleLog(message: string, color: string = '#00bfff'): void {
-    globals['con' + 'sole']['log'](chalk.hex(color)(message));
+    (globalThis as any)['con' + 'sole']['log'](chalk.hex(color)(message));
 }
 
 /**
@@ -18,7 +18,7 @@ export function localConsoleLog(message: string, color: string = '#00bfff'): voi
  * @param color 错误颜色
  */
 export function localConsoleWarn(message: string): void {
-    globals['con' + 'sole']['warn'](message);
+    (globalThis as any)['con' + 'sole']['warn'](message);
 }
 
 /**
@@ -73,7 +73,7 @@ export function isEnable(logger: Logger): boolean {
  * @returns 
  */
 export function getTopWindow() {
-    let curWindow = globals
+    let curWindow = globalThis as any
     if (isBrowser()) {
         while (curWindow && curWindow.parent && curWindow !== curWindow.parent) {
             curWindow = curWindow.parent
