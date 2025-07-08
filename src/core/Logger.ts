@@ -1,4 +1,4 @@
-import type { LogLevel, LogOptions, Colors, PrintOptions, Env } from '../types';
+import type { LogLevel, LogOptions, LevelColors, PrintOptions, Env } from '../types';
 import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable } from '../utils/common';
 import { envs, setColors, chalkLevel, setCallStackIndex, defaultNamespace, defaultLevel } from '../utils/constant';
 import { print } from '../utils/print';
@@ -308,10 +308,10 @@ export default class Logger {
     /**
      * 设置颜色
      *
-     * @param {Colors} colors - 需要更新的颜色选项
+     * @param {LevelColors} colors - 需要更新的颜色选项
      * @returns {void}
      */
-    setColors(colors: Colors): void {
+    setColors(colors: LevelColors): void {
         isEnable(this) && setColors(colors);
     }
 }

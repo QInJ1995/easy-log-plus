@@ -11,7 +11,7 @@ import Logger from './Logger';
  * @param {LogOptions} options 日志选项
  * @returns {Logger} 日志实例
  */
-const createLogger = (namespace?: string | null, options?: LogOptions): Logger | undefined => {
+const createLogger = (namespace?: string | null, options?: LogOptions): Logger => {
     const isInBrowser = isBrowser(); // 判断是否在浏览器环境
     const topWindow = getTopWindow() // 获取顶层 window 对象
     let logger
@@ -78,30 +78,25 @@ const createLogger = (namespace?: string | null, options?: LogOptions): Logger |
         localConsoleLog(`EasyLogPlus${namespace ? `|[${namespace}]` : ''} logger created successfully!`)
     }
 
+    // 挂载到全局对象上
+    options?.isGlobal && setGlobalLogger(logger);
 
-    // 如果存在日志实例，则返回
-    if (logger) {
-
-        // 挂载到全局对象上
-        options?.isGlobal && setGlobalLogger(logger);
-
-        // 代理处理 在node和浏览器环境时需要隐藏方法
-        return new Proxy(logger, {
-            get(target, prop, receiver) {
-                // 如果在浏览器环境中，且目标属性是方法，则返回 undefined 来“隐藏”方法
-                if (isInBrowser) {
-                    if (['overline', 'dim', 'inverse'].includes(prop as string)) {
-                        throw new Error(`[easy-log-plus] \`${prop as string}\` is not supported in current environment`);
-                    };
-                } else {
-                    if (['image',].includes(prop as string)) {
-                        throw new Error(`[easy-log-plus] \`${prop as string}\` is not supported in current environment`);
-                    }
+    // 代理处理 在node和浏览器环境时需要隐藏方法
+    return new Proxy(logger, {
+        get(target, prop, receiver) {
+            // 如果在浏览器环境中，且目标属性是方法，则返回 undefined 来“隐藏”方法
+            if (isInBrowser) {
+                if (['overline', 'dim', 'inverse'].includes(prop as string)) {
+                    throw new Error(`[easy-log-plus] \`${prop as string}\` is not supported in current environment`);
+                };
+            } else {
+                if (['image',].includes(prop as string)) {
+                    throw new Error(`[easy-log-plus] \`${prop as string}\` is not supported in current environment`);
                 }
-                return Reflect.get(target, prop, receiver);
             }
-        });
-    }
+            return Reflect.get(target, prop, receiver);
+        }
+    });
 };
 
 export default createLogger;

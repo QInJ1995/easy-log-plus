@@ -113,7 +113,7 @@ export interface PrintCustomStyle {
  * * @property {string} [style.reset] - 重置样式
  * * @property {string} [style.inverse] - 反转颜色 不支持浏览器
  * } style - 日志样式
- * @property {Colors} colors - 日志颜色
+ * @property {LevelColors} colors - 日志颜色
  * @property {string} formatter - 日志格式
  * @property {number} depth - 日志深度
  * @property {string} env - 环境变量(默认：development)
@@ -135,7 +135,7 @@ export interface LogOptions {
     dim?: boolean;
     inverse?: boolean;
   },
-  colors?: Colors;
+  colors?: LevelColors;
   formatter?: string
   depth?: number;
 }
@@ -148,7 +148,7 @@ export interface LogOptions {
  * @property {string} error - 错误日志颜色
  * @property {string} log - 日志颜色
  */
-export interface Colors {
+export interface LevelColors {
   debug?: string;
   info?: string;
   warn?: string;

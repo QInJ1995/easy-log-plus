@@ -1,4 +1,4 @@
-import type { Colors, Emojis, Env, LogLevel } from '../types/index'
+import type { LevelColors, Emojis, Env, LogLevel } from '../types/index'
 import { getGlobal } from './globals'
 
 // 全局对象
@@ -34,7 +34,7 @@ export const emojis: Emojis = {
 };
 
 // 日志level颜色
-export const colors: Colors = {
+export const colors: LevelColors = {
     debug: '#87CEFA',
     info: '#90EE90',
     warn: '#FF7F00',
@@ -49,7 +49,7 @@ export const replaceCharacters: string[] = ['[]', '【】']
  *  设置日志颜色
  * @param newColors 
  */
-export function setColors(newColors: Colors): void {
+export function setColors(newColors: LevelColors): void {
     Object.assign(colors, newColors);
 }
 
