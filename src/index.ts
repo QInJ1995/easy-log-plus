@@ -1,15 +1,6 @@
 import createLogger from './core/createLogger';
 import EasyLogVuePlugin from './core/vue-plugin';
-import Logger from './core/Logger';
 import { envs } from './utils/constant'
-import { LogLevel, PrintCustomStyle, Env, LogOptions, LevelColors, EasyLogVuePluginOptions, BaseColors } from './types'
-
-// 导出类型
-export type {
-    LogLevel, PrintCustomStyle, Env, LogOptions,
-    LevelColors, EasyLogVuePluginOptions, BaseColors, Logger
-}
-
 
 
 // 支持 ES Module

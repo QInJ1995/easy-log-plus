@@ -1,6 +1,6 @@
-import type { LogLevel, LogOptions, LevelColors, PrintOptions, Env } from '../types';
+import type { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
 import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable } from '../utils/common';
-import { envs, setColors, chalkLevel, setCallStackIndex, defaultNamespace, defaultLevel } from '../utils/constant';
+import { envs, chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
 
@@ -10,7 +10,7 @@ import chalk from 'chalk';
  * @class Logger
  * @constructor
  * @param {string} [namespace='Easy-Log-Plus'] - 命名空间名称
- * @param {LogOptions} [options] - 日志配置选项
+ * @param {ILogOptions} [options] - 日志配置选项
  */
 export default class Logger {
     /**
@@ -28,9 +28,9 @@ export default class Logger {
     /**
      * 日志配置选项
      *
-     * @type {Required<LogOptions>}
+     * @type {Required<ILogOptions>}
      */
-    public options: LogOptions;
+    public options: ILogOptions = {};
 
     /**
      * 存储打印样式的 Map 对象
@@ -39,19 +39,19 @@ export default class Logger {
      */
     private printMap: Map<string, any> = new Map();
 
-    constructor(namespace?: string | null, options: LogOptions = {}) {
+    constructor(namespace?: string | null, options: ILogOptions = {}) {
         chalk.level = chalkLevel;
         this.namespace = namespace ?? defaultNamespace
-        options.colors && setColors(options.colors);
         this.env = options.env ?? envs.dev
-        typeof options.depth === 'number' && setCallStackIndex(options.depth);
         this.options = {
             level: options.level || defaultLevel,
+            levelColors: options.levelColors ? { ...defaultLevelColors, ...options.levelColors! } : defaultLevelColors,
             isColor: options.isColor ?? true,
             isEmoji: options.isEmoji ?? true,
             style: options.style ?? {},
+            depth: typeof options.depth === 'number' && options.depth >= 0 ? options.depth : 0,
             formatter: options.formatter || '[$namespace$] [$time$] [$level$] [$tracker$] [$label$]',
-        };
+        }
     }
 
     /**
@@ -64,7 +64,7 @@ export default class Logger {
         if (type === 'log' && !shouldLog(this, level)) return
         const printCustomStyle = mergeObjects(this.options.style!, getPrintCustomStyle(this.printMap))
         const label = this.printMap.get('label')
-        const callStackInfo = getCallStackInfo()
+        const callStackInfo = getCallStackInfo(this.options.depth)
         const printOptions: PrintOptions = {
             level,
             namespace: this.namespace,
@@ -212,8 +212,9 @@ export default class Logger {
      * @param {any[]} args 日志参数
      * @returns {void | Function}
      */
-    log(...args: any[]): void {
+    log(...args: any[]): Logger {
         isEnable(this) && this.print('log', 'silent', args,)
+        return this
     }
 
     /**
@@ -222,8 +223,9 @@ export default class Logger {
      * @param args debug日志参数
      * @returns {Logger}
      */
-    debug(...args: any[]): void {
+    debug(...args: any[]): Logger {
         isEnable(this) && this.print('log', 'debug', args,)
+        return this
     }
 
     /**
@@ -232,8 +234,9 @@ export default class Logger {
      * @param args info日志参数
      * @returns {Logger}
      */
-    info(...args: any[]): void {
+    info(...args: any[]): Logger {
         isEnable(this) && this.print('log', 'info', args,)
+        return this
     }
 
     /**
@@ -242,8 +245,9 @@ export default class Logger {
      * @param args warn日志参数
      * @returns {Logger}
      */
-    warn(...args: any[]): void {
+    warn(...args: any[]): Logger {
         isEnable(this) && this.print('log', 'warn', args,)
+        return this
     }
 
     /**
@@ -252,8 +256,9 @@ export default class Logger {
      * @param args error日志参数
      * @returns {Logger}
      */
-    error(...args: any[]): void {
+    error(...args: any[]): Logger {
         isEnable(this) && this.print('log', 'error', args,)
+        return this
     }
 
     /**
@@ -261,8 +266,9 @@ export default class Logger {
      * 
      * @returns {Logger}
      */
-    time(): void {
+    time(): Logger {
         isEnable(this) && this.print('time', 'silent',)
+        return this
     }
 
     /**
@@ -270,8 +276,9 @@ export default class Logger {
      *
      * @returns {Logger}
      */
-    timeEnd(): void {
+    timeEnd(): Logger {
         isEnable(this) && this.print('timeEnd', 'silent',)
+        return this
     }
 
     /**
@@ -281,8 +288,9 @@ export default class Logger {
      * @param {number} scale - 图片缩放比例 0-1
      * @returns {void}
      */
-    image(url: string, scale: number = 0.1): void {
+    image(url: string, scale: number = 0.1): Logger {
         isEnable(this) && this.print('image', 'silent', [{ url, scale }])
+        return this
     }
 
     /**
@@ -291,27 +299,8 @@ export default class Logger {
      * @param {Object | Array<any>} obj - 需要打印的对象或数组
      * @returns {void}
      */
-    table(obj: Object | Array<any>): void {
+    table(obj: Object | Array<any>): Logger {
         isEnable(this) && this.print('table', 'silent', [obj])
-    }
-
-    /**
-     * 设置日志配置选项
-     *
-     * @param {LogOptions} options - 需要更新的日志选项
-     * @returns {void}
-     */
-    setOptions(options: LogOptions): void {
-        isEnable(this) && Object.assign(this.options, options);
-    }
-
-    /**
-     * 设置颜色
-     *
-     * @param {LevelColors} colors - 需要更新的颜色选项
-     * @returns {void}
-     */
-    setColors(colors: LevelColors): void {
-        isEnable(this) && setColors(colors);
+        return this
     }
 }

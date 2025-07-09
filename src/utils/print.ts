@@ -1,5 +1,5 @@
 import type { PrintOptions } from '../types/index'
-import { emojis, colors, } from './constant'
+import { emojis, } from './constant'
 import { getCurrentTimeDate, formatString, removeEmptyBrackets, getLogTrace, getChalk } from './common'
 
 
@@ -55,7 +55,7 @@ function formatTable(options: PrintOptions): { table: any; groupCollapsed: any }
     title = removeEmptyBrackets(title)
     logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis.down}`)
     title = `${title}`
-    color = logOptions.isColor ? color || colors[level!] : '#fff'
+    color = logOptions.isColor ? color || logOptions.levelColors![level!] : '#fff'
     printCustomStyle.color = color
     return { table, groupCollapsed: getChalk(printCustomStyle)(title) }
 }
@@ -80,7 +80,7 @@ function formatImage(options: PrintOptions): Promise<any[]> {
         logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis.image}`)
         title = `${title} -> `
         let color = printCustomStyle.color
-        color = logOptions.isColor ? color || colors[level!] : '#fff'
+        color = logOptions.isColor ? color || logOptions.levelColors![level!] : '#fff'
         let img: HTMLImageElement | null = new Image()
         img.crossOrigin = 'anonymous'
         img.onload = () => {
@@ -137,7 +137,7 @@ function formatTime(options: PrintOptions): string {
     title = removeEmptyBrackets(title)
     logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis.clock}`)
     title = `${title} -> `
-    color = logOptions.isColor ? color || colors[level!] : '#fff'
+    color = logOptions.isColor ? color || logOptions.levelColors![level!] : '#fff'
     printCustomStyle.color = color
     return getChalk(printCustomStyle)(title)
 }
@@ -169,7 +169,7 @@ export function formatLog(options: PrintOptions): any[] {
     title = removeEmptyBrackets(title)
     logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis[level!] || emojis.rocket}`)
     title = `${title} -> ${placeHolder}`
-    color = logOptions.isColor ? color || colors[level!] : '#fff'
+    color = logOptions.isColor ? color || logOptions.levelColors![level!] : '#fff'
     printCustomStyle.color = color
     return [getChalk(printCustomStyle)(title), ...messages]
 }

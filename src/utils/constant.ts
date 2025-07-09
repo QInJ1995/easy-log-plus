@@ -4,7 +4,7 @@ import type { LevelColors, Emojis, Env, LogLevel } from '../types/index'
 export const chalkLevel = 3
 
 // 调用栈索引
-export let callStackIndex: number = 3
+export const defaultCallStackIndex: number = 3
 
 // 环境
 export const envs: Readonly<{ dev: Env, prod: Env, }> = { dev: 'development', prod: 'production', }
@@ -30,7 +30,7 @@ export const emojis: Emojis = {
 };
 
 // 日志level颜色
-export const colors: LevelColors = {
+export const defaultLevelColors: LevelColors = {
     debug: '#87CEFA',
     info: '#90EE90',
     warn: '#FF7F00',
@@ -40,19 +40,3 @@ export const colors: LevelColors = {
 
 // 替换字符
 export const replaceCharacters: string[] = ['[]', '【】']
-
-/**
- *  设置日志颜色
- * @param newColors 
- */
-export function setColors(newColors: LevelColors): void {
-    Object.assign(colors, newColors);
-}
-
-/**
- * 设置调用栈索引
- * @param depth 
- */
-export function setCallStackIndex(depth: number): void {
-    callStackIndex = callStackIndex + depth || 0
-}

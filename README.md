@@ -33,7 +33,7 @@ const logger = createLogger('MyApp', {
   depth: 0, // 堆栈深度 默认为0， 在封装打印时需要配置，目的为了准确获取 tracker 信息
   isColor: true, // 是否启用彩色输出 默认为 true
   isEmoji: true, // 是否显示表情符号 默认为 true
-  colors: { // 自定义颜色
+  levelColors: { // 自定义等级颜色
     debug: '#87CEFA', // 调试级别颜色 默认为 '#87CEFA'
     info: '#90EE90', // 普通级别颜色 默认为 '#90EE90'
     warn: '#FF7F00', // 警告级别颜色 默认为 '#FF7F00'
@@ -109,7 +109,7 @@ app.use(EasyLogVuePlugin, {
   isColor: true, // 是否启用彩色输出 默认为 true
   isEmoji: true, // 是否显示表情符号 默认为 true
   isGlobal:  true, // 是否在全局(window/global)挂载logger 默认为 false  
-  colors: { // 自定义颜色
+  levelColors: { // 自定义颜色
     debug: '#87CEFA', // 调试级别颜色 默认为 '#87CEFA'
     info: '#90EE90', // 普通级别颜色 默认为 '#90EE90'
     warn: '#FF7F00', // 警告级别颜色 默认为 '#FF7F00'
@@ -156,7 +156,7 @@ logger.info('这是一条日志')
   - `0`: 默认值，表示不获取堆栈信息
 - `isColor`: 是否启用彩色输出
 - `isEmoji`: 是否显示表情符号
-- `colors`: 自定义颜色配置
+- `levelColors`: 自定义等级颜色配置
   - `debug`: 调试级别颜色
   - `info`: 普通级别颜色
   - `warn`: 警告级别颜色
@@ -172,32 +172,6 @@ logger.info('这是一条日志')
   - `overline`: 上划线
   - `dim`: 灰色
   - `inverse`: 反转颜色
-
-## 动态配置
-
-Logger 实例提供了动态更新配置的方法：
-
-```typescript
-const logger = createLogger('MyApp');
-
-// 更新配置选项
-logger.setOptions({
-  level: 'warn',
-  isEmoji: false,
-  style: {
-    
-  }
-});
-
-// 自定义日志颜色
-logger.setColors({
-  debug: '#95a5a6', // 默认为 '#87CEFA'
-  info: '#2ecc71', // 默认为 '#90EE90'
-  warn: '#e67e22', // 默认为 '#FF7F00'
-  error: '#ff0000' // 默认为 '#ff0000'
-  silent: '#000000' // 默认为 '#A7B0C4'
-});
-```
 
 ## 生成环境在浏览器的Console中查看日志
 
@@ -216,7 +190,6 @@ __EASY_LOG_PLUS__.level = 'debug'; // 设置日志级别 生成模式下默认�
 - 支持 ES Module 和 CommonJS 两种导入方式
 - Vue 2/3 插件支持
 - 支持显示文件名、函数名和行号
-- 支持动态更新配置
 - 支持自定义日志颜色
 - 支持表情符号
 - 支持自定义样式

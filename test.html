@@ -33,7 +33,14 @@
             // env: envs.prod
         })
         const logger3 = createLogger('qj-logger', {
-            env: envs.prod
+            env: envs.prod,
+            levelColors: {
+                debug: 'red',
+                info: 'blue',
+                warn: 'yellow',
+                error: 'red',
+                silent: 'green'
+            }
         })
         const logger = createLogger('hit-emr', {
             level: 'debug',
@@ -47,6 +54,7 @@
         logger2.underline.log(222)
         logger2.bold.italic.underline.strikethrough.color('green').label('info3').log(333)
         function qqqq() {
+            logger3.underline.log('overline1').color('red').log('overline2').log('overline3').log('overline4').log('overline5')
             logger2.bold.italic.underline.strikethrough.color('#FFA500').label('打印信息wwwwww').log('wwwwwwwwwwwwwwwww')
             logger3.label('logger3').log(logger3)
             logger3.label('logger3').debug(logger3)
@@ -56,13 +64,13 @@
         }
         qqqq()
 
-        logger.label('测试').time('test')
+        logger.label('测试').time('test').log('测试时间')
         logger.debug('debug', 'dads', {}, 111, true)
         logger.info('打印信息', 1, 2)
         logger.warn('warn')
         logger.error('error', 111, 'sdasdasd')
         logger.error('aaaa', { a: 1, b: { c: 2 } }, [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }], [1, '2', { c: 3 }])
-        logger.label('测试').timeEnd('test')
+        logger.label('测试').timeEnd('test').log('测试时间结束')
 
 
     </script>

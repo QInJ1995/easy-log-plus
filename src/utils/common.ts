@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import type { LogLevel, CallStackInfo, PrintCustomStyle, } from '../types/index';
-import { callStackIndex, envs, } from './constant';
+import { defaultCallStackIndex, envs, } from './constant';
 import Logger from '../core/Logger';
 
 /**
@@ -166,7 +166,7 @@ export function getChalk(printCustomStyle: PrintCustomStyle): Function {
     return Object.entries(printCustomStyle).reduce((acc, cur) => {
         let [key, value] = cur
         const isColor = ['color', 'bgColor'].includes(key)
-        const curKey = isColor ? capitalizeFirstLetter(value, false) : key
+        const curKey = isColor ? capitalizeFirstLetter(value as string, false) : key
         if (value) {
             if (Reflect.has(acc, curKey)) {
                 if (key === 'bgColor') {
@@ -177,9 +177,9 @@ export function getChalk(printCustomStyle: PrintCustomStyle): Function {
                 if (isColor) {
                     switch (key) {
                         case 'color':
-                            return acc.hex(value)
+                            return acc.hex(value as string)
                         default:
-                            return acc.bgHex(value)
+                            return acc.bgHex(value as string)
                     }
                 }
             }
@@ -223,7 +223,8 @@ function capitalizeFirstLetter(str: string, isUpperCase: boolean = true): string
  * @param {number} depth - 堆栈深度，默认为 0
  */
 
-export function getCallStackInfo(): CallStackInfo {
+export function getCallStackInfo(depth: number = 0): CallStackInfo {
+    const callStackIndex = defaultCallStackIndex + depth;
     try {
         throw new Error();
     } catch (e: any) {

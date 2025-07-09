@@ -1,18 +1,18 @@
 // vue插件
 
-import type { EasyLogVuePluginOptions, IEasyLogVuePlugin } from '../types/index'
+import type { IEasyLogVuePluginOptions, IEasyLogVuePlugin } from '../types/index'
 import createLogger from './createLogger';
 
 /**
  * 插件安装函数
  * @param {any} app Vue 应用实例
- * @param {EasyLogVuePluginOptions} options 插件配置选项
+ * @param {IEasyLogVuePluginOptions} options 插件配置选项
  * @returns {void}
  */
 // 插件安装函数
 const install = (
     app: any,
-    options?: EasyLogVuePluginOptions
+    options?: IEasyLogVuePluginOptions
 ): void => {
     options = {
         isVue: true,
