@@ -1,8 +1,14 @@
 import Logger from "../core/Logger";
+
 declare global {
-    // Extend the globalThis type to include logger
-    var logger: Logger | undefined;
+  // Extend the globalThis type to include logger
+  var logger: LoggerType | undefined;
 }
+
+/**
+ * 日志类型
+ */
+export type LoggerType = Logger;
 
 /** * 顶层 window 配置代理目标
  * @description 用于在浏览器环境下
