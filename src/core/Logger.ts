@@ -1,5 +1,5 @@
 import type { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
-import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable } from '../utils/common';
+import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis } from '../utils/common';
 import { envs, chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
@@ -13,6 +13,12 @@ import chalk from 'chalk';
  * @param {ILogOptions} [options] - 日志配置选项
  */
 export default class Logger {
+
+    /**
+     * 顶层全局对象
+     */
+    public topGlobalThis: any;
+
     /**
      * 当前环境
      */
@@ -39,9 +45,10 @@ export default class Logger {
      */
     private printMap: Map<string, any> = new Map();
 
-    constructor(namespace?: string | null, options: ILogOptions = {}) {
+    constructor(namespace?: string | null, options: ILogOptions = {}, topGlobalThis?: any) {
         chalk.level = chalkLevel;
         this.namespace = namespace ?? defaultNamespace
+        this.topGlobalThis = topGlobalThis ?? getTopGlobalThis()
         this.env = options.env ?? envs.dev
         this.options = {
             level: options.level || defaultLevel,

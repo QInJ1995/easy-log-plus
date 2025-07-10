@@ -1,6 +1,6 @@
 {
   "name": "easy-log-plus",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A simple and powerful logging utility for TypeScript/JavaScript",
   "type": "module",
   "main": "dist/easy-log-plus.mjs",

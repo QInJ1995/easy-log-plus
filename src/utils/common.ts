@@ -14,11 +14,18 @@ export function localConsoleLog(message: string, color: string = '#00bfff'): voi
 
 /**
  * 本地警告日志
- * @param message 错误消息
- * @param color 错误颜色
+ * @param args 
  */
-export function localConsoleWarn(message: string): void {
-    (globalThis as any)['con' + 'sole']['warn'](message);
+export function localConsoleWarn(...args: any[]): void {
+    (globalThis as any)['con' + 'sole']['warn'](args);
+}
+
+/**
+ * 本地错误日志
+ * @param args 
+ */
+export function localConsoleError(...args: any[]): void {
+    (globalThis as any)['con' + 'sole']['error'](args);
 }
 
 /**
@@ -50,8 +57,7 @@ export function getCurrentTimeDate(): string {
 export function shouldLog(logger: Logger, level?: LogLevel,): boolean {
     const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
     if (logger.env === envs.prod) {
-        const topWindow = getTopWindow()
-        logger.options.level = topWindow.__EASY_LOG_PLUS__?.level
+        logger.options.level = logger.topGlobalThis?.__EASY_LOG_PLUS__?.level
     }
     return !level || level === 'silent' ? true : levels.indexOf(level) >= levels.indexOf(logger.options.level || 'debug');
 }
@@ -62,8 +68,7 @@ export function shouldLog(logger: Logger, level?: LogLevel,): boolean {
  */
 export function isEnable(logger: Logger): boolean {
     if (logger.env === envs.prod) {
-        const topWindow = getTopWindow()
-        return topWindow.__EASY_LOG_PLUS__?.showLog;
+        return logger.topGlobalThis.__EASY_LOG_PLUS__?.showLog;
     }
     return true
 }
@@ -72,14 +77,14 @@ export function isEnable(logger: Logger): boolean {
  * 获取顶层 Window
  * @returns 
  */
-export function getTopWindow() {
-    let curWindow = globalThis as any
+export function getTopGlobalThis() {
+    let curGlobalThis = globalThis as any
     if (isBrowser()) {
-        while (curWindow && curWindow.parent && curWindow !== curWindow.parent) {
-            curWindow = curWindow.parent
+        while (curGlobalThis && curGlobalThis.parent && curGlobalThis !== curGlobalThis.parent) {
+            curGlobalThis = curGlobalThis.parent
         }
     }
-    return curWindow
+    return curGlobalThis
 }
 
 /**
@@ -306,7 +311,7 @@ function _extractFileName(fullPath: string): string {
         return fileName || '';
 
     } catch (error) {
-        console.warn('提取文件名失败:', error);
+        localConsoleError('[easy-log-plus] Error when extracting file name from path: ', error);
         // 降级处理：简单的字符串分割
         return fullPath.split(/[\/\\]/).pop() || '';
     }

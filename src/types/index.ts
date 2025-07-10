@@ -23,7 +23,7 @@ export type LoggerType = Logger;
 export type TopWindowCfgProxyTarget = {
   showLog: boolean;
   level: LogLevel;
-  createLogs: Map<string, Logger>;
+  hasLogs: Map<string, Logger>;
   [key: string]: any;
   [key: symbol]: any;
 };

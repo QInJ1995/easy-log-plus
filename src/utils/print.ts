@@ -3,7 +3,6 @@ import { emojis, } from './constant'
 import { getCurrentTimeDate, formatString, removeEmptyBrackets, getLogTrace, getChalk } from './common'
 
 
-
 /**
  * 打印日志处理 避免打包被删除
  * 

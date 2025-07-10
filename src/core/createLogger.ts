@@ -1,6 +1,6 @@
 
 import type { ILogOptions, TopWindowCfgProxyTarget } from '../types';
-import { getTopWindow, isBrowser, localConsoleLog, localConsoleWarn } from '../utils/common';
+import { getTopGlobalThis, isBrowser, localConsoleLog, localConsoleWarn } from '../utils/common';
 import { defaultLevel, defaultNamespace, envs, } from '../utils/constant';
 import { setGlobalLogger, } from '../utils/globals';
 import Logger from './Logger';
@@ -13,19 +13,19 @@ import Logger from './Logger';
  */
 const createLogger = (namespace?: string | null, options?: ILogOptions): Logger => {
     const isInBrowser = isBrowser(); // 判断是否在浏览器环境
-    const topWindow = getTopWindow() // 获取顶层 window 对象
+    const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
     let logger
 
     // 初始化配置
-    if (!topWindow.__EASY_LOG_PLUS__) {
+    if (!topGlobalThis.__EASY_LOG_PLUS__) {
         const topWindowCfgProxyTarget: TopWindowCfgProxyTarget = {
             showLog: (options?.env ?? envs.dev) !== envs.prod,
             level: options?.level ?? defaultLevel,
-            createLogs: new Map(),
+            hasLogs: new Map(),
         };
 
         // 代理顶层 window 对象的 __EASY_LOG_PLUS__ 属性
-        topWindow.__EASY_LOG_PLUS__ = new Proxy(topWindowCfgProxyTarget, {
+        topGlobalThis.__EASY_LOG_PLUS__ = new Proxy(topWindowCfgProxyTarget, {
             set(target, property, value, receiver) {
                 const allowedProperties = new Set(['showLog', 'level']);
                 // 检查属性是否在允许列表中
@@ -59,8 +59,8 @@ const createLogger = (namespace?: string | null, options?: ILogOptions): Logger 
     }
 
     // 如果顶层 window 对象存在 __EASY_LOG_PLUS__ 属性，则从该属性中获取日志实例
-    if (topWindow.__EASY_LOG_PLUS__.createLogs.has(namespace || defaultNamespace)) {
-        logger = topWindow.__EASY_LOG_PLUS__.createLogs.get(namespace || defaultNamespace)
+    if (topGlobalThis.__EASY_LOG_PLUS__.hasLogs.has(namespace || defaultNamespace)) {
+        logger = topGlobalThis.__EASY_LOG_PLUS__.hasLogs.get(namespace || defaultNamespace)
     } else {
         // 兼容浏览器环境 默认关闭浏览器不支持样式
         if (options?.style) {
@@ -72,9 +72,9 @@ const createLogger = (namespace?: string | null, options?: ILogOptions): Logger 
             }
         }
         // 创建日志实例
-        logger = new Logger(namespace, options);
+        logger = new Logger(namespace, options, topGlobalThis);
         // 将日志实例存储在全局变量中
-        topWindow.__EASY_LOG_PLUS__.createLogs.set(namespace || defaultNamespace, logger);
+        topGlobalThis.__EASY_LOG_PLUS__.hasLogs.set(namespace || defaultNamespace, logger);
         localConsoleLog(`EasyLogPlus${namespace ? `|[${namespace}]` : ''} logger created successfully!`)
     }
 
