@@ -1,6 +1,6 @@
-import type { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
-import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis } from '../utils/common';
-import { envs, chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
+import { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
+import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis, debugAlert } from '../utils/common';
+import { chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
 
@@ -22,7 +22,7 @@ export default class Logger {
     /**
      * 当前环境
      */
-    public env: Env = envs.dev;
+    public env: Env = Env.Development;
 
     /**
      * 当前命名空间，默认为 Easy-Log-Plus
@@ -49,7 +49,7 @@ export default class Logger {
         chalk.level = chalkLevel;
         this.namespace = namespace ?? defaultNamespace
         this.topGlobalThis = topGlobalThis ?? getTopGlobalThis()
-        this.env = options.env ?? envs.dev
+        this.env = options.env ?? Env.Development
         this.options = {
             level: options.level || defaultLevel,
             levelColors: options.levelColors ? { ...defaultLevelColors, ...options.levelColors! } : defaultLevelColors,
@@ -97,6 +97,7 @@ export default class Logger {
                 break;
             default:
                 print('log', printOptions)
+                debugAlert(level, this, printOptions) 
                 break;
         }
     }
@@ -220,7 +221,7 @@ export default class Logger {
      * @returns {void | Function}
      */
     log(...args: any[]): Logger {
-        isEnable(this) && this.print('log', 'silent', args,)
+        isEnable(this) && this.print('log', LogLevel.Silent, args,)
         return this
     }
 
@@ -231,7 +232,7 @@ export default class Logger {
      * @returns {Logger}
      */
     debug(...args: any[]): Logger {
-        isEnable(this) && this.print('log', 'debug', args,)
+        isEnable(this) && this.print('log', LogLevel.Debug, args,)
         return this
     }
 
@@ -242,7 +243,7 @@ export default class Logger {
      * @returns {Logger}
      */
     info(...args: any[]): Logger {
-        isEnable(this) && this.print('log', 'info', args,)
+        isEnable(this) && this.print('log', LogLevel.Info, args,)
         return this
     }
 
@@ -253,7 +254,7 @@ export default class Logger {
      * @returns {Logger}
      */
     warn(...args: any[]): Logger {
-        isEnable(this) && this.print('log', 'warn', args,)
+        isEnable(this) && this.print('log', LogLevel.Warn, args,)
         return this
     }
 
@@ -264,7 +265,7 @@ export default class Logger {
      * @returns {Logger}
      */
     error(...args: any[]): Logger {
-        isEnable(this) && this.print('log', 'error', args,)
+        isEnable(this) && this.print('log', LogLevel.Error, args,)
         return this
     }
 
@@ -274,7 +275,7 @@ export default class Logger {
      * @returns {Logger}
      */
     time(): Logger {
-        isEnable(this) && this.print('time', 'silent',)
+        isEnable(this) && this.print('time', LogLevel.Silent,)
         return this
     }
 
@@ -284,7 +285,7 @@ export default class Logger {
      * @returns {Logger}
      */
     timeEnd(): Logger {
-        isEnable(this) && this.print('timeEnd', 'silent',)
+        isEnable(this) && this.print('timeEnd', LogLevel.Silent,)
         return this
     }
 
@@ -296,7 +297,7 @@ export default class Logger {
      * @returns {void}
      */
     image(url: string, scale: number = 0.1): Logger {
-        isEnable(this) && this.print('image', 'silent', [{ url, scale }])
+        isEnable(this) && this.print('image', LogLevel.Silent, [{ url, scale }])
         return this
     }
 
@@ -307,7 +308,7 @@ export default class Logger {
      * @returns {void}
      */
     table(obj: Object | Array<any>): Logger {
-        isEnable(this) && this.print('table', 'silent', [obj])
+        isEnable(this) && this.print('table', LogLevel.Silent, [obj])
         return this
     }
 }

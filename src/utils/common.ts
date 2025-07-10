@@ -1,7 +1,18 @@
 import chalk from 'chalk';
-import type { LogLevel, CallStackInfo, PrintCustomStyle, } from '../types/index';
-import { defaultCallStackIndex, envs, } from './constant';
+import { LogLevel, CallStackInfo, PrintCustomStyle, Env, PrintOptions, } from '../types/index';
+import { defaultCallStackIndex, } from './constant';
 import Logger from '../core/Logger';
+
+export function debugAlert(level: LogLevel, logger: Logger, options: PrintOptions) {
+    if (level === LogLevel.Debug && logger.topGlobalThis?.__EASY_LOG_PLUS__?.isDebug && isBrowser()) {
+        (globalThis as any)['al' + 'ert'](`时间: ${getCurrentTimeDate()}
+命名空间: ${options.namespace}
+标签: ${options.label}
+文件名: ${options.callStackInfo.fileName}
+方法名: ${options.callStackInfo.functionName}
+行号: ${options.callStackInfo.lineNumber}`);
+    }
+}
 
 /**
  * 
@@ -17,7 +28,7 @@ export function localConsoleLog(message: string, color: string = '#00bfff'): voi
  * @param args 
  */
 export function localConsoleWarn(...args: any[]): void {
-    (globalThis as any)['con' + 'sole']['warn'](args);
+    (globalThis as any)['con' + 'sole']['warn'](...args);
 }
 
 /**
@@ -25,7 +36,7 @@ export function localConsoleWarn(...args: any[]): void {
  * @param args 
  */
 export function localConsoleError(...args: any[]): void {
-    (globalThis as any)['con' + 'sole']['error'](args);
+    (globalThis as any)['con' + 'sole']['error'](...args);
 }
 
 /**
@@ -55,11 +66,11 @@ export function getCurrentTimeDate(): string {
  * @returns {boolean} - 如果日志级别应该被记录，则返回true，否则返回false
  */
 export function shouldLog(logger: Logger, level?: LogLevel,): boolean {
-    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    if (logger.env === envs.prod) {
+    const levels: LogLevel[] = [LogLevel.Debug, LogLevel.Info, LogLevel.Warn, LogLevel.Error];
+    if (logger.env === Env.Production) {
         logger.options.level = logger.topGlobalThis?.__EASY_LOG_PLUS__?.level
     }
-    return !level || level === 'silent' ? true : levels.indexOf(level) >= levels.indexOf(logger.options.level || 'debug');
+    return !level || level === LogLevel.Silent ? true : levels.indexOf(level) >= levels.indexOf(logger.options.level || LogLevel.Debug);
 }
 
 /**
@@ -67,7 +78,7 @@ export function shouldLog(logger: Logger, level?: LogLevel,): boolean {
  * @returns {boolean} - 如果启用日志，则返回true，否则返回false
  */
 export function isEnable(logger: Logger): boolean {
-    if (logger.env === envs.prod) {
+    if (logger.env === Env.Production) {
         return logger.topGlobalThis.__EASY_LOG_PLUS__?.showLog;
     }
     return true

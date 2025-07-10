@@ -11,14 +11,12 @@
 <body>
     <script>
 
-        const { createLogger, envs } = window.EasyLogPlus
-        // envs.prod = '1111'
+        const { createLogger, } = window.EasyLogPlus
 
         const logger2 = createLogger('aaaa', {
             level: 'debug',
             formatter: '$namespace$ | [$time$] [$level$] [$tracker$] $label$',
             isGlobal: true,
-            // env: envs.prod,
             style: {
                 // color: 'red',
                 // bgColor: 'blue',
@@ -30,10 +28,9 @@
                 // dim: true,
                 // inverse: true,
             }
-            // env: envs.prod
         })
         const logger3 = createLogger('qj-logger', {
-            env: envs.prod,
+            env: 'prod',
             levelColors: {
                 debug: 'red',
                 info: 'blue',
@@ -54,6 +51,9 @@
         logger2.underline.log(222)
         logger2.bold.italic.underline.strikethrough.color('green').label('info3').log(333)
         function qqqq() {
+            setTimeout(() => {
+                logger3.label('setTimeout').log('1秒')
+            }, 1000)
             logger3.underline.log('overline1').color('red').log('overline2').log('overline3').log('overline4').log('overline5')
             logger2.bold.italic.underline.strikethrough.color('#FFA500').label('打印信息wwwwww').log('wwwwwwwwwwwwwwwww')
             logger3.label('logger3').log(logger3)

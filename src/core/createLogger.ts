@@ -1,7 +1,7 @@
 
-import type { ILogOptions, TopWindowCfgProxyTarget } from '../types';
+import { Env, LogLevel, type ILogOptions, type TopWindowCfgProxyTarget } from '../types';
 import { getTopGlobalThis, isBrowser, localConsoleLog, localConsoleWarn } from '../utils/common';
-import { defaultLevel, defaultNamespace, envs, } from '../utils/constant';
+import { defaultLevel, defaultNamespace, } from '../utils/constant';
 import { setGlobalLogger, } from '../utils/globals';
 import Logger from './Logger';
 
@@ -19,15 +19,16 @@ const createLogger = (namespace?: string | null, options?: ILogOptions): Logger 
     // 初始化配置
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
         const topWindowCfgProxyTarget: TopWindowCfgProxyTarget = {
-            showLog: (options?.env ?? envs.dev) !== envs.prod,
+            showLog: (options?.env ?? Env.Development) !== Env.Production,
             level: options?.level ?? defaultLevel,
             hasLogs: new Map(),
         };
-
+        isInBrowser && (topWindowCfgProxyTarget.isDebug = false)
         // 代理顶层 window 对象的 __EASY_LOG_PLUS__ 属性
         topGlobalThis.__EASY_LOG_PLUS__ = new Proxy(topWindowCfgProxyTarget, {
             set(target, property, value, receiver) {
                 const allowedProperties = new Set(['showLog', 'level']);
+                isInBrowser && allowedProperties.add('isDebug')
                 // 检查属性是否在允许列表中
                 if (!allowedProperties.has(property as string)) {
                     localConsoleWarn(`[easy-log-plus]: Attempted to set unsupported property: ${String(property)}!`);
@@ -46,8 +47,15 @@ const createLogger = (namespace?: string | null, options?: ILogOptions): Logger 
                             localConsoleWarn('[easy-log-plus]: level must be a string!');
                             return false;
                         }
-                        if (!['debug', 'info', 'warn', 'error', 'silent'].includes(value)) {
-                            localConsoleWarn('[easy-log-plus]: level must be one of debug, info, warn, error, silent!');
+                        if (![LogLevel.Debug, LogLevel.Info, LogLevel.Warn, LogLevel.Error, LogLevel.Silent].includes(value as LogLevel)) {
+                            localConsoleWarn(`[easy-log-plus]: level must be one of ${LogLevel.Debug}, ${LogLevel.Info}, ${LogLevel.Warn}, ${LogLevel.Error}, ${LogLevel.Silent}!`);
+                            return false;
+                        }
+                    }
+                    // 如果设置的是 isDebug 属性，类型检查
+                    if (property === 'isDebug') {
+                        if (typeof value !== 'boolean') {
+                            localConsoleWarn('[easy-log-plus]: isDebug must be a boolean!');
                             return false;
                         }
                     }

@@ -24,6 +24,7 @@ export type TopWindowCfgProxyTarget = {
   showLog: boolean;
   level: LogLevel;
   hasLogs: Map<string, Logger>;
+  isDebug?: boolean;
   [key: string]: any;
   [key: symbol]: any;
 };
@@ -31,7 +32,12 @@ export type TopWindowCfgProxyTarget = {
 /**
  * 环境
  */
-export type Env = 'development' | 'production'
+// export type Env = 'development' | 'production'
+
+export enum Env {
+  Development = 'dev',
+  Production = 'prod'
+}
 
 /**
  * 日志级别
@@ -43,7 +49,16 @@ export type Env = 'development' | 'production'
  * @property {string} error - 错误级别
  * @property {string} silent - 静默级别
  */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent';
+// export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent';
+
+// 日志等级
+export enum LogLevel {
+  Debug = 'debug',
+  Info = 'info',
+  Warn = 'warn',
+  Error = 'error',
+  Silent = 'silent'
+}
 
 /**
  * 打印选项

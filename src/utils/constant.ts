@@ -1,4 +1,4 @@
-import type { LevelColors, Emojis, Env, LogLevel } from '../types/index'
+import { LevelColors, Emojis, LogLevel } from '../types/index'
 
 // chalk等级
 export const chalkLevel = 3
@@ -6,14 +6,11 @@ export const chalkLevel = 3
 // 调用栈索引
 export const defaultCallStackIndex: number = 3
 
-// 环境
-export const envs: Readonly<{ dev: Env, prod: Env, }> = { dev: 'development', prod: 'production', }
-
 // 默认命名空间
 export const defaultNamespace = 'Easy-Log-Plus'
 
 // 默认日志等级
-export const defaultLevel: LogLevel = 'debug'
+export const defaultLevel: LogLevel = LogLevel.Debug
 
 // Emoji
 export const emojis: Emojis = {

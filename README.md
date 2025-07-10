@@ -24,10 +24,10 @@ logger.log('这是一条调试信息');
 ### ES Module 方式
 
 ```typescript
-import {createLogger, envs} from 'easy-log-plus';
+import {createLogger} from 'easy-log-plus';
 
 const logger = createLogger('MyApp', {
-  env: envs.prod, // 环境变量 默认为 'dev'
+  env: 'prod', // 环境变量 默认为 'dev'
   level: 'debug', // 日志级别 默认为 'debug'：'debug' <= 'info' <= 'warn' <= 'error' 
   formatter: '', // 默认：[$namespace$] [$time$] [$level$] [$tracker$] [$label$] 日志格式说明： $namespace$：命名空间，$time$：时间戳，$level$：日志级别，$tracker$：跟踪器，$label$：标签  
   depth: 0, // 堆栈深度 默认为0， 在封装打印时需要配置，目的为了准确获取 tracker 信息
@@ -76,7 +76,7 @@ logger.label('CustomInfo').color('#ff0000').bold.italic.underline.strikethrough.
 
 ```javascript
 const createLogger = require('easy-log-plus');
-const { createLogger, envs } = require('easy-log-plus')
+const { createLogger } = require('easy-log-plus')
 
 const logger = createLogger('MyApp', {
   level: 'debug',
@@ -102,7 +102,7 @@ app.use(EasyLogVuePlugin, {
   isProvide: true,    // 是否使用 provide/inject 方式 默认为 false
   enabled: true,       // 是否启用插件 默认为 true
   // 日志配置项
-  env: envs.prod, // 环境变量 默认为 'dev'
+  env: 'prod', // 环境变量 默认为 'dev'
   level: 'debug', // 日志级别 默认为 'debug'：'debug' <= 'info' <= 'warn' <= 'error' 
   formatter: '$namespace$ | [$time$] [$level$] [$tracker$] $label$', // 日志格式： $namespace$：命名空间，$time$：时间戳，$level$：日志级别，$tracker$：跟踪器，$label$：标签  
   depth: 0, // 堆栈深度 默认为0， 在封装打印时需要配置，目的为了准确获取 tracker 信息
@@ -177,7 +177,8 @@ logger.info('这是一条日志')
 
 ```text
 __EASY_LOG_PLUS__.showLog = true; // 开启日志
-__EASY_LOG_PLUS__.level = 'debug'; // 设置日志级别 生成模式下默认为error
+__EASY_LOG_PLUS__.level = 'debug'; // 设置日志级别 生成模式下默认为debug
+__EASY_LOG_PLUS__.isDebug = true; //  浏览器alert提示 window.logger.debug()打印模式下可用  默认为false
 ```
 
 ## 特性
