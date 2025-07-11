@@ -13,7 +13,7 @@
 
         const { createLogger, } = window.EasyLogPlus
 
-        const logger2 = createLogger('aaaa', {
+        const logger2 = createLogger('', {
             level: 'debug',
             formatter: '$namespace$ | [$time$] [$level$] [$tracker$] $label$',
             isGlobal: true,
@@ -41,7 +41,7 @@
         })
         const logger = createLogger('hit-emr', {
             level: 'debug',
-            // env: envs.prod
+            env: 'prod',
         })
         logger3.table([1, 2])
         // logger2.image('https://lsky-pro.smartideahub.site:2083/qls/image-20210724174717647.png')

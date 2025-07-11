@@ -4,6 +4,7 @@ import { getTopGlobalThis, isBrowser, localConsoleLog, localConsoleWarn } from '
 import { defaultLevel, defaultNamespace, } from '../utils/constant';
 import { setGlobalLogger, } from '../utils/globals';
 import Logger from './Logger';
+import buildInfo from '../../build-info.json'
 
 /**
  * 创建日志实例
@@ -83,7 +84,20 @@ const createLogger = (namespace?: string | null, options?: ILogOptions): Logger 
         logger = new Logger(namespace, options, topGlobalThis);
         // 将日志实例存储在全局变量中
         topGlobalThis.__EASY_LOG_PLUS__.hasLogs.set(namespace || defaultNamespace, logger);
-        localConsoleLog(`EasyLogPlus${namespace ? `|[${namespace}]` : ''} logger created successfully!`)
+        // localConsoleLog(`EasyLogPlus${namespace ? `|[${namespace}]` : ''} logger created successfully!`)
+        localConsoleLog(
+            '.-----------------------------------------------------------------------.' + '\n' +
+            `${namespace ? `|${namespace.padStart(20 + namespace.length, ' ')}${' | Created Successfully!'.padEnd(24 + 27 - namespace.length, ' ')}|` :
+            '|                          Created Successfully!                        |'}` + '\n' +
+            '|      _____                  _                  ____  _                |' + '\n' +
+            '|     | ____|__ _ ___ _   _  | |    ___   __ _  |  _ \\| |_   _ ___      |' + '\n' +
+            '|     |  _| / _` / __| | | | | |   / _ \\ / _` | | |_) | | | | / __|     |' + '\n' +
+            '|     | |__| (_| \\__ \\ |_| | | |__| (_) | (_| | |  __/| | |_| \\__ \\     |' + '\n' +
+            '|     |_____\\__,_|___/\\__, | |_____\\___/ \\__, | |_|   |_|\\__,_|___/     |' + '\n' +
+            '|                     |___/              |___/                          |' + '\n' +
+            `|                               v${buildInfo.version}                                  |` + '\n' +
+            '\'-----------------------------------------------------------------------\'' + '\n'
+        )
     }
 
     // 代理处理 在node和浏览器环境时需要隐藏方法
