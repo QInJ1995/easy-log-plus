@@ -88,14 +88,11 @@ export function isEnable(logger: Logger): boolean {
  * 获取顶层 Window
  * @returns 
  */
-export function getTopGlobalThis() {
-    let curGlobalThis = globalThis as any
+export function getTopGlobalThis(): any {
     if (isBrowser()) {
-        while (curGlobalThis && curGlobalThis.parent && curGlobalThis !== curGlobalThis.parent) {
-            curGlobalThis = curGlobalThis.parent
-        }
+        return globalThis.top
     }
-    return curGlobalThis
+    return globalThis
 }
 
 /**
@@ -103,7 +100,11 @@ export function getTopGlobalThis() {
  * 
  */
 export function isBrowser(): boolean {
-    return typeof window as any !== 'undefined'
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined' &&
+    typeof navigator !== 'undefined'
+  );
 }
 
 
