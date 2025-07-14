@@ -32,11 +32,9 @@ export type TopWindowCfgProxyTarget = {
 /**
  * 环境
  */
-// export type Env = 'development' | 'production'
-
 export enum Env {
-  Development = 'dev',
-  Production = 'prod'
+  Dev = 'dev',
+  Prod = 'prod'
 }
 
 /**
@@ -214,7 +212,7 @@ export type BaseColors = 'black' | 'red' | 'green' | 'yellow' | 'blue' | 'magent
  * @property {LevelColors} colors - 日志颜色
  * @property {string} formatter - 日志格式
  * @property {number} depth - 日志深度
- * @property {string} env - 环境变量(默认：development)
+ * @property {string} env - 环境变量(默认：dev)
  */
 export interface ILogOptions {
   env?: Env;

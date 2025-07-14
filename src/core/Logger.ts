@@ -22,7 +22,7 @@ export default class Logger {
     /**
      * 当前环境
      */
-    public env: Env = Env.Development;
+    public env: Env = Env.Dev;
 
     /**
      * 当前命名空间，默认为 Easy-Log-Plus
@@ -49,7 +49,7 @@ export default class Logger {
         chalk.level = chalkLevel;
         this.namespace = namespace ?? defaultNamespace
         this.topGlobalThis = topGlobalThis ?? getTopGlobalThis()
-        this.env = options.env ?? Env.Development
+        this.env = options.env ?? Env.Dev
         this.options = {
             level: options.level || defaultLevel,
             levelColors: options.levelColors ? { ...defaultLevelColors, ...options.levelColors! } : defaultLevelColors,

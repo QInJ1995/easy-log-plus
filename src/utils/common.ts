@@ -67,7 +67,7 @@ export function getCurrentTimeDate(): string {
  */
 export function shouldLog(logger: Logger, level?: LogLevel,): boolean {
     const levels: LogLevel[] = [LogLevel.Debug, LogLevel.Info, LogLevel.Warn, LogLevel.Error];
-    if (logger.env === Env.Production) {
+    if (logger.env === Env.Prod) {
         logger.options.level = logger.topGlobalThis?.__EASY_LOG_PLUS__?.level
     }
     return !level || level === LogLevel.Silent ? true : levels.indexOf(level) >= levels.indexOf(logger.options.level || LogLevel.Debug);
@@ -78,7 +78,7 @@ export function shouldLog(logger: Logger, level?: LogLevel,): boolean {
  * @returns {boolean} - 如果启用日志，则返回true，否则返回false
  */
 export function isEnable(logger: Logger): boolean {
-    if (logger.env === Env.Production) {
+    if (logger.env === Env.Prod) {
         return logger.topGlobalThis.__EASY_LOG_PLUS__?.showLog;
     }
     return true

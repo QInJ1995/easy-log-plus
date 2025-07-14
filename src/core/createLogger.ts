@@ -20,7 +20,7 @@ const createLogger = (namespace?: string | null, options?: ILogOptions): Logger 
     // 初始化配置
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
         const topWindowCfgProxyTarget: TopWindowCfgProxyTarget = {
-            showLog: (options?.env ?? Env.Development) !== Env.Production,
+            showLog: (options?.env ?? Env.Dev) !== Env.Prod,
             level: options?.level ?? defaultLevel,
             hasLogs: new Map(),
         };

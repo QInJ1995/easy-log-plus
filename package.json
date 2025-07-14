@@ -1,19 +1,19 @@
 {
   "name": "easy-log-plus",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A simple and powerful logging utility for TypeScript/JavaScript",
   "type": "module",
   "main": "dist/easy-log-plus.mjs",
-  "types": "dist/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/easy-log-plus.mjs",
       "require": "./dist/easy-log-plus.cjs",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/types/index.d.ts"
     },
     "./types": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/types/index.d.ts"
+      "types": "./dist/types/types/index.d.ts",
+      "default": "./dist/types/types/index.d.ts"
     }
   },
   "scripts": {
