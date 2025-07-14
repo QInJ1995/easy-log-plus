@@ -10,6 +10,8 @@ db.json
 analysis.html
 test.html
 test.js
+build-info.json
+prebuild.js
 tsconfig.json
 vite.config.dev.ts
 vite.config.prod.ts

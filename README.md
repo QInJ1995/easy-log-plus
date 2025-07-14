@@ -173,11 +173,11 @@ logger.info('这是一条日志')
   - `dim`: 灰色
   - `inverse`: 反转颜色
 
-## 生成环境在浏览器的Console中查看日志
+## 生产环境在浏览器的Console中查看日志
 
 ```text
 __EASY_LOG_PLUS__.showLog = true; // 开启日志
-__EASY_LOG_PLUS__.level = 'debug'; // 设置日志级别 生成模式下默认为debug
+__EASY_LOG_PLUS__.level = 'debug'; // 设置日志级别 生产模式下默认为debug
 __EASY_LOG_PLUS__.isDebug = true; //  浏览器alert提示 window.logger.debug()打印模式下可用  默认为false
 ```
 
