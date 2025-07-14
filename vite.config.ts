@@ -27,7 +27,7 @@ export default defineConfig({
     progress(),
     dts({
       insertTypesEntry: true, // 自动插入 types 字段到 package.json
-      outDir: 'dist/types' // 输出目录 
+      outDir: 'dist' // 输出目录 
 
     }),
     // 生成库的依赖关系图
