@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { LogLevel, CallStackInfo, PrintCustomStyle, Env, PrintOptions, } from '../types/index';
 import { defaultCallStackIndex, } from './constant';
 import Logger from '../core/Logger';
+import buildInfo from '../../build-info.json'
 
 export function debugAlert(level: LogLevel, logger: Logger, options: PrintOptions) {
     if (level === LogLevel.Debug && logger.topGlobalThis?.__EASY_LOG_PLUS__?.isDebug && isBrowser()) {
@@ -100,11 +101,11 @@ export function getTopGlobalThis(): any {
  * 
  */
 export function isBrowser(): boolean {
-  return (
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined' &&
-    typeof navigator !== 'undefined'
-  );
+    return (
+        typeof window !== 'undefined' &&
+        typeof document !== 'undefined' &&
+        typeof navigator !== 'undefined'
+    );
 }
 
 
@@ -285,6 +286,31 @@ export function getCallStackInfo(depth: number = 0): CallStackInfo {
             fileName,
             lineNumber
         };
+    }
+}
+
+/**
+ * 打印 ASCII 艺术字
+ */
+export function printAsciiArt(namespace: string = '',) {
+    localConsoleLog(
+        '\n' + '.-----------------------------------------------------------------------.' + '\n' +
+        `${_getTextLine((namespace ? namespace + ' | ' : '') + 'Created Successfully!')}` + '\n' +
+        '|      _____                  _                  ____  _                |' + '\n' +
+        '|     | ____|__ _ ___ _   _  | |    ___   __ _  |  _ \u005C| |_   _ ___      |' + '\n' +
+        '|     |  _| / _` / __| | | | | |   / _ \u005C / _` | | |_) | | | | / __|     |' + '\n' +
+        '|     | |__| (_| \u005C__ \u005C |_| | | |__| (_) | (_| | |  __/| | |_| \u005C__ \u005C     |' + '\n' +
+        '|     |_____\u005C__,_|___/\u005C__, | |_____\u005C___/ \u005C__, | |_|   |_|\u005C__,_|___/     |' + '\n' +
+        '|                     |___/              |___/                          |' + '\n' +
+        `${_getTextLine('v' + buildInfo.version)}` + '\n' +
+        '\'-----------------------------------------------------------------------\'' + '\n' + '\n'
+    )
+
+    function _getTextLine(text: string = '') {
+        const blankNumber = 73 - 2 - text.length
+        const startBlank = [...Array(Math.floor(blankNumber / 2))].map(() => ' ').join('')
+        const endBlank = [...Array(Math.ceil(blankNumber / 2))].map(() => ' ').join('')
+        return `|${startBlank}${text}${endBlank}|`
     }
 }
 
