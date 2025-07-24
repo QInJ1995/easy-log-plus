@@ -70,12 +70,12 @@ export default class Logger {
     private print(type: string, level: LogLevel, messages?: any[],): void {
         if (type === 'log' && !shouldLog(this, level)) return
         const printCustomStyle = mergeObjects(this.options.style!, getPrintCustomStyle(this.printMap))
-        const label = this.printMap.get('label')
+        const labels: string[] = this.printMap.get('labels') || []
         const callStackInfo = getCallStackInfo(this.options.depth)
         const printOptions: PrintOptions = {
             level,
             namespace: this.namespace,
-            label,
+            labels,
             messages: messages || [],
             logOptions: this.options,
             callStackInfo,
@@ -97,7 +97,7 @@ export default class Logger {
                 break;
             default:
                 print('log', printOptions)
-                debugAlert(level, this, printOptions) 
+                debugAlert(level, this, printOptions)
                 break;
         }
     }
@@ -131,7 +131,11 @@ export default class Logger {
      * @returns 
      */
     label(label: string): Logger {
-        isEnable(this) && this.printMap.set('label', label)
+        if (isEnable(this)) {
+            const labels = this.printMap.get('labels') || []
+            labels.push(label)
+            this.printMap.set('labels', labels)
+        }
         return this
     }
 

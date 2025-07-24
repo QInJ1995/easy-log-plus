@@ -41,7 +41,7 @@ export async function print(
  * @returns
  */
 function formatTable(options: PrintOptions): { table: any; groupCollapsed: any } {
-    let { level, messages, namespace, label, logOptions, callStackInfo, printCustomStyle } = options;
+    let { level, messages, namespace, labels, logOptions, callStackInfo, printCustomStyle } = options;
     const table = messages[0] ?? {}
     let color = printCustomStyle.color
     let title = formatString(logOptions.formatter!, {
@@ -49,7 +49,7 @@ function formatTable(options: PrintOptions): { table: any; groupCollapsed: any }
         time: getCurrentTimeDate(),
         level: level !== 'silent' ? `${level!.toUpperCase()}` : '',
         tracker: getLogTrace(callStackInfo.fileName, callStackInfo.functionName, callStackInfo.lineNumber) || '',
-        label: label || '',
+        label: labels!.join('|') || '',
     })
     title = removeEmptyBrackets(title)
     logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis.down}`)
@@ -66,14 +66,14 @@ function formatTable(options: PrintOptions): { table: any; groupCollapsed: any }
  */
 function formatImage(options: PrintOptions): Promise<any[]> {
     return new Promise((resolve) => {
-        const { messages, label, logOptions, namespace, level, callStackInfo, printCustomStyle } = options
+        const { messages, labels, logOptions, namespace, level, callStackInfo, printCustomStyle } = options
         const { url, scale } = messages[0]
         let title = formatString(logOptions.formatter!, {
             namespace: namespace || '',
             time: getCurrentTimeDate(),
             level: '',
             tracker: getLogTrace(callStackInfo.fileName, callStackInfo.functionName, callStackInfo.lineNumber) || '',
-            label: label || '',
+            label: labels!.join('|') || '',
         })
         title = removeEmptyBrackets(title)
         logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis.image}`)
@@ -124,13 +124,13 @@ function formatImage(options: PrintOptions): Promise<any[]> {
  * @returns string
  */
 function formatTime(options: PrintOptions): string {
-    const { level, namespace, label, logOptions, printCustomStyle, } = options;
+    const { level, namespace, labels, logOptions, printCustomStyle, } = options;
     let color = options.printCustomStyle.color
     let title = formatString(logOptions.formatter!, {
         namespace: namespace || '',
         time: '',
         level: '',
-        label: label || '',
+        label: labels!.join('|') || '',
         tracker: '',
     })
     title = removeEmptyBrackets(title)
@@ -155,14 +155,14 @@ function formatTime(options: PrintOptions): string {
  * @returns
  */
 export function formatLog(options: PrintOptions): any[] {
-    let { level, messages, namespace, label, logOptions, callStackInfo, printCustomStyle } = options;
+    let { level, messages, namespace, labels, logOptions, callStackInfo, printCustomStyle } = options;
     let color = printCustomStyle.color
     let title = formatString(logOptions.formatter!, {
         namespace: namespace || '',
         time: getCurrentTimeDate(),
         level: level !== 'silent' ? `${level!.toUpperCase()}` : '',
         tracker: getLogTrace(callStackInfo.fileName, callStackInfo.functionName, callStackInfo.lineNumber) || '',
-        label: label || '',
+        label: labels!.join('|') || '',
     })
     const placeHolder = messages.map(item => typeof item === 'string' ? '%s' : '%o').join(' ')
     title = removeEmptyBrackets(title)

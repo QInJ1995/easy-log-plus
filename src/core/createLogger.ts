@@ -84,7 +84,7 @@ const createLogger = (namespace?: string | null, options?: ILogOptions): Logger 
         // 将日志实例存储在全局变量中
         topGlobalThis.__EASY_LOG_PLUS__.hasLogs.set(namespace || defaultNamespace, logger);
         // 打印 ascii 艺术字
-        printAsciiArt(namespace || '')
+        (options?.env ?? Env.Dev) !== Env.Prod && printAsciiArt(namespace || '')
     }
 
     // 代理处理 在node和浏览器环境时需要隐藏方法

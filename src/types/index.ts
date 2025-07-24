@@ -73,7 +73,7 @@ export type PrintOptions = {
   level?: LogLevel;
   messages: any[];
   namespace?: string;
-  label?: string;
+  labels?: string[];
   logOptions: ILogOptions;
   callStackInfo: CallStackInfo;
   printCustomStyle: PrintCustomStyle;

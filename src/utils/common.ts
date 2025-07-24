@@ -8,7 +8,7 @@ export function debugAlert(level: LogLevel, logger: Logger, options: PrintOption
     if (level === LogLevel.Debug && logger.topGlobalThis?.__EASY_LOG_PLUS__?.isDebug && isBrowser()) {
         (globalThis as any)['al' + 'ert'](`时间: ${getCurrentTimeDate()}
 命名空间: ${options.namespace}
-标签: ${options.label}
+标签: ${options.labels!.join('|') || ''}
 文件名: ${options.callStackInfo.fileName}
 方法名: ${options.callStackInfo.functionName}
 行号: ${options.callStackInfo.lineNumber}`);
