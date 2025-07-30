@@ -75,7 +75,7 @@ logger.label('CustomInfo').color('#ff0000').bold.italic.underline.strikethrough.
 ### CommonJS 方式
 
 ```javascript
-const createLogger = require('easy-log-plus');
+const EasyLogPlus = require('easy-log-plus');
 const { createLogger } = require('easy-log-plus')
 
 const logger = createLogger('MyApp', {

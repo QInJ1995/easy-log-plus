@@ -161,8 +161,8 @@ export type CallStackInfo = {
  * easy-log-vue 插件接口
  * @property {Function} install - 安装方法
  */
-export type IEasyLogVuePlugin = {
-  install: (app: any, options?: IEasyLogVuePluginOptions) => void;
+export type IEasyLogPlusVuePlugin = {
+  install: (app: any, options?: IEasyLogPlusVuePluginOptions) => void;
 }
 
 /**
@@ -244,7 +244,7 @@ export interface ILogOptions {
  * @property {boolean} enabled - 是否启用插件
  * @extends  {ILogOptions} - 日志选项
  */
-export interface IEasyLogVuePluginOptions extends ILogOptions {
+export interface IEasyLogPlusVuePluginOptions extends ILogOptions {
   namespace?: string; // 命名空间
   isVue?: boolean; // 是否 挂载到 Vue 实例
   isProvide?: boolean; // 是否使用 provide/inject 只支持vue3
