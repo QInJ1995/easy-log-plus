@@ -1,5 +1,5 @@
 import { Env, ILogOptions, LogLevel, TopCfgProxyTarget } from "../types";
-import { selectRecordFile } from "./clientRecord";
+import { openRecordFile, closeRecordFile } from "./clientRecord";
 import { getTopGlobalThis, isClient, localConsoleWarn } from "./common";
 import { defaultLevel } from "./constant";
 
@@ -61,7 +61,7 @@ export default (options?: ILogOptions) => {
                             localConsoleWarn('[easy-log-plus]: isRecord must be a boolean!');
                             return false;
                         }
-                        value && selectRecordFile()
+                        value ? openRecordFile() : closeRecordFile();
                     }
                     return Reflect.set(target, property, value, receiver);
                 }
