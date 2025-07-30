@@ -5,7 +5,7 @@ import Logger from '../core/Logger';
 import buildInfo from '../../build-info.json'
 
 export function debugAlert(level: LogLevel, logger: Logger, options: PrintOptions) {
-    if (level === LogLevel.Debug && logger.topGlobalThis?.__EASY_LOG_PLUS__?.isDebug && isBrowser()) {
+    if (level === LogLevel.Debug && logger.topGlobalThis?.__EASY_LOG_PLUS__?.isDebug && isClient()) {
         (globalThis as any)['al' + 'ert'](`时间: ${getCurrentTimeDate()}
 命名空间: ${options.namespace}
 标签: ${options.labels!.join('|') || ''}
@@ -90,7 +90,7 @@ export function isEnable(logger: Logger): boolean {
  * @returns 
  */
 export function getTopGlobalThis(): any {
-    if (isBrowser()) {
+    if (isClient()) {
         return globalThis.top
     }
     return globalThis
@@ -100,7 +100,7 @@ export function getTopGlobalThis(): any {
  *  检查当前环境是否为浏览器
  * 
  */
-export function isBrowser(): boolean {
+export function isClient(): boolean {
     return (
         typeof window !== 'undefined' &&
         typeof document !== 'undefined' &&

@@ -1,4 +1,5 @@
 import { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
+import { appendToFile } from '../utils/clientRecord';
 import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis, debugAlert } from '../utils/common';
 import { chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
 import { print } from '../utils/print';
@@ -18,6 +19,11 @@ export default class Logger {
      * 顶层全局对象
      */
     public topGlobalThis: any;
+
+    /**
+     * 日志记录对象
+     */
+    public record: any
 
     /**
      * 当前环境
@@ -67,7 +73,7 @@ export default class Logger {
      * @param {LogLevel} level 日志级别
      * @returns {void}
      */
-    private print(type: string, level: LogLevel, messages?: any[],): void {
+    private async print(type: string, level: LogLevel, messages?: any[],): Promise<void> {
         if (type === 'log' && !shouldLog(this, level)) return
         const printCustomStyle = mergeObjects(this.options.style!, getPrintCustomStyle(this.printMap))
         const labels: string[] = this.printMap.get('labels') || []
@@ -96,8 +102,9 @@ export default class Logger {
                 print('table', printOptions)
                 break;
             default:
-                print('log', printOptions)
+                const printString = await print('log', printOptions)
                 debugAlert(level, this, printOptions)
+                printString && appendToFile(printString)
                 break;
         }
     }

@@ -12,7 +12,7 @@ import { getCurrentTimeDate, formatString, removeEmptyBrackets, getLogTrace, get
 export async function print(
     type: string,
     options: PrintOptions
-): Promise<void> {
+): Promise<string | void> {
     switch (type) {
         case 'time':
             (globalThis as any)['con' + 'sole']['time'](formatTime(options));
@@ -30,8 +30,9 @@ export async function print(
             (globalThis as any)['con' + 'sole']['groupEnd']();
             break;
         default:
-            (globalThis as any)['con' + 'sole']['log'](...formatLog(options));
-            break;
+            const { printString, printLog } = formatLog(options);
+            (globalThis as any)['con' + 'sole']['log'](...printLog);
+            return printString
     }
 }
 
@@ -154,7 +155,7 @@ function formatTime(options: PrintOptions): string {
  * @param options.callStackInfo 调用堆栈信息
  * @returns
  */
-export function formatLog(options: PrintOptions): any[] {
+export function formatLog(options: PrintOptions): { printString: string, printLog: any[] } {
     let { level, messages, namespace, labels, logOptions, callStackInfo, printCustomStyle } = options;
     let color = printCustomStyle.color
     let title = formatString(logOptions.formatter!, {
@@ -170,6 +171,16 @@ export function formatLog(options: PrintOptions): any[] {
     title = `${title} -> ${placeHolder}`
     color = logOptions.isColor ? color || logOptions.levelColors![level!] : '#fff'
     printCustomStyle.color = color
-    return [getChalk(printCustomStyle)(title), ...messages]
+    return { printString: title + _serializeMessage(messages), printLog: [getChalk(printCustomStyle)(title), ...messages] }
+}
+
+function _serializeMessage(messages: any[]): string {
+    return messages.reduce((prev, next) => {
+        if (typeof next === 'string') {
+            return prev + next
+        } else {
+            return prev + JSON.stringify(next)
+        }
+    })
 }
 

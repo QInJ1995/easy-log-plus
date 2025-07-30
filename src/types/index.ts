@@ -20,11 +20,12 @@ export type LoggerType = Logger;
  * @property {any} [key: string] - 其他任意属性
  * @property {any} [key: symbol] - 其他任意属性
  */
-export type TopWindowCfgProxyTarget = {
-  showLog: boolean;
-  level: LogLevel;
-  hasLogs: Map<string, Logger>;
-  isDebug?: boolean;
+export type TopCfgProxyTarget = {
+  showLog: boolean; // 是否显示日志
+  level: LogLevel; // 日志级别
+  hasLogs: Map<string, Logger>; // 存储已创建的日志实例
+  isDebug?: boolean; // 是否调试模式
+  isRecord?: boolean; // 是否记录日志
   [key: string]: any;
   [key: symbol]: any;
 };
