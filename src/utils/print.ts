@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { type PrintOptions } from "../types/index";
 import { emojis } from "./constant";
 import {
@@ -7,6 +8,7 @@ import {
     getLogTrace,
     getChalk,
 } from "./common";
+import { logStore } from "../record/client/initStore";
 
 /**
  * 打印日志处理 避免打包被删除
@@ -17,7 +19,7 @@ import {
 export async function print(
     type: string,
     options: PrintOptions
-): Promise<string | void> {
+): Promise<void> {
     switch (type) {
         case "time":
             (globalThis as any)["con" + "sole"]["time"](formatTime(options));
@@ -37,9 +39,7 @@ export async function print(
             (globalThis as any)["con" + "sole"]["groupEnd"]();
             break;
         default:
-            const { printString, printLog } = formatLog(options);
-            (globalThis as any)["con" + "sole"]["log"](...printLog);
-            return printString;
+            (globalThis as any)["con" + "sole"]["log"](...formatLog(options));
     }
 }
 
@@ -202,10 +202,7 @@ function formatTime(options: PrintOptions): string {
  * @param options.callStackInfo 调用堆栈信息
  * @returns
  */
-export function formatLog(options: PrintOptions): {
-    printString: string;
-    printLog: any[];
-} {
+export function formatLog(options: PrintOptions): any[] {
     let {
         level,
         messages,
@@ -231,7 +228,7 @@ export function formatLog(options: PrintOptions): {
     title = removeEmptyBrackets(title);
     logOptions.isEmoji &&
         (title = `${emojis.new} ${title} ${emojis[level!] || emojis.rocket}`);
-    const printString = `${title} -> ${_serializeMessage(messages)}`
+    logStore && logStore.setItem(uuidv4(), { title, messages, })
     const placeHolder = messages
         .map((item) => (typeof item === "string" ? "%s" : "%o"))
         .join(" ");
@@ -240,40 +237,5 @@ export function formatLog(options: PrintOptions): {
         ? color || logOptions.levelColors![level!]
         : "#fff";
     printCustomStyle.color = color;
-    return {
-        printString,
-        printLog: [getChalk(printCustomStyle)(title), ...messages],
-    };
-}
-
-function _serializeMessage(messages: any[]): string {
-    // 创建一个Set用于跟踪已序列化的对象，处理循环引用
-    const seen = new Set();
-
-    // 安全的字符串化函数
-    const safeStringify = (obj: any) => {
-        return JSON.stringify(obj, (_key, value) => {
-            // 处理循环引用
-            if (typeof value === 'object' && value !== null) {
-                if (seen.has(value)) {
-                    return '[Circular Reference]';
-                }
-                seen.add(value);
-            }
-            // 过滤掉全局对象
-            if (value === window || value === document) {
-                return '[Global Object]';
-            }
-            return value;
-        });
-    };
-
-    return messages.reduce((prev, next) => {
-        if (typeof next === "string") {
-            return prev + next;
-        } else {
-            // 使用安全的字符串化方法
-            return prev + safeStringify(next);
-        }
-    }, "");
+    return [getChalk(printCustomStyle)(title), ...messages]
 }

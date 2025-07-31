@@ -85,6 +85,8 @@
       logger3.label("测试1").log("测试1111");
       logger3.label("测试2").log("测试12222");
       logger3.label("测试3").log("测试13333");
+      logger3.label("测试3").log({ a: { b: { c: 1 } } });
+      logger3.label("测试3").log([1, "2", { c: 3 }]);
       logger3.label("测试4").log("测试444", 1, { a: { b: { c: 1 } } }, true, false, [1, 2, 3]);
       logger.error(
         "aaaa",
