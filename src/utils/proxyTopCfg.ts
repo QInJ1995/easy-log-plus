@@ -1,8 +1,8 @@
 import { Env, ILogOptions, LogLevel, TopCfgProxyTarget } from "../types";
 import { getTopGlobalThis, isClient, localConsoleWarn } from "./common";
 import { defaultLevel } from "./constant";
+import downloadLog from '../record/client/downloadLog'
 import { initLogStore, logStore } from '../record/client/initStore';
-import { registerDownloadLogEvent, removeDownloadLogEvent } from "../record/client/keyboardEvents";
 
 
 export default (options?: ILogOptions) => {
@@ -17,14 +17,22 @@ export default (options?: ILogOptions) => {
         if (isInClient) {
             topCfgProxyTarget.debugLog = false
             topCfgProxyTarget.recordLog = false
+            topCfgProxyTarget.execExportLog = () => { } // 导出日志
         }
         // 代理顶层 window 对象的 __EASY_LOG_PLUS__ 属性 
-        return new Proxy(topCfgProxyTarget, {
+        const proxyTopCfg = new Proxy(topCfgProxyTarget, {
+            get(target, property, receiver) {
+                if (typeof target[property] === 'function') {
+                    downloadLog() // 执行导出日志
+                }
+                return Reflect.get(target, property, receiver);
+            },
             set(target, property, value, receiver) {
                 const allowedProperties = new Set(['showLog', 'level']);
                 if (isInClient) {
                     allowedProperties.add('debugLog')
                     allowedProperties.add('recordLog')
+                    allowedProperties.add('execExportLog')
                 }
                 // 检查属性是否在允许列表中
                 if (!allowedProperties.has(property as string)) {
@@ -64,17 +72,21 @@ export default (options?: ILogOptions) => {
                         }
                         if (value) {
                             initLogStore(); // 初始化日志存储
-                            registerDownloadLogEvent(); // 注册下载日志事件
                         } else {
                             logStore && logStore.clear(); // 清空日志存储
-                            removeDownloadLogEvent(); // 移除下载日志事件
                         }
+                    }
+                    // 如果设置的是 execExportLog 属性，类型检查
+                    if (property === 'execExportLog') {
+                        localConsoleWarn('[easy-log-plus]: execExportLog is readonly and cannot be set!');
+                        return false
                     }
                     return Reflect.set(target, property, value, receiver);
                 }
 
             }
         });
+        return proxyTopCfg
     } else {
         return topGlobalThis.__EASY_LOG_PLUS__
     }

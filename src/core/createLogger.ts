@@ -24,7 +24,7 @@ const createLogger = (namespace?: string | null, options?: ILogOptions): Logger 
         topGlobalThis.__EASY_LOG_PLUS__ = proxyTopCfg
     }
     // 如果顶层 window 对象存在 __EASY_LOG_PLUS__ 属性，则从该属性中获取日志实例
-    if (topGlobalThis.__EASY_LOG_PLUS__ && topGlobalThis.__EASY_LOG_PLUS__.hasLogs.has(namespace || defaultNamespace)) {
+    if (topGlobalThis?.__EASY_LOG_PLUS__ && topGlobalThis.__EASY_LOG_PLUS__.hasLogs.has(namespace || defaultNamespace)) {
         logger = topGlobalThis.__EASY_LOG_PLUS__.hasLogs.get(namespace || defaultNamespace)
     } else {
         // 兼容浏览器环境 默认关闭浏览器不支持样式
