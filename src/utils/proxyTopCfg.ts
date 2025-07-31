@@ -1,7 +1,8 @@
 import { Env, ILogOptions, LogLevel, TopCfgProxyTarget } from "../types";
-import { openRecordFile, closeRecordFile } from "./clientRecord";
 import { getTopGlobalThis, isClient, localConsoleWarn } from "./common";
 import { defaultLevel } from "./constant";
+import { initLogStore, logStore } from '../record/client/initStore';
+import { registerDownloadLogEvent, removeDownloadLogEvent } from "../record/client/keyboardEvents";
 
 
 export default (options?: ILogOptions) => {
@@ -14,16 +15,16 @@ export default (options?: ILogOptions) => {
             hasLogs: new Map(),
         };
         if (isInClient) {
-            topCfgProxyTarget.isDebug = false
-            topCfgProxyTarget.isRecord = false
+            topCfgProxyTarget.debugLog = false
+            topCfgProxyTarget.recordLog = false
         }
         // 代理顶层 window 对象的 __EASY_LOG_PLUS__ 属性 
         return new Proxy(topCfgProxyTarget, {
             set(target, property, value, receiver) {
                 const allowedProperties = new Set(['showLog', 'level']);
                 if (isInClient) {
-                    allowedProperties.add('isDebug')
-                    allowedProperties.add('isRecord')
+                    allowedProperties.add('debugLog')
+                    allowedProperties.add('recordLog')
                 }
                 // 检查属性是否在允许列表中
                 if (!allowedProperties.has(property as string)) {
@@ -48,20 +49,26 @@ export default (options?: ILogOptions) => {
                             return false;
                         }
                     }
-                    // 如果设置的是 isDebug 属性，类型检查
-                    if (property === 'isDebug') {
+                    // 如果设置的是 debugLog 属性，类型检查
+                    if (property === 'debugLog') {
                         if (typeof value !== 'boolean') {
-                            localConsoleWarn('[easy-log-plus]: isDebug must be a boolean!');
+                            localConsoleWarn('[easy-log-plus]: debugLog must be a boolean!');
                             return false;
                         }
                     }
-                    // 如果设置的是 isDebug 属性，类型检查
-                    if (property === 'isRecord') {
+                    // 如果设置的是 debugLog 属性，类型检查
+                    if (property === 'recordLog') {
                         if (typeof value !== 'boolean') {
-                            localConsoleWarn('[easy-log-plus]: isRecord must be a boolean!');
+                            localConsoleWarn('[easy-log-plus]: recordLog must be a boolean!');
                             return false;
                         }
-                        value ? openRecordFile() : closeRecordFile();
+                        if (value) {
+                            initLogStore(); // 初始化日志存储
+                            registerDownloadLogEvent(); // 注册下载日志事件
+                        } else {
+                            logStore && logStore.clear(); // 清空日志存储
+                            removeDownloadLogEvent(); // 移除下载日志事件
+                        }
                     }
                     return Reflect.set(target, property, value, receiver);
                 }

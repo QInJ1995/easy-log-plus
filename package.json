@@ -37,6 +37,8 @@
     "vite-plugin-progress": "^0.0.7"
   },
   "dependencies": {
-    "chalk": "^5.4.1"
+    "chalk": "^5.4.1",
+    "localforage": "^1.10.0",
+    "uuid": "^11.1.0"
   }
 }

@@ -1,9 +1,10 @@
+import { logStore } from '../record/client/initStore';
 import { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
-import { appendToFile } from '../utils/clientRecord';
 import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis, debugAlert } from '../utils/common';
 import { chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * 日志记录器类，用于按命名空间输出结构化日志。
@@ -104,7 +105,7 @@ export default class Logger {
             default:
                 const printString = await print('log', printOptions)
                 debugAlert(level, this, printOptions)
-                printString && appendToFile(printString)
+                printString && logStore && logStore.setItem(uuidv4(), printString)
                 break;
         }
     }

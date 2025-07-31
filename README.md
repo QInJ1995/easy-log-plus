@@ -178,7 +178,7 @@ logger.info('这是一条日志')
 ```text
 __EASY_LOG_PLUS__.showLog = true; // 开启日志
 __EASY_LOG_PLUS__.level = 'debug'; // 设置日志级别 生产模式下默认为debug
-__EASY_LOG_PLUS__.isDebug = true; //  浏览器alert提示 window.logger.debug()打印模式下可用  默认为false
+__EASY_LOG_PLUS__.debugLog = true; //  浏览器alert提示 window.logger.debug()打印模式下可用  默认为false
 ```
 
 ## 特性

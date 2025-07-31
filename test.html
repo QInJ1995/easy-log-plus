@@ -1,97 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <script src="./dist/easy-log-plus.umd.js"></script>
-  </head>
 
-  <body>
-    <script>
-      const { createLogger } = window.EasyLogPlus;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <script src="./dist/easy-log-plus.umd.js"></script>
+</head>
 
-      const logger2 = createLogger("", {
-        level: "debug",
-        formatter: "$namespace$ | [$time$] [$level$] [$tracker$] $label$",
-        isGlobal: true,
-        style: {
-          // color: 'red',
-          // bgColor: 'blue',
-          // bold: true,
-          // italic: true,
-          // underline: true,
-          // overline: true,
-          // strikethrough: true,
-          // dim: true,
-          // inverse: true,
-        },
-      });
-      const logger3 = createLogger("qj-logger", {
-        env: "prod",
-        levelColors: {
-          debug: "red",
-          info: "blue",
-          warn: "yellow",
-          error: "red",
-          silent: "green",
-        },
-      });
-      const logger = createLogger("hit-emr", {
-        level: "debug",
-        env: "prod",
-      });
-      logger3.table([1, 2]);
-      // logger2.image('https://lsky-pro.smartideahub.site:2083/qls/image-20210724174717647.png')
-      logger2
-        .label("图片")
-        .image(
-          "https://img2.baidu.com/it/u=2814429148,2262424695&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1730998800&t=e60940f39f2a1e0cf5e65c6df7b0227a"
-        );
-      logger2.color("red").label("info1").bgColor("green").log(111);
-      logger2.log(45454222);
-      logger2.underline.log(222);
+<body>
+  <script>
+    const { createLogger } = window.EasyLogPlus;
+
+    const logger2 = createLogger("", {
+      level: "debug",
+      formatter: "$namespace$ | [$time$] [$level$] [$tracker$] $label$",
+      isGlobal: true,
+      style: {
+        // color: 'red',
+        // bgColor: 'blue',
+        // bold: true,
+        // italic: true,
+        // underline: true,
+        // overline: true,
+        // strikethrough: true,
+        // dim: true,
+        // inverse: true,
+      },
+    });
+    const logger3 = createLogger("qj-logger", {
+      env: "prod",
+      levelColors: {
+        debug: "red",
+        info: "blue",
+        warn: "yellow",
+        error: "red",
+        silent: "green",
+      },
+    });
+    const logger = createLogger("hit-emr", {
+      level: "debug",
+      env: "prod",
+    });
+    logger3.table([1, 2]);
+    // logger2.image('https://lsky-pro.smartideahub.site:2083/qls/image-20210724174717647.png')
+    logger2
+      .label("图片")
+      .image(
+        "https://img2.baidu.com/it/u=2814429148,2262424695&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1730998800&t=e60940f39f2a1e0cf5e65c6df7b0227a"
+      );
+    logger2.color("red").label("info1").bgColor("green").log(111);
+    logger2.log(45454222);
+    logger2.underline.log(222);
+    logger2.bold.italic.underline.strikethrough
+      .color("green")
+      .label("info3")
+      .log(333);
+    function qqqq() {
+      logger3.underline
+        .log("overline1")
+        .color("red")
+        .log("overline2")
+        .log("overline3")
+        .log("overline4")
+        .log("overline5");
       logger2.bold.italic.underline.strikethrough
-        .color("green")
-        .label("info3")
-        .log(333);
-      function qqqq() {
-        logger3.underline
-          .log("overline1")
-          .color("red")
-          .log("overline2")
-          .log("overline3")
-          .log("overline4")
-          .log("overline5");
-        logger2.bold.italic.underline.strikethrough
-          .color("#FFA500")
-          .label("打印信息wwwwww")
-          .log("wwwwwwwwwwwwwwwww");
-        logger3
-          .label("logger3")
-          .label("测试222")
-          .log([{ a: 1 }, 1, "2"]);
-        logger3.label("logger3").debug([1,2,3]);
-        logger3.label("logger3").info(1);
-        logger3.label("logger3").warn(true);
-        logger3.label("logger3").error(null);
-        setTimeout(() => {
-          logger3.label("setTimeout").log("1秒");
-        }, 3000);
-      }
+        .color("#FFA500")
+        .label("打印信息wwwwww")
+        .log("wwwwwwwwwwwwwwwww");
+      logger3
+        .label("logger3")
+        .label("测试222")
+        .log([{ a: 1 }, 1, "2"]);
+      logger3.label("logger3").debug([1, 2, 3]);
+      logger3.label("logger3").info(1);
+      logger3.label("logger3").warn(true);
+      logger3.label("logger3").error(null);
+      setTimeout(() => {
+        logger3.label("setTimeout").log("1秒");
+      }, 3000);
+    }
 
-      function qqqq2() {
-        logger3.label("测试1").log("测试1111");
-        logger3.label("测试2").log("测试12222");
-        logger3.label("测试3").log("测试13333");
-      }
-      // qqqq()
-
-      logger.label("测试").time("test").log("测试时间");
-      logger.debug("debug", "dads", {}, 111, true);
-      logger.info("打印信息", 1, 2);
-      logger.warn("warn");
-      logger.error("error", 111, "sdasdasd");
+    function qqqq2() {
+      logger3.label("测试1").log("测试1111");
+      logger3.label("测试2").log("测试12222");
+      logger3.label("测试3").log("测试13333");
+      logger3.label("测试4").log("测试444", 1, { a: { b: { c: 1 } } }, true, false, [1, 2, 3]);
       logger.error(
         "aaaa",
         { a: 1, b: { c: 2 } },
@@ -101,7 +95,25 @@
         [1, "2", { c: 3 }],
         [1, "2", { c: 3 }]
       );
-      logger.label("测试").timeEnd("test").log("测试时间结束");
-    </script>
-  </body>
+    }
+    // qqqq()
+
+    logger.label("测试").time("test").log("测试时间");
+    logger.debug("debug", "dads", {}, 111, true);
+    logger.info("打印信息", 1, 2);
+    logger.warn("warn");
+    logger.error("error", 111, "sdasdasd");
+    logger.error(
+      "aaaa",
+      { a: 1, b: { c: 2 } },
+      [1, "2", { c: 3 }],
+      [1, "2", { c: 3 }],
+      [1, "2", { c: 3 }],
+      [1, "2", { c: 3 }],
+      [1, "2", { c: 3 }]
+    );
+    logger.label("测试").timeEnd("test").log("测试时间结束");
+  </script>
+</body>
+
 </html>

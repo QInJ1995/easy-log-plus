@@ -17,7 +17,6 @@ const createLogger = (namespace?: string | null, options?: ILogOptions): Logger 
     const isInClient = isClient(); // 判断是否在浏览器环境
     const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
     let logger: Logger
-
     // 创建配置代理对象
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
         // 创建代理对象

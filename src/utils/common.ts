@@ -17,7 +17,7 @@ export function debugAlert(
 ) {
   if (
     level === LogLevel.Debug &&
-    logger.topGlobalThis?.__EASY_LOG_PLUS__?.isDebug &&
+    logger.topGlobalThis?.__EASY_LOG_PLUS__?.debugLog &&
     isClient()
   ) {
     (globalThis as any)["al" + "ert"](`时间: ${getCurrentTimeDate()}
@@ -65,7 +65,7 @@ export function localConsoleError(...args: any[]): void {
  *
  * @returns {string} 当前日期和时间的字符串表示
  */
-export function getCurrentTimeDate(isRecord?: boolean): string {
+export function getCurrentTimeDate(recordLog?: boolean): string {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0"); // 月份从0开始
@@ -74,7 +74,7 @@ export function getCurrentTimeDate(isRecord?: boolean): string {
   const minutes = String(now.getMinutes()).padStart(2, "0");
   const seconds = String(now.getSeconds()).padStart(2, "0");
 
-  return isRecord
+  return recordLog
     ? `${year}_${month}_${day}_${hours}_${minutes}_${seconds}`
     : `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
