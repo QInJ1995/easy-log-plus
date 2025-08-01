@@ -2,7 +2,7 @@ import { Env, ILogOptions, LogLevel, TopCfgProxyTarget } from "../../types";
 import { getTopGlobalThis, checkIsBrowser, localConsoleError, localConsoleLog, localConsoleWarn } from "../../utils/common";
 import { defaultLevel } from "../../utils/constant";
 import downloadLog from './downloadLog'
-import { clearStores } from "./storeHandler";
+import { clearStores } from "./store";
 
 
 export default (options?: ILogOptions) => {

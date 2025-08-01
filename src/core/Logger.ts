@@ -1,9 +1,10 @@
-import { initLogStore } from '../environment/browser/storeHandler';
 import LocalForageService from '../environment/browser/LocalForageService';
 import { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
-import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis, debugAlert } from '../utils/common';
+import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis, debugAlert, checkIsBrowser } from '../utils/common';
 import { chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
 import { print } from '../utils/print';
+import registerBrowser from '../environment/browser/registerBrowser'
+import registerServer from '../environment/server/registerServer'
 import chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -54,11 +55,11 @@ export default class Logger {
     private printMap: Map<string, any> = new Map();
 
     constructor(namespace?: string | null, options: ILogOptions = {}, topGlobalThis?: any) {
+        const isBrowser = checkIsBrowser();
         chalk.level = chalkLevel;
         this.namespace = namespace ?? defaultNamespace
         this.topGlobalThis = topGlobalThis ?? getTopGlobalThis()
         this.env = options.env ?? Env.Dev
-        this.logStore = initLogStore(this.namespace || defaultNamespace)
         this.options = {
             level: options.level || defaultLevel,
             levelColors: options.levelColors ? { ...defaultLevelColors, ...options.levelColors! } : defaultLevelColors,
@@ -68,6 +69,9 @@ export default class Logger {
             depth: typeof options.depth === 'number' && options.depth >= 0 ? options.depth : 0,
             formatter: options.formatter || '[$namespace$] [$time$] [$level$] [$tracker$] [$label$]',
         }
+        // 注册不同环境注册
+        isBrowser ? registerBrowser(this) : registerServer()
+
     }
 
     /**

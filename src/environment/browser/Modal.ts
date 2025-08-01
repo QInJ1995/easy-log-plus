@@ -1,16 +1,16 @@
 export default class Modal {
-    private options: any;
-    private backdrop: any;
-    private container: any;
-    content?: HTMLDivElement;
-    header?: HTMLDivElement;
-    title?: HTMLHeadingElement;
-    closeBtn?: HTMLButtonElement;
-    body?: HTMLDivElement;
-    footer: any;
-    cancelBtn?: HTMLButtonElement;
-    confirmBtn?: HTMLButtonElement;
-    isOpen?: boolean;
+    private options: any; // 默认配置和用户配置
+    private backdrop: any; // 背景遮罩
+    private container: any; // 模态框容器
+    content?: HTMLDivElement; // 内容框
+    header?: HTMLDivElement; // 标题栏
+    title?: HTMLHeadingElement; // 标题
+    body?: HTMLDivElement; // 内容区域
+    footer: any; // 底部区域
+    closeBtn?: HTMLButtonElement; // 关闭按钮
+    cancelBtn?: HTMLButtonElement; // 取消按钮
+    confirmBtn?: HTMLButtonElement; // 确认按钮
+    isOpen?: boolean; // 是否已打开
     constructor(options = {}) {
         // 默认配置
         this.options = {
@@ -197,27 +197,27 @@ export default class Modal {
     // 绑定事件
     bindEvents() {
         // 关闭按钮
-        this.closeBtn && this.closeBtn.addEventListener('click', () => this.close());
+        this.closeBtn && this.closeBtn.addEventListener('click', () => this.destroy());
 
         // 取消按钮
         this.cancelBtn && this.cancelBtn.addEventListener('click', () => {
             this.options.onCancel();
-            this.close();
+            this.destroy();
         });
 
         // 确认按钮
         this.confirmBtn && this.confirmBtn.addEventListener('click', () => {
             this.options.onConfirm();
-            this.close();
+            this.destroy();
         });
 
         // 点击背景关闭
-        this.backdrop.addEventListener('click', () => this.close());
+        this.backdrop.addEventListener('click', () => this.destroy());
 
         // ESC键关闭
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen) {
-                this.close();
+                this.destroy();
             }
         });
     }

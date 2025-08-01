@@ -1,7 +1,7 @@
 import { getTopGlobalThis } from '../../utils/common'
 import LocalForageService from './LocalForageService'
 
-function initLogStore(namespace: string = 'logs') {
+function registerLogStore(namespace: string = 'logs') {
     // 初始化日志表
     const logStore = new LocalForageService({ storeName: namespace, description: `${namespace || ''}日志表` })
     // 代理日志表
@@ -23,7 +23,7 @@ function initLogStore(namespace: string = 'logs') {
     })
 }
 
-function initConfigStore() {
+function registerConfigStore() {
     // 初始化配置表
     return new LocalForageService({ storeName: 'config', description: '配置表' })
 }
@@ -33,7 +33,7 @@ function clearStores(stores: (LocalForageService | null)[]): Promise<void[]> {
 }
 
 export {
-    initLogStore,
-    initConfigStore,
+    registerLogStore,
+    registerConfigStore,
     clearStores
 }

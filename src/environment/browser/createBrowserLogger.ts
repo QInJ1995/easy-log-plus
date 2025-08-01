@@ -5,7 +5,6 @@ import { setGlobalLogger, } from '../../utils/globals';
 import Logger from '../../core/Logger';
 import getProxyLogger from './proxyLogger'
 import getProxyTopCfg from './proxyTopCfg';
-import Modal from './Modal';
 export default function (namespace?: string | null, options?: ILogOptions): Logger {
     const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
     let logger: Logger
@@ -42,24 +41,6 @@ export default function (namespace?: string | null, options?: ILogOptions): Logg
 
     // 挂载到全局对象上
     options?.isGlobal && setGlobalLogger(proxyLogger);
-    topGlobalThis.test = () => {
-        // 创建并打开弹窗
-        const modal = new Modal({
-            title: '自定义弹窗',
-            content: `
-        <p>这是一个完全由JavaScript生成的弹窗</p>
-        <p>可以包含任意HTML内容</p>
-        <input type="text" style="width:100%;padding:8px;margin-top:10px;border:1px solid #ddd;border-radius:4px;" placeholder="请输入内容">
-      `,
-            onConfirm: () => {
-                alert('点击了确认按钮');
-            },
-            onCancel: () => {
-                console.log('点击了取消按钮');
-            }
-        });
-        modal.open();
-    }
 
     return proxyLogger
 }

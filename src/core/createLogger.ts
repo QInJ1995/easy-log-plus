@@ -2,8 +2,8 @@
 import { type ILogOptions, } from '../types';
 import { checkIsBrowser, } from '../utils/common';
 import Logger from './Logger';
-import initBrowser from '../environment/browser/initBrowser'
-import initServer from '../environment/server/initServer'
+import initBrowser from '../environment/browser/createBrowserLogger'
+import initServer from '../environment/server/createServerLogger'
 
 
 
