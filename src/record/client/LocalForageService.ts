@@ -53,13 +53,13 @@ export default class LocalForageService {
     async setItem(key: string, value: any): Promise<any> {
         try {
             if (typeof key !== 'string') {
-                localConsoleWarn('[easy-log-plus]: store set key must be a string!')
+                localConsoleWarn(`[easy-log-plus]: ${this.config.storeName} store set key must be a string!`)
                 return
             }
             await this.storage.setItem(key, value);
             return value;
         } catch (error) {
-            localConsoleError(`[easy-log-plus]: Failed to set ${key}:`, error);
+            localConsoleError(`[easy-log-plus]: ${this.config.storeName} store Failed to set ${key}:`, error);
         }
     }
 
@@ -71,12 +71,12 @@ export default class LocalForageService {
     async getItem(key: string): Promise<any> {
         try {
             if (typeof key !== 'string') {
-                localConsoleWarn('[easy-log-plus]: store get key must be a string!')
+                localConsoleWarn(`[easy-log-plus]: ${this.config.storeName} store get key must be a string!`)
                 return
             }
             return await this.storage.getItem(key);
         } catch (error) {
-            localConsoleError(`[easy-log-plus]: store failed to get ${key}:`, error);
+            localConsoleError(`[easy-log-plus]: ${this.config.storeName} store failed to get ${key}:`, error);
         }
     }
 
@@ -88,12 +88,12 @@ export default class LocalForageService {
     async removeItem(key: string): Promise<void> {
         try {
             if (typeof key !== 'string') {
-                localConsoleWarn('[easy-log-plus]: store remove key must be a string!')
+                localConsoleWarn(`[easy-log-plus]: ${this.config.storeName} store remove key must be a string!`)
                 return
             }
             await this.storage.removeItem(key);
         } catch (error) {
-            localConsoleError(`[easy-log-plus]: store failed to remove ${key}:`, error);
+            localConsoleError(`[easy-log-plus]: ${this.config.storeName} store failed to remove ${key}:`, error);
         }
     }
 
@@ -105,7 +105,7 @@ export default class LocalForageService {
         try {
             await this.storage.clear();
         } catch (error) {
-            localConsoleError('[easy-log-plus]: store failed to clear:', error);
+            localConsoleError(`[easy-log-plus]: ${this.config.storeName} store failed to clear:`, error);
         }
     }
 
@@ -117,7 +117,7 @@ export default class LocalForageService {
         try {
             return await this.storage.length();
         } catch (error) {
-            localConsoleError('[easy-log-plus]: store failed to get length:', error);
+            localConsoleError(`[easy-log-plus]: ${this.config.storeName} store failed to get length:`, error);
         }
     }
 
@@ -129,7 +129,7 @@ export default class LocalForageService {
         try {
             return await this.storage.keys();
         } catch (error) {
-            localConsoleError('[easy-log-plus]: store failed to get keys:', error);
+            localConsoleError(`[easy-log-plus]: ${this.config.storeName} store failed to get keys:`, error);
         }
     }
 
@@ -141,12 +141,12 @@ export default class LocalForageService {
     async iterate(callback: (value: any, key: string, index: number) => any): Promise<any> {
         try {
             if (typeof callback !== 'function') {
-                localConsoleWarn('[easy-log-plus]: store iterate callback must be a function!')
+                localConsoleWarn(`[easy-log-plus]: ${this.config.storeName} store iterate callback must be a function!`)
                 return
             }
             return await this.storage.iterate(callback);
         } catch (error) {
-            localConsoleError('[easy-log-plus]: store failed to iterate:', error);
+            localConsoleError(`[easy-log-plus]: ${this.config.storeName} store failed to iterate:`, error);
         }
     }
 

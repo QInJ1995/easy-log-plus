@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { type PrintOptions } from "../types/index";
 import { emojis } from "./constant";
 import {
@@ -8,7 +7,6 @@ import {
     getLogTrace,
     getChalk,
 } from "./common";
-import { logStore } from "../record/client/initStore";
 
 /**
  * 打印日志处理 避免打包被删除
@@ -19,7 +17,7 @@ import { logStore } from "../record/client/initStore";
 export async function print(
     type: string,
     options: PrintOptions
-): Promise<void> {
+): Promise<string | void> {
     switch (type) {
         case "time":
             (globalThis as any)["con" + "sole"]["time"](formatTime(options));
@@ -39,7 +37,9 @@ export async function print(
             (globalThis as any)["con" + "sole"]["groupEnd"]();
             break;
         default:
-            (globalThis as any)["con" + "sole"]["log"](...formatLog(options));
+            const { printList, title } = formatLog(options);
+            (globalThis as any)["con" + "sole"]["log"](...printList);
+            return title
     }
 }
 
@@ -202,7 +202,7 @@ function formatTime(options: PrintOptions): string {
  * @param options.callStackInfo 调用堆栈信息
  * @returns
  */
-export function formatLog(options: PrintOptions): any[] {
+export function formatLog(options: PrintOptions): any {
     let {
         level,
         messages,
@@ -228,7 +228,7 @@ export function formatLog(options: PrintOptions): any[] {
     title = removeEmptyBrackets(title);
     logOptions.isEmoji &&
         (title = `${emojis.new} ${title} ${emojis[level!] || emojis.rocket}`);
-    logStore && logStore.setItem(uuidv4(), { title, messages, })
+    const nowTitle = title;
     const placeHolder = messages
         .map((item) => (typeof item === "string" ? "%s" : "%o"))
         .join(" ");
@@ -237,5 +237,5 @@ export function formatLog(options: PrintOptions): any[] {
         ? color || logOptions.levelColors![level!]
         : "#fff";
     printCustomStyle.color = color;
-    return [getChalk(printCustomStyle)(title), ...messages]
+    return { printList: [getChalk(printCustomStyle)(title), ...messages], title: nowTitle }
 }

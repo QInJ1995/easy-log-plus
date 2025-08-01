@@ -1,8 +1,11 @@
+import { initLogStore } from '../record/client/storeHandler';
+import LocalForageService from '../record/client/LocalForageService';
 import { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
 import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis, debugAlert } from '../utils/common';
 import { chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
 import { print } from '../utils/print';
 import chalk from 'chalk';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * 日志记录器类，用于按命名空间输出结构化日志。
@@ -20,9 +23,9 @@ export default class Logger {
     public topGlobalThis: any;
 
     /**
-     * 日志记录对象
+     * 日志存储器
      */
-    public record: any
+    public logStore: LocalForageService | null = null;
 
     /**
      * 当前环境
@@ -55,6 +58,7 @@ export default class Logger {
         this.namespace = namespace ?? defaultNamespace
         this.topGlobalThis = topGlobalThis ?? getTopGlobalThis()
         this.env = options.env ?? Env.Dev
+        this.logStore = initLogStore(this.namespace || defaultNamespace)
         this.options = {
             level: options.level || defaultLevel,
             levelColors: options.levelColors ? { ...defaultLevelColors, ...options.levelColors! } : defaultLevelColors,
@@ -101,7 +105,8 @@ export default class Logger {
                 print('table', printOptions)
                 break;
             default:
-                await print('log', printOptions)
+                const title = await print('log', printOptions)
+                this.logStore && this.logStore.setItem(uuidv4(), { title, messages, })
                 debugAlert(level, this, printOptions)
                 break;
         }

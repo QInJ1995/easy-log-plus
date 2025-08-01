@@ -1,17 +1,11 @@
 import { getTopGlobalThis } from '../../utils/common'
 import LocalForageService from './LocalForageService'
 
-
-let proxyLogStore: LocalForageService | null = null
-let configStore: LocalForageService | null = null
-
-
-function initLogStore() {
-    if (proxyLogStore) return
+function initLogStore(namespace: string = 'logs') {
     // 初始化日志表
-    const logStore = new LocalForageService({ storeName: 'logs', description: '日志表' })
+    const logStore = new LocalForageService({ storeName: namespace, description: `${namespace || ''}日志表` })
     // 代理日志表
-    proxyLogStore = new Proxy(logStore, {
+    return new Proxy(logStore, {
         get(target, propKey,) {
             if (['setItem', 'getItem', 'removeItem', 'clear', 'keys', 'length', 'iterate'].includes(propKey as string)) {
                 const topGlobalThis = getTopGlobalThis();
@@ -27,25 +21,19 @@ function initLogStore() {
             }
         }
     })
-    getTopGlobalThis().logStore = proxyLogStore
 }
 
 function initConfigStore() {
-    if (configStore) return
     // 初始化配置表
-    configStore = new LocalForageService({ storeName: 'config', description: '配置表' })
+    return new LocalForageService({ storeName: 'config', description: '配置表' })
 }
 
-
-function clearStore() {
-    proxyLogStore = null
-    configStore = null
+function clearStores(stores: (LocalForageService | null)[]): Promise<void[]> {
+    return Promise.all(stores.filter(store => store != null).map(store => store.clear()))
 }
 
 export {
     initLogStore,
     initConfigStore,
-    clearStore,
-    proxyLogStore as logStore,
-    configStore
+    clearStores
 }

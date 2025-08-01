@@ -2,21 +2,26 @@ import {
     getCurrentTimeDate, getTopGlobalThis, localConsoleError,
     localConsoleLog, localConsoleWarn
 } from "../../utils/common";
-import { logStore } from "./initStore";
 
-export default async function () {
+export default async function (namespace: string) {
+    if (!namespace) {
+        localConsoleWarn("[easy-log-plus]: download logs failed! function parameter namespace is required!");
+        return
+    }
+    const topGlobalThis = getTopGlobalThis()
+    const logStore = topGlobalThis.__EASY_LOG_PLUS__?.hasLogs?.get(namespace)?.logStore
     try {
         if (!logStore) {
-            localConsoleWarn("[easy-log-plus]: download logs failed! logStore is not initialized.");
+            localConsoleWarn(`[easy-log-plus]: download logs failed! ${namespace || ''} logStore is not initialized.`);
             return
         }
         const keys = await logStore?.keys()
         if (!keys || keys.length === 0) {
-            localConsoleWarn("[easy-log-plus]: download logs failed! logStore is empty.");
+            localConsoleWarn(`[easy-log-plus]: download logs failed! ${namespace || ''} logStore is empty.`);
             return
         }
         let content = '';
-        const topGlobalThis = getTopGlobalThis()
+
         for (const key of keys) {
             const value = await logStore?.getItem(key);
             let { title, messages } = value
@@ -26,7 +31,7 @@ export default async function () {
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8', })
         const link = topGlobalThis.document.createElement('a')
         link.href = URL.createObjectURL(blob)
-        link.download = `EasyLogPlus_${getCurrentTimeDate(true)}.log`
+        link.download = `easy-log-plus_${namespace}_${getCurrentTimeDate(true)}.log`
         link.click()
         URL.revokeObjectURL(link.href) // 释放内存
         link.remove() // 移除链接

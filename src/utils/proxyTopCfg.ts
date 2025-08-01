@@ -1,8 +1,8 @@
 import { Env, ILogOptions, LogLevel, TopCfgProxyTarget } from "../types";
-import { getTopGlobalThis, isClient, localConsoleWarn } from "./common";
+import { getTopGlobalThis, isClient, localConsoleError, localConsoleLog, localConsoleWarn } from "./common";
 import { defaultLevel } from "./constant";
 import downloadLog from '../record/client/downloadLog'
-import { initLogStore, logStore } from '../record/client/initStore';
+import { clearStores } from "../record/client/storeHandler";
 
 
 export default (options?: ILogOptions) => {
@@ -12,31 +12,36 @@ export default (options?: ILogOptions) => {
         const topCfgProxyTarget: TopCfgProxyTarget = {
             showLog: (options?.env ?? Env.Dev) !== Env.Prod,
             level: options?.level ?? defaultLevel,
-            hasLogs: new Map(),
         };
+        // 定义一个不可枚举、不可写、不可配置的属性 hasLogs
+        Object.defineProperty(topCfgProxyTarget, 'hasLogs', {
+            value: new Map(),
+            enumerable: false, // 不可枚举
+            writable: false, // 不可写
+            configurable: false // 不可配置
+        });
         if (isInClient) {
             topCfgProxyTarget.debugLog = false
             topCfgProxyTarget.recordLog = false
-            topCfgProxyTarget.execExportLog = () => { } // 导出日志
+            topCfgProxyTarget.execExportLog = (namespace: string) => { downloadLog(namespace) } // 导出日志
         }
         // 代理顶层 window 对象的 __EASY_LOG_PLUS__ 属性 
         const proxyTopCfg = new Proxy(topCfgProxyTarget, {
-            get(target, property, receiver) {
-                if (typeof target[property] === 'function') {
-                    downloadLog() // 执行导出日志
-                }
-                return Reflect.get(target, property, receiver);
+            // 拦截属性的删除
+            deleteProperty(_target, property) {
+                localConsoleWarn(`[easy-log-plus]: Not allow to delete property: ${String(property)}!`);
+                return false; // 不允许删除属性
             },
+            // 拦截属性的设置
             set(target, property, value, receiver) {
-                const allowedProperties = new Set(['showLog', 'level']);
+                const allowedProperties = new Set(['showLog', 'level',]);
                 if (isInClient) {
                     allowedProperties.add('debugLog')
                     allowedProperties.add('recordLog')
-                    allowedProperties.add('execExportLog')
                 }
                 // 检查属性是否在允许列表中
                 if (!allowedProperties.has(property as string)) {
-                    localConsoleWarn(`[easy-log-plus]: Attempted to set unsupported property: ${String(property)}!`);
+                    localConsoleWarn(`[easy-log-plus]: Not allow to set unsupported property: ${String(property)}!`);
                     return false; // 不允许设置不支持的属性
                 } else {
                     // 如果设置的是 showLog 属性，类型检查
@@ -70,16 +75,11 @@ export default (options?: ILogOptions) => {
                             localConsoleWarn('[easy-log-plus]: recordLog must be a boolean!');
                             return false;
                         }
-                        if (value) {
-                            initLogStore(); // 初始化日志存储
-                        } else {
-                            logStore && logStore.clear(); // 清空日志存储
+                        if (!value) {
+                            clearStores(Array.from(topCfgProxyTarget?.hasLogs?.values() || []).map(item => item.logStore))
+                                .then(() => localConsoleLog('[easy-log-plus]: all logs cleared!'))
+                                .catch(err => localConsoleError('[easy-log-plus]: clear all logs failed!', err));
                         }
-                    }
-                    // 如果设置的是 execExportLog 属性，类型检查
-                    if (property === 'execExportLog') {
-                        localConsoleWarn('[easy-log-plus]: execExportLog is readonly and cannot be set!');
-                        return false
                     }
                     return Reflect.set(target, property, value, receiver);
                 }

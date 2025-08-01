@@ -23,10 +23,10 @@ export type LoggerType = Logger;
 export type TopCfgProxyTarget = {
   showLog: boolean; // 是否显示日志
   level: LogLevel; // 日志级别
-  hasLogs: Map<string, Logger>; // 存储已创建的日志实例
+  hasLogs?: Map<string, Logger>; // 存储已创建的日志实例
   debugLog?: boolean; // 是否调试模式
   recordLog?: boolean; // 是否记录日志
-  execExportLog?: () => void; // 执行导出日志
+  execExportLog?: (namespace: string) => void; // 执行导出日志
   [key: string]: any;
   [key: symbol]: any;
 };
