@@ -18,7 +18,7 @@ export function debugAlert(
   if (
     level === LogLevel.Debug &&
     logger.topGlobalThis?.__EASY_LOG_PLUS__?.debugLog &&
-    isClient()
+    checkIsBrowser()
   ) {
     (globalThis as any)["al" + "ert"](`时间: ${getCurrentTimeDate()}
 命名空间: ${options.namespace}
@@ -117,7 +117,7 @@ export function isEnable(logger: Logger): boolean {
  * @returns
  */
 export function getTopGlobalThis(): any {
-  if (isClient()) {
+  if (checkIsBrowser()) {
     return globalThis.top;
   }
   return globalThis;
@@ -127,7 +127,7 @@ export function getTopGlobalThis(): any {
  *  检查当前环境是否为浏览器
  *
  */
-export function isClient(): boolean {
+export function checkIsBrowser(): boolean {
   return (
     typeof window !== "undefined" &&
     typeof document !== "undefined" &&

@@ -1,13 +1,13 @@
-import { Env, ILogOptions, LogLevel, TopCfgProxyTarget } from "../types";
-import { getTopGlobalThis, isClient, localConsoleError, localConsoleLog, localConsoleWarn } from "./common";
-import { defaultLevel } from "./constant";
-import downloadLog from '../record/client/downloadLog'
-import { clearStores } from "../record/client/storeHandler";
+import { Env, ILogOptions, LogLevel, TopCfgProxyTarget } from "../../types";
+import { getTopGlobalThis, checkIsBrowser, localConsoleError, localConsoleLog, localConsoleWarn } from "../../utils/common";
+import { defaultLevel } from "../../utils/constant";
+import downloadLog from './downloadLog'
+import { clearStores } from "./storeHandler";
 
 
 export default (options?: ILogOptions) => {
     const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
-    const isInClient = isClient(); // 判断是否在浏览器环境
+    const isBrowser = checkIsBrowser(); // 判断是否在浏览器环境
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
         const topCfgProxyTarget: TopCfgProxyTarget = {
             showLog: (options?.env ?? Env.Dev) !== Env.Prod,
@@ -20,7 +20,7 @@ export default (options?: ILogOptions) => {
             writable: false, // 不可写
             configurable: false // 不可配置
         });
-        if (isInClient) {
+        if (isBrowser) {
             topCfgProxyTarget.debugLog = false
             topCfgProxyTarget.recordLog = false
             topCfgProxyTarget.execExportLog = (namespace: string) => { downloadLog(namespace) } // 导出日志
@@ -35,7 +35,7 @@ export default (options?: ILogOptions) => {
             // 拦截属性的设置
             set(target, property, value, receiver) {
                 const allowedProperties = new Set(['showLog', 'level',]);
-                if (isInClient) {
+                if (isBrowser) {
                     allowedProperties.add('debugLog')
                     allowedProperties.add('recordLog')
                 }

@@ -1,5 +1,5 @@
-import { initLogStore } from '../record/client/storeHandler';
-import LocalForageService from '../record/client/LocalForageService';
+import { initLogStore } from '../environment/browser/storeHandler';
+import LocalForageService from '../environment/browser/LocalForageService';
 import { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
 import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis, debugAlert } from '../utils/common';
 import { chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
