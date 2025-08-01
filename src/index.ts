@@ -1,5 +1,5 @@
 import createLogger from './core/createLogger';
-import EasyLogPlusVuePlugin from './core/vue-plugin';
+import EasyLogPlusVuePlugin from './plugins/vue-plugin';
 import { Env, LogLevel } from './types'
 
 

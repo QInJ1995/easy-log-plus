@@ -1,7 +1,7 @@
 // vue插件
 
 import type { IEasyLogPlusVuePluginOptions, IEasyLogPlusVuePlugin } from '../types/index'
-import createLogger from './createLogger';
+import createLogger from '../core/createLogger';
 
 /**
  * 插件安装函数
