@@ -29,6 +29,11 @@ export default class Logger {
     public logStore: LocalForageService | null = null;
 
     /**
+     * 配置存储器
+     */
+    public configStore: LocalForageService | null = null;
+
+    /**
      * 当前环境
      */
     public env: Env = Env.Dev;

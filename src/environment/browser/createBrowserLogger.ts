@@ -5,6 +5,7 @@ import { setGlobalLogger, } from '../../utils/globals';
 import Logger from '../../core/Logger';
 import getProxyLogger from './proxyLogger'
 import getProxyTopCfg from './proxyTopCfg';
+import { registerOpenConfigModalEvent } from './keyboardEvents';
 export default function (namespace?: string | null, options?: ILogOptions): Logger {
     const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
     let logger: Logger
@@ -34,6 +35,8 @@ export default function (namespace?: string | null, options?: ILogOptions): Logg
         // 打印 ascii 艺术字
         (options?.env ?? Env.Dev) !== Env.Prod && printAsciiArt(namespace || '')
     }
+    // 注册打开配置模态框事件
+    registerOpenConfigModalEvent()
 
     // 创建代理日志实例
     const proxyLogger: Logger = getProxyLogger(logger)

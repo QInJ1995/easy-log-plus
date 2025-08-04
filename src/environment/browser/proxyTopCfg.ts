@@ -1,5 +1,5 @@
 import { Env, ILogOptions, LogLevel, TopCfgProxyTarget } from "../../types";
-import { getTopGlobalThis, checkIsBrowser, localConsoleError, localConsoleLog, localConsoleWarn } from "../../utils/common";
+import { getTopGlobalThis, localConsoleError, localConsoleLog, localConsoleWarn } from "../../utils/common";
 import { defaultLevel } from "../../utils/constant";
 import downloadLog from './downloadLog'
 import { clearStores } from "./store";
@@ -7,7 +7,6 @@ import { clearStores } from "./store";
 
 export default (options?: ILogOptions) => {
     const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
-    const isBrowser = checkIsBrowser(); // 判断是否在浏览器环境
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
         const topCfgProxyTarget: TopCfgProxyTarget = {
             showLog: (options?.env ?? Env.Dev) !== Env.Prod,
@@ -20,11 +19,9 @@ export default (options?: ILogOptions) => {
             writable: false, // 不可写
             configurable: false // 不可配置
         });
-        if (isBrowser) {
-            topCfgProxyTarget.debugLog = false
-            topCfgProxyTarget.recordLog = false
-            topCfgProxyTarget.execExportLog = (namespace: string) => { downloadLog(namespace) } // 导出日志
-        }
+        topCfgProxyTarget.debugLog = false
+        topCfgProxyTarget.recordLog = false
+        topCfgProxyTarget.execExportLog = (namespace: string) => { downloadLog(namespace) } // 导出日志
         // 代理顶层 window 对象的 __EASY_LOG_PLUS__ 属性 
         const proxyTopCfg = new Proxy(topCfgProxyTarget, {
             // 拦截属性的删除
@@ -34,11 +31,7 @@ export default (options?: ILogOptions) => {
             },
             // 拦截属性的设置
             set(target, property, value, receiver) {
-                const allowedProperties = new Set(['showLog', 'level',]);
-                if (isBrowser) {
-                    allowedProperties.add('debugLog')
-                    allowedProperties.add('recordLog')
-                }
+                const allowedProperties = new Set(['showLog', 'level', 'debugLog', 'recordLog', 'isOpenConfigModal']);
                 // 检查属性是否在允许列表中
                 if (!allowedProperties.has(property as string)) {
                     localConsoleWarn(`[easy-log-plus]: Not allow to set unsupported property: ${String(property)}!`);

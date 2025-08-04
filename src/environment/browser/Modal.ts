@@ -197,7 +197,10 @@ export default class Modal {
     // 绑定事件
     bindEvents() {
         // 关闭按钮
-        this.closeBtn && this.closeBtn.addEventListener('click', () => this.destroy());
+        this.closeBtn && this.closeBtn.addEventListener('click', () => {
+            this.options.onCancel();
+            this.destroy();
+        });
 
         // 取消按钮
         this.cancelBtn && this.cancelBtn.addEventListener('click', () => {

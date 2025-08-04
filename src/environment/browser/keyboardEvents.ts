@@ -1,19 +1,30 @@
 // 注册监听键盘ctrl + shift + d 键盘事件
 
-import { localConsoleLog, } from "../../utils/common";
+import { getTopGlobalThis, localConsoleLog, } from "../../utils/common";
 import Modal from "./Modal";
 
 
 function _registerKeyboardEvent(fn: (event: KeyboardEvent) => void) {
-    globalThis.document.addEventListener('keydown', fn);
+    const topGlobalThis = getTopGlobalThis()
+    topGlobalThis.document.addEventListener('keydown', fn);
 }
 function _removeKeyboardEvent(fn: (event: KeyboardEvent) => void) {
-    globalThis.document.removeEventListener('keydown', fn);
+    const topGlobalThis = getTopGlobalThis()
+    topGlobalThis.document.removeEventListener('keydown', fn);
+}
+
+function _setTopGlobalThisIsShowConfigModal(isShow: boolean) {
+    const topGlobalThis = getTopGlobalThis()
+    topGlobalThis.isShowConfigModal = isShow
+    !isShow && delete topGlobalThis.isShowConfigModal
 }
 
 function openConfigModal(event: KeyboardEvent) {
     if (event.shiftKey && event.altKey && event.code === 'KeyD') {
+        const topGlobalThis = getTopGlobalThis()
+        // const __EASY_LOG_PLUS__ = topGlobalThis.__EASY_LOG_PLUS__
         // 创建并打开弹窗
+        if (topGlobalThis.isShowConfigModal) return
         const modal = new Modal({
             title: 'EasyLogPlus Config',
             content: `
@@ -23,13 +34,15 @@ function openConfigModal(event: KeyboardEvent) {
       `,
             onConfirm: () => {
                 alert('点击了确认按钮');
+                _setTopGlobalThisIsShowConfigModal(false)
             },
             onCancel: () => {
                 console.log('点击了取消按钮');
-                modal.destroy();
+                _setTopGlobalThisIsShowConfigModal(false)
             }
         });
         modal.open();
+        _setTopGlobalThisIsShowConfigModal(true)
     }
 
 }
