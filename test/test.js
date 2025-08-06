@@ -1,5 +1,5 @@
-import { createLogger } from './dist/easy-log-plus.mjs'
-import EasyLogPlus from './dist/easy-log-plus.mjs'
+import { createLogger } from '../dist/easy-log-plus.mjs'
+import EasyLogPlus from '../dist/easy-log-plus.mjs'
 console.log("🚀 ~ EasyLogPlus:", EasyLogPlus)
 
 

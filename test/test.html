@@ -5,12 +5,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Document</title>
-  <script src="./dist/easy-log-plus.umd.js"></script>
+  <!-- <script src="./dist/easy-log-plus.umd.js"></script> -->
 </head>
 
 <body>
-  <script>
-    const { createLogger } = window.EasyLogPlus;
+  <script type="module">
+     import { createLogger } from '../src/index.ts';
+    // const { createLogger } = window.EasyLogPlus;
 
     const logger2 = createLogger("", {
       level: "debug",

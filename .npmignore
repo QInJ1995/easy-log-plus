@@ -8,8 +8,6 @@ yarn.lock
 package.json
 db.json
 analysis.html
-test.html
-test.js
 build-info.json
 prebuild.js
 tsconfig.json

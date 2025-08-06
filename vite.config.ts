@@ -4,27 +4,36 @@ import progress from 'vite-plugin-progress'
 import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig({
+  // 服务器配置
+  server: {
+    port: 3000, // 可选，指定端口
+    strictPort: true, // 可选，如果端口被占用则退出
+    open: '/test/test.html' // 启动时自动打开测试页面（确保路径正确）
+  },
+  // 仅在开发时显式指定入口（避免影响构建）
   build: {
-    sourcemap: false, // 生成完整的 Sourcemap
+    // 生成完整的 Sourcemap 文件
+    sourcemap: false,
+    // 指定输出目录
     lib: {
-      entry: 'src/index.ts',
-      name: 'EasyLogPlus',
-      formats: ['es', 'cjs', 'umd'], // 生成ESModule和CommonJS格式
-      fileName: (format) => getFileName(format),
+      entry: 'src/index.ts', // 入口文件
+      name: 'EasyLogPlus', // 全局变量名称
+      formats: ['es', 'cjs', 'umd'], // 生成ESModule、CommonJS、UMD
+      fileName: (format) => getFileName(format), // 文件名
     },
     // 配置 Rollup 的选项，用于打包库
     rollupOptions: {
-      // 配置外部依赖，不打包模块
-      external: [],
-      // 配置输出选项，指定全局变量名称
+      input: 'src/index.ts', // 入口文件
       output: {
-        exports: 'named',
+        exports: 'named' // 设置导出类型为命名导出
       },
+      external: [], // 忽略的依赖项
     }
   },
+  // 配置插件
   plugins: [
-    // 显示构建进度条
-    progress(),
+    progress(), // 进度条
+    // 生成类型声明文件
     dts({
       insertTypesEntry: true, // 自动插入 types 字段到 package.json
       outDir: 'dist' // 输出目录 
