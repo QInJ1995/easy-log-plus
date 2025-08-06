@@ -1,4 +1,7 @@
+import { getTopGlobalThis } from "../utils/common";
+
 export default class Modal {
+    static language: string = 'cn' // 语言
     private options: any; // 默认配置和用户配置
     private backdrop: any; // 背景遮罩
     private container: any; // 模态框容器
@@ -11,6 +14,7 @@ export default class Modal {
     cancelBtn?: HTMLButtonElement; // 取消按钮
     confirmBtn?: HTMLButtonElement; // 确认按钮
     isOpen?: boolean; // 是否已打开
+    topGlobalThis: any;
     constructor(options = {}) {
         // 默认配置
         this.options = {
@@ -23,6 +27,8 @@ export default class Modal {
             width: '500px',
             animate: true
         };
+
+        this.topGlobalThis = getTopGlobalThis()
 
         // 合并用户配置
         Object.assign(this.options, options);
@@ -37,14 +43,18 @@ export default class Modal {
 
     mount() {
         // 添加到文档
-        document.body.appendChild(this.backdrop);
-        document.body.appendChild(this.container);
+        this.topGlobalThis.document.body.appendChild(this.backdrop);
+        this.topGlobalThis.document.body.appendChild(this.container);
+    }
+
+    updateContent(content: string) {
+        this.body && (this.body.innerHTML = content);
     }
 
     // 创建所有DOM元素
     createElements() {
         // 创建背景遮罩
-        this.backdrop = document.createElement('div');
+        this.backdrop = this.topGlobalThis.document.createElement('div');
         this.backdrop.style.cssText = `
       position: fixed;
       top: 0;
@@ -59,7 +69,7 @@ export default class Modal {
     `;
 
         // 创建容器
-        this.container = document.createElement('div');
+        this.container = this.topGlobalThis.document.createElement('div');
         this.container.style.cssText = `
       position: fixed;
       top: 0;
@@ -74,8 +84,8 @@ export default class Modal {
     `;
 
         // 创建内容框
-        this.content = document.createElement('div');
-        this.content.style.cssText = `
+        this.content = this.topGlobalThis.document.createElement('div');
+        this.content!.style.cssText = `
       background: white;
       border-radius: 8px;
       width: ${this.options.width};
@@ -86,8 +96,8 @@ export default class Modal {
     `;
 
         // 创建标题栏
-        this.header = document.createElement('div');
-        this.header.style.cssText = `
+        this.header = this.topGlobalThis.document.createElement('div');
+        this.header!.style.cssText = `
       padding: 16px 20px;
       border-bottom: 1px solid #eee;
       display: flex;
@@ -95,16 +105,16 @@ export default class Modal {
       align-items: center;
     `;
 
-        this.title = document.createElement('h3');
-        this.title.style.cssText = `
+        this.title = this.topGlobalThis.document.createElement('h3');
+        this.title!.style.cssText = `
       margin: 0;
       font-size: 18px;
       color: #333;
     `;
-        this.title.textContent = this.options.title;
+        this.title!.textContent = this.options.title;
 
-        this.closeBtn = document.createElement('button');
-        this.closeBtn.style.cssText = `
+        this.closeBtn = this.topGlobalThis.document.createElement('button');
+        this.closeBtn!.style.cssText = `
       background: none;
       border: none;
       font-size: 20px;
@@ -118,27 +128,27 @@ export default class Modal {
       justify-content: center;
       border-radius: 50%;
     `;
-        this.closeBtn.textContent = '×';
-        this.closeBtn.onmouseover = () => {
+        this.closeBtn!.textContent = '×';
+        this.closeBtn!.onmouseover = () => {
             this.closeBtn && (this.closeBtn.style.backgroundColor = '#f5f5f5');
             this.closeBtn && (this.closeBtn.style.color = '#333');
         };
-        this.closeBtn.onmouseout = () => {
+        this.closeBtn!.onmouseout = () => {
             this.closeBtn && (this.closeBtn.style.backgroundColor = '');
             this.closeBtn && (this.closeBtn.style.color = '');
         };
 
         // 创建内容区域
-        this.body = document.createElement('div');
-        this.body.style.cssText = `
+        this.body = this.topGlobalThis.document.createElement('div');
+        this.body!.style.cssText = `
       padding: 20px;
       font-size: 14px;
       color: #666;
     `;
-        this.body.innerHTML = this.options.content;
+        this.body!.innerHTML = this.options.content;
 
         // 创建按钮区域
-        this.footer = document.createElement('div');
+        this.footer = this.topGlobalThis.document.createElement('div');
         this.footer.style.cssText = `
       padding: 12px 20px;
       border-top: 1px solid #eee;
@@ -147,8 +157,8 @@ export default class Modal {
       gap: 10px;
     `;
 
-        this.cancelBtn = document.createElement('button');
-        this.cancelBtn.style.cssText = `
+        this.cancelBtn = this.topGlobalThis.document.createElement('button');
+        this.cancelBtn!.style.cssText = `
       padding: 6px 16px;
       border: 1px solid #ddd;
       border-radius: 4px;
@@ -157,16 +167,16 @@ export default class Modal {
       font-size: 14px;
       color: #666;
     `;
-        this.cancelBtn.textContent = this.options.cancelText;
-        this.cancelBtn.onmouseover = () => {
+        this.cancelBtn!.textContent = this.options.cancelText;
+        this.cancelBtn!.onmouseover = () => {
             this.cancelBtn && (this.cancelBtn.style.backgroundColor = '#f5f5f5');
         };
-        this.cancelBtn.onmouseout = () => {
+        this.cancelBtn!.onmouseout = () => {
             this.cancelBtn && (this.cancelBtn.style.backgroundColor = '');
         };
 
-        this.confirmBtn = document.createElement('button');
-        this.confirmBtn.style.cssText = `
+        this.confirmBtn = this.topGlobalThis.document.createElement('button');
+        this.confirmBtn!.style.cssText = `
       padding: 6px 16px;
       border: none;
       border-radius: 4px;
@@ -175,42 +185,39 @@ export default class Modal {
       font-size: 14px;
       color: white;
     `;
-        this.confirmBtn.textContent = this.options.confirmText;
-        this.confirmBtn.onmouseover = () => {
+        this.confirmBtn!.textContent = this.options.confirmText;
+        this.confirmBtn!.onmouseover = () => {
             this.confirmBtn && (this.confirmBtn.style.backgroundColor = '#0f62d9');
         };
-        this.confirmBtn.onmouseout = () => {
+        this.confirmBtn!.onmouseout = () => {
             this.confirmBtn && (this.confirmBtn.style.backgroundColor = '');
         };
 
         // 组装元素
-        this.header.appendChild(this.title);
-        this.header.appendChild(this.closeBtn);
+        this.header!.appendChild(this.title!);
+        this.header!.appendChild(this.closeBtn!);
 
         this.footer.appendChild(this.cancelBtn);
         this.footer.appendChild(this.confirmBtn);
 
-        this.content.appendChild(this.header);
-        this.content.appendChild(this.body);
-        this.content.appendChild(this.footer);
+        this.content!.appendChild(this.header!);
+        this.content!.appendChild(this.body!);
+        this.content!.appendChild(this.footer);
 
         this.container.appendChild(this.content);
     }
 
     closeEvent() {
         this.options.onCancel();
-        this.destroy();
     }
 
     confirmEvent() {
-        this.options.onConfirm();
-        this.destroy();
+        this.options.onConfirm(this.getFormValues());
     }
 
     ESCEvent(e: KeyboardEvent) {
         if (e.key === 'Escape' && this.isOpen) {
             this.options.onCancel();
-            this.destroy();
         }
     }
 
@@ -229,7 +236,7 @@ export default class Modal {
         this.backdrop && this.backdrop.addEventListener('click', this.closeEvent.bind(this));
 
         // ESC键关闭
-        document.addEventListener('keydown', this.ESCEvent.bind(this));
+        this.topGlobalThis.document.addEventListener('keydown', this.ESCEvent.bind(this));
     }
 
     // 移除事件
@@ -238,7 +245,33 @@ export default class Modal {
         this.cancelBtn && this.cancelBtn.removeEventListener('click', this.closeEvent.bind(this));
         this.confirmBtn && this.confirmBtn.removeEventListener('click', this.confirmEvent.bind(this));
         this.backdrop && this.backdrop.removeEventListener('click', this.closeEvent.bind(this));
-        document.removeEventListener('keydown', this.ESCEvent.bind(this));
+        this.topGlobalThis.document.removeEventListener('keydown', this.ESCEvent.bind(this));
+    }
+
+    getFormValues() {
+        // 获取语言选择下拉框的值
+        const language = (this.body!.querySelector('#language') as HTMLSelectElement).value
+
+        // 获取复选框的选中状态（布尔值）
+        const showLog = (this.body!.querySelector('#showLog') as HTMLInputElement).checked
+        const debugLog = (this.body!.querySelector('#debugLog') as HTMLInputElement).checked
+        const recordLog = (this.body!.querySelector('#recordLog') as HTMLInputElement).checked
+        const persistentConfig = (this.body!.querySelector('#persistentConfig') as HTMLInputElement).checked
+
+        // 获取级别选择下拉框的值
+        const level = (this.body!.querySelector('#level') as HTMLSelectElement).value
+        const downloadLog = (this.body!.querySelector('#downloadLog') as HTMLSelectElement).value
+
+        // 返回所有值的对象
+        return {
+            language,
+            showLog,
+            debugLog,
+            recordLog,
+            persistentConfig,
+            level,
+            downloadLog
+        };
     }
 
     // 打开模态框
@@ -252,7 +285,7 @@ export default class Modal {
         this.container.style.display = 'flex';
 
         // 防止页面滚动
-        document.body.style.overflow = 'hidden';
+        this.topGlobalThis.document.body.style.overflow = 'hidden';
 
         // 触发动画
         setTimeout(() => {
@@ -271,7 +304,7 @@ export default class Modal {
         this.content && (this.content.style.opacity = '0');
 
         // 恢复页面滚动
-        document.body.style.overflow = '';
+        this.topGlobalThis.document.body.style.overflow = '';
 
         // 动画结束后隐藏
         setTimeout(() => {
@@ -285,8 +318,8 @@ export default class Modal {
         if (!this.isOpen) return;
         this.close();
         setTimeout(() => {
-            document.body.removeChild(this.backdrop);
-            document.body.removeChild(this.container);
+            this.topGlobalThis.document.body.removeChild(this.backdrop);
+            this.topGlobalThis.document.body.removeChild(this.container);
         }, 300);
     }
 }

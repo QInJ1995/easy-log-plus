@@ -37,3 +37,23 @@ export const defaultLevelColors: LevelColors = {
 
 // 替换字符
 export const replaceCharacters: string[] = ['[]', '【】']
+
+
+export const zh = {
+    cn: {
+        showLog: '显示日志',
+        level: '日志级别',
+        debugLog: '调试日志',
+        recordLog: '记录日志',
+        downloadLog: '下载日志',
+        persistentConfig: '持久化配置',
+    },
+    en: {
+        showLog: 'Show Log',
+        level: 'Log Level',
+        debugLog: 'Debug Log',
+        recordLog: 'Record Log',
+        downloadLog: 'Download Record',
+        persistentConfig: 'Persistent Config',
+    },
+}

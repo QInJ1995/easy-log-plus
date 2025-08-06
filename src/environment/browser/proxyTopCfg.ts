@@ -12,6 +12,11 @@ export default (options?: ILogOptions) => {
         const topCfgProxyTarget: TopCfgProxyTarget = {
             showLog: (options?.env ?? Env.Dev) !== Env.Prod,
             level: options?.level ?? defaultLevel,
+            debugLog: false,
+            recordLog: false,
+            persistentConfig: false,
+            configModal: proxyConfigModal(),
+            execExportLog: (namespace: string) => { downloadLog(namespace) } // 导出日志
         };
         // 定义一个不可枚举、不可写、不可配置的属性 hasLogs
         Object.defineProperty(topCfgProxyTarget, 'hasLogs', {
@@ -20,10 +25,7 @@ export default (options?: ILogOptions) => {
             writable: false, // 不可写
             configurable: false // 不可配置
         });
-        topCfgProxyTarget.debugLog = false
-        topCfgProxyTarget.recordLog = false
-        topCfgProxyTarget.configModal = proxyConfigModal()
-        topCfgProxyTarget.execExportLog = (namespace: string) => { downloadLog(namespace) } // 导出日志
+
         // 代理顶层 window 对象的 __EASY_LOG_PLUS__ 属性 
         const proxyTopCfg = new Proxy(topCfgProxyTarget, {
             // 拦截属性的删除

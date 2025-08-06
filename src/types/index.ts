@@ -27,6 +27,7 @@ export type TopCfgProxyTarget = {
   hasLogs?: Map<string, Logger>; // 存储已创建的日志实例
   debugLog?: boolean; // 是否调试模式
   recordLog?: boolean; // 是否记录日志
+  persistentConfig?: boolean; // 是否持久化配置
   configModal?: { isOpen: boolean, modal: Modal }; // 配置弹窗
   execExportLog?: (namespace: string) => void; // 执行导出日志
   [key: string]: any;
