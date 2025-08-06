@@ -3,6 +3,7 @@ import { getTopGlobalThis, localConsoleError, localConsoleLog, localConsoleWarn 
 import { defaultLevel } from "../../utils/constant";
 import downloadLog from './downloadLog'
 import { clearStores } from "./store";
+import proxyConfigModal from './proxyConfigModal'
 
 
 export default (options?: ILogOptions) => {
@@ -21,6 +22,7 @@ export default (options?: ILogOptions) => {
         });
         topCfgProxyTarget.debugLog = false
         topCfgProxyTarget.recordLog = false
+        topCfgProxyTarget.configModal = proxyConfigModal()
         topCfgProxyTarget.execExportLog = (namespace: string) => { downloadLog(namespace) } // 导出日志
         // 代理顶层 window 对象的 __EASY_LOG_PLUS__ 属性 
         const proxyTopCfg = new Proxy(topCfgProxyTarget, {
