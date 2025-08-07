@@ -3,7 +3,6 @@ import {
   LogLevel,
   CallStackInfo,
   PrintCustomStyle,
-  Env,
   PrintOptions,
 } from "../types/index";
 import { defaultCallStackIndex } from "./constant";
@@ -17,7 +16,7 @@ export function debugAlert(
 ) {
   if (
     level === LogLevel.Debug &&
-    logger.topGlobalThis?.__EASY_LOG_PLUS__?.debugLog &&
+    logger.config.isDebugLog &&
     checkIsBrowser()
   ) {
     (globalThis as any)["al" + "ert"](`时间: ${getCurrentTimeDate()}
@@ -92,13 +91,10 @@ export function shouldLog(logger: Logger, level?: LogLevel): boolean {
     LogLevel.Warn,
     LogLevel.Error,
   ];
-  if (logger.env === Env.Prod) {
-    logger.options.level = logger.topGlobalThis?.__EASY_LOG_PLUS__?.level;
-  }
   return !level || level === LogLevel.Silent
     ? true
     : levels.indexOf(level) >=
-        levels.indexOf(logger.options.level || LogLevel.Debug);
+    levels.indexOf(logger.config.level || LogLevel.Debug);
 }
 
 /**
@@ -106,10 +102,7 @@ export function shouldLog(logger: Logger, level?: LogLevel): boolean {
  * @returns {boolean} - 如果启用日志，则返回true，否则返回false
  */
 export function isEnable(logger: Logger): boolean {
-  if (logger.env === Env.Prod) {
-    return logger.topGlobalThis.__EASY_LOG_PLUS__?.showLog;
-  }
-  return true;
+  return logger.config.isEnableLog;
 }
 
 /**
@@ -148,15 +141,13 @@ export function getLogTrace(
   lineNumber: string | undefined
 ): string {
   if (functionName && fileName && lineNumber) {
-    return `${functionName ? functionName + "()" : ""} ${fileName}${
-      lineNumber ? ":" + lineNumber : ""
-    }`;
+    return `${functionName ? functionName + "()" : ""} ${fileName}${lineNumber ? ":" + lineNumber : ""
+      }`;
   } else if (!functionName && fileName && lineNumber) {
     return `${fileName}${lineNumber ? ":" + lineNumber : ""}`;
   } else if (functionName && !fileName && lineNumber) {
-    return `${functionName ? functionName + "()" : ""}${
-      lineNumber ? ":" + lineNumber : ""
-    }`;
+    return `${functionName ? functionName + "()" : ""}${lineNumber ? ":" + lineNumber : ""
+      }`;
   } else {
     return "";
   }

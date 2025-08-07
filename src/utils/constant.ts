@@ -39,21 +39,39 @@ export const defaultLevelColors: LevelColors = {
 export const replaceCharacters: string[] = ['[]', '【】']
 
 
-export const zh = {
-    cn: {
-        showLog: '显示日志',
+export const languageCfg = {
+    'zh-CN': {
+        language: '语言',
+        logInstance: '日志实例',
+        enableLog: '启用日志',
         level: '日志级别',
         debugLog: '调试日志',
         recordLog: '记录日志',
         downloadLog: '下载日志',
+        clearLog: '清除日志',
         persistentConfig: '持久化配置',
+        clearCache: '清除缓存',
+        restConfig: '恢复默认配置',
+        close: '关闭',
+        all: '全部',
+        modifyConfig: '修改配置',
+        config: '配置',
     },
-    en: {
-        showLog: 'Show Log',
+    'en-US': {
+        language: 'Language',
+        logInstance: 'Log Instance',
+        enableLog: 'Enable Log',
         level: 'Log Level',
         debugLog: 'Debug Log',
         recordLog: 'Record Log',
-        downloadLog: 'Download Record',
+        downloadLog: 'Download Log',
+        clearLog: 'Clear Log',
         persistentConfig: 'Persistent Config',
+        clearCache: 'Clear Cache',
+        restConfig: 'Rest Config',
+        close: 'Close',
+        all: 'All',
+        modifyConfig: 'Modify Config',
+        config: 'Config',
     },
 }

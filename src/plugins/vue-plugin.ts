@@ -21,15 +21,16 @@ const install = (
         ...options,
     };
     if (!options?.enabled) return;
-    const logger = createLogger(options?.namespace, options)
-    if ('provide' in app) {
-        // Vue 3 方式
-        options?.isVue && (app.config.globalProperties.$logger = logger);
-        options?.isProvide && (app.provide('$logger', logger));
-    } else {
-        // Vue 2 兼容方式
-        options?.isVue && (app.prototype.$logger = logger);
-    }
+    createLogger(options?.namespace, options).then((logger) => {
+        if ('provide' in app) {
+            // Vue 3 方式
+            options?.isVue && (app.config.globalProperties.$logger = logger);
+            options?.isProvide && (app.provide('$logger', logger));
+        } else {
+            // Vue 2 兼容方式
+            options?.isVue && (app.prototype.$logger = logger);
+        }
+    })
 };
 
 // 插件对象

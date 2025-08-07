@@ -12,7 +12,7 @@ export default function (namespace?: string | null, options?: ILogOptions): Logg
     // 创建配置代理对象
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
         // 创建代理对象
-        const proxyTopCfg: TopCfgProxyTarget = getProxyTopCfg(options)
+        const proxyTopCfg: TopCfgProxyTarget = getProxyTopCfg()
         topGlobalThis.__EASY_LOG_PLUS__ = proxyTopCfg
     }
     // 如果顶层 window 对象存在 __EASY_LOG_PLUS__ 属性，则从该属性中获取日志实例

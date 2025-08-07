@@ -1,5 +1,5 @@
 import LocalForageService from '../environment/browser/LocalForageService';
-import { LogLevel, ILogOptions, PrintOptions, Env, } from '../types';
+import { LogLevel, ILogOptions, PrintOptions, Env, ILoggerConfig, Language, } from '../types';
 import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis, debugAlert, checkIsBrowser } from '../utils/common';
 import { chalkLevel, defaultNamespace, defaultLevel, defaultLevelColors } from '../utils/constant';
 import { print } from '../utils/print';
@@ -34,6 +34,17 @@ export default class Logger {
     public configStore: LocalForageService | null = null;
 
     /**
+     * 日志配置
+     */
+    public config: ILoggerConfig = {
+        isEnableLog: true,
+        level: defaultLevel,
+        isDebugLog: false,
+        isRecordLog: false,
+        isPersistentConfig: false,
+    };
+
+    /**
      * 当前环境
      */
     public env: Env = Env.Dev;
@@ -61,12 +72,20 @@ export default class Logger {
 
     constructor(namespace?: string | null, options: ILogOptions = {}, topGlobalThis?: any) {
         const isBrowser = checkIsBrowser();
+        // 注册不同环境注册
+        isBrowser ? registerBrowser(this) : registerServer()
         chalk.level = chalkLevel;
         this.namespace = namespace ?? defaultNamespace
         this.topGlobalThis = topGlobalThis ?? getTopGlobalThis()
         this.env = options.env ?? Env.Dev
+        this.setConfig({
+            isEnableLog: options.isEnableLog ?? this.env !== Env.Prod, // 生产环境禁用日志
+            level: options.level || defaultLevel, // 默认日志级别
+            isRecordLog: options.isRecordLog ?? false, // 是否记录日志
+            isPersistentConfig: options.isPersistentConfig ?? false, // 是否持久化配置
+            language: options.language ?? Language.CN, // 默认语言
+        })
         this.options = {
-            level: options.level || defaultLevel,
             levelColors: options.levelColors ? { ...defaultLevelColors, ...options.levelColors! } : defaultLevelColors,
             isColor: options.isColor ?? true,
             isEmoji: options.isEmoji ?? true,
@@ -74,9 +93,6 @@ export default class Logger {
             depth: typeof options.depth === 'number' && options.depth >= 0 ? options.depth : 0,
             formatter: options.formatter || '[$namespace$] [$time$] [$level$] [$tracker$] [$label$]',
         }
-        // 注册不同环境注册
-        isBrowser ? registerBrowser(this) : registerServer()
-
     }
 
     /**
@@ -115,7 +131,7 @@ export default class Logger {
                 break;
             default:
                 const title = await print('log', printOptions)
-                this.logStore && this.logStore.setItem(uuidv4(), { title, messages, })
+                this.config.isRecordLog && this.logStore?.setItem(uuidv4(), { title, messages, })
                 debugAlert(level, this, printOptions)
                 break;
         }
@@ -333,5 +349,19 @@ export default class Logger {
     table(obj: Object | Array<any>): Logger {
         isEnable(this) && this.print('table', LogLevel.Silent, [obj])
         return this
+    }
+
+    /**
+     * 设置日志配置
+     * @param config 
+     * @returns 
+     */
+    setConfig(config: ILoggerConfig): void {
+        this.config = { ...this.config, ...config }
+        if (this.config.isPersistentConfig) {
+            this.configStore?.setItem(this.namespace || defaultNamespace, this.config)
+        } else {
+            this.configStore?.removeItem(this.namespace || defaultNamespace)
+        }
     }
 }

@@ -1,7 +1,6 @@
 import { getTopGlobalThis } from "../utils/common";
 
 export default class Modal {
-    static language: string = 'cn' // 语言
     private options: any; // 默认配置和用户配置
     private backdrop: any; // 背景遮罩
     private container: any; // 模态框容器
@@ -45,10 +44,6 @@ export default class Modal {
         // 添加到文档
         this.topGlobalThis.document.body.appendChild(this.backdrop);
         this.topGlobalThis.document.body.appendChild(this.container);
-    }
-
-    updateContent(content: string) {
-        this.body && (this.body.innerHTML = content);
     }
 
     // 创建所有DOM元素
@@ -141,7 +136,7 @@ export default class Modal {
         // 创建内容区域
         this.body = this.topGlobalThis.document.createElement('div');
         this.body!.style.cssText = `
-      padding: 20px;
+      padding: 10px;
       font-size: 14px;
       color: #666;
     `;
@@ -153,7 +148,7 @@ export default class Modal {
       padding: 12px 20px;
       border-top: 1px solid #eee;
       display: flex;
-      justify-content: flex-end;
+      justify-content: center;
       gap: 10px;
     `;
 
@@ -190,7 +185,7 @@ export default class Modal {
             this.confirmBtn && (this.confirmBtn.style.backgroundColor = '#0f62d9');
         };
         this.confirmBtn!.onmouseout = () => {
-            this.confirmBtn && (this.confirmBtn.style.backgroundColor = '');
+            this.confirmBtn && (this.confirmBtn.style.backgroundColor = '#1677ff');
         };
 
         // 组装元素
@@ -212,7 +207,7 @@ export default class Modal {
     }
 
     confirmEvent() {
-        this.options.onConfirm(this.getFormValues());
+        this.options.onConfirm(this);
     }
 
     ESCEvent(e: KeyboardEvent) {
@@ -246,32 +241,6 @@ export default class Modal {
         this.confirmBtn && this.confirmBtn.removeEventListener('click', this.confirmEvent.bind(this));
         this.backdrop && this.backdrop.removeEventListener('click', this.closeEvent.bind(this));
         this.topGlobalThis.document.removeEventListener('keydown', this.ESCEvent.bind(this));
-    }
-
-    getFormValues() {
-        // 获取语言选择下拉框的值
-        const language = (this.body!.querySelector('#language') as HTMLSelectElement).value
-
-        // 获取复选框的选中状态（布尔值）
-        const showLog = (this.body!.querySelector('#showLog') as HTMLInputElement).checked
-        const debugLog = (this.body!.querySelector('#debugLog') as HTMLInputElement).checked
-        const recordLog = (this.body!.querySelector('#recordLog') as HTMLInputElement).checked
-        const persistentConfig = (this.body!.querySelector('#persistentConfig') as HTMLInputElement).checked
-
-        // 获取级别选择下拉框的值
-        const level = (this.body!.querySelector('#level') as HTMLSelectElement).value
-        const downloadLog = (this.body!.querySelector('#downloadLog') as HTMLSelectElement).value
-
-        // 返回所有值的对象
-        return {
-            language,
-            showLog,
-            debugLog,
-            recordLog,
-            persistentConfig,
-            level,
-            downloadLog
-        };
     }
 
     // 打开模态框

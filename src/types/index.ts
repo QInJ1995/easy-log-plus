@@ -13,21 +13,24 @@ declare global {
  */
 export type LoggerType = Logger;
 
+export interface ILoggerConfig {
+  isEnableLog: boolean; // 是否启用日志
+  level: LogLevel; // 日志级别
+  isDebugLog?: boolean; // 是否调试模式
+  isRecordLog: boolean; // 是否记录日志
+  isPersistentConfig: boolean; // 是否持久化配置
+  language?: string; // 语言
+}
+
 /** * 顶层 window 配置代理目标
  * @description 用于在浏览器环境下
  * 通过顶层 window 对象配置日志选项
- * @property {boolean} showLog - 是否显示日志
  * @property {string} level - 日志级别
  * @property {any} [key: string] - 其他任意属性
  * @property {any} [key: symbol] - 其他任意属性
  */
 export type TopCfgProxyTarget = {
-  showLog: boolean; // 是否显示日志
-  level: LogLevel; // 日志级别
   hasLogs?: Map<string, Logger>; // 存储已创建的日志实例
-  debugLog?: boolean; // 是否调试模式
-  recordLog?: boolean; // 是否记录日志
-  persistentConfig?: boolean; // 是否持久化配置
   configModal?: { isOpen: boolean, modal: Modal }; // 配置弹窗
   execExportLog?: (namespace: string) => void; // 执行导出日志
   [key: string]: any;
@@ -40,6 +43,14 @@ export type TopCfgProxyTarget = {
 export enum Env {
   Dev = 'dev',
   Prod = 'prod'
+}
+
+/**
+ * 语言
+ */
+export enum Language {
+  CN = 'zh-CN',
+  EN = 'en-US'
 }
 
 /**
@@ -218,6 +229,10 @@ export type BaseColors = 'black' | 'red' | 'green' | 'yellow' | 'blue' | 'magent
  * @property {string} formatter - 日志格式
  * @property {number} depth - 日志深度
  * @property {string} env - 环境变量(默认：dev)
+ * @property {boolean} isRecordLog - 是否记录日志
+ * @property {boolean} isPersistentConfig - 是否持久化配置
+ * @property {string} language - 语言
+ * @property {boolean} isEnableLog - 是否启用日志
  */
 export interface ILogOptions {
   env?: Env;
@@ -239,6 +254,10 @@ export interface ILogOptions {
   levelColors?: LevelColors;
   formatter?: string
   depth?: number;
+  isEnableLog?: boolean;
+  isRecordLog?: boolean;
+  isPersistentConfig?: boolean;
+  language?: string;
 }
 
 /**

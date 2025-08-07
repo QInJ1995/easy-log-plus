@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     port: 3000, // 可选，指定端口
     strictPort: true, // 可选，如果端口被占用则退出
-    // open: '/test/test.html' // 启动时自动打开测试页面（确保路径正确）
+    open: '/test/test.html' // 启动时自动打开测试页面（确保路径正确）
   },
   // 仅在开发时显式指定入口（避免影响构建）
   build: {

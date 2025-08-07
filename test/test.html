@@ -10,11 +10,11 @@
 
 <body>
   <script type="module">
-     import { createLogger } from '../src/index.ts';
+    import { createLogger } from '../src/index.ts';
     // const { createLogger } = window.EasyLogPlus;
 
-    const logger2 = createLogger("", {
-      level: "debug",
+    const logger2 = await createLogger("", {
+      // level: "error",
       formatter: "$namespace$ | [$time$] [$level$] [$tracker$] $label$",
       isGlobal: true,
       style: {
@@ -29,7 +29,8 @@
         // inverse: true,
       },
     });
-    const logger3 = createLogger("qj-logger", {
+    const logger3 = await createLogger("qj-logger", {
+      // level: "error",
       env: "prod",
       levelColors: {
         debug: "red",
@@ -39,9 +40,9 @@
         silent: "green",
       },
     });
-    const logger = createLogger("hit-emr", {
-      level: "debug",
-      env: "prod",
+    const logger = await createLogger("hit-emr", {
+      // level: "error",
+      // env: "prod",
     });
     logger3.table([1, 2]);
     // logger2.image('https://lsky-pro.smartideahub.site:2083/qls/image-20210724174717647.png')

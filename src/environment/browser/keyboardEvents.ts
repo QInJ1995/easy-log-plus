@@ -15,7 +15,7 @@ function _removeKeyboardEvent(fn: (event: KeyboardEvent) => void) {
 
 
 function openConfigModal(event: KeyboardEvent) {
-    if (event.shiftKey && event.altKey && event.code === 'KeyD') {
+    if (event.shiftKey && event.altKey && event.code === 'KeyL') {
         const topGlobalThis = getTopGlobalThis()
         const configModal = topGlobalThis.__EASY_LOG_PLUS__?.configModal
         // 创建并打开弹窗
@@ -28,13 +28,12 @@ function openConfigModal(event: KeyboardEvent) {
 
 export function registerOpenConfigModalEvent() {
     _registerKeyboardEvent(openConfigModal)
-    localConsoleLog('[easy-log-plus]: you can open config modal by press Alter(Option on Mac) + Shift + D')
+    localConsoleLog('[easy-log-plus]: you can open config modal by press Alter(Option on Mac) + Shift + L')
 }
 
 // 移除监听
 export function removeOpenConfigModalEvent() {
     _removeKeyboardEvent(openConfigModal)
-    localConsoleLog('[easy-log-plus]: cancel Alter(Option on Mac) + Shift + D keyboard event.')
 }
 
 
