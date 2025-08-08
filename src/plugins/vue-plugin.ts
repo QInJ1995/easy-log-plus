@@ -2,6 +2,7 @@
 
 import type { IEasyLogPlusVuePluginOptions, IEasyLogPlusVuePlugin } from '../types/index'
 import createLogger from '../core/createLogger';
+import Logger from '../core/Logger';
 
 /**
  * 插件安装函数
@@ -21,7 +22,7 @@ const install = (
         ...options,
     };
     if (!options?.enabled) return;
-    createLogger(options?.namespace, options).then((logger) => {
+    (createLogger(options?.namespace, options) as Promise<Logger>).then((logger) => {
         if ('provide' in app) {
             // Vue 3 方式
             options?.isVue && (app.config.globalProperties.$logger = logger);
