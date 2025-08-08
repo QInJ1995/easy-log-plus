@@ -1,6 +1,5 @@
 import { TopCfgProxyTarget } from "../../types";
 import { getTopGlobalThis, localConsoleWarn } from "../../utils/common";
-import downloadLog from './downloadLog'
 import proxyConfigModal from './proxyConfigModal'
 
 
@@ -9,7 +8,6 @@ export default () => {
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
         const topCfgProxyTarget: TopCfgProxyTarget = {
             configModal: proxyConfigModal(),
-            execExportLog: (namespace: string) => { downloadLog(namespace) } // 导出日志
         };
         // 定义一个不可枚举、不可写、不可配置的属性 hasLogs
         Object.defineProperty(topCfgProxyTarget, 'hasLogs', {

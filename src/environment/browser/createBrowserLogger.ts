@@ -1,12 +1,13 @@
 import { Env, type ILogOptions, type TopCfgProxyTarget } from '../../types';
 import { getTopGlobalThis, printAsciiArt } from '../../utils/common';
-import { defaultNamespace, } from '../../utils/constant';
+import { defaultLevel, defaultNamespace, } from '../../utils/constant';
 import { setGlobalLogger, } from '../../utils/globals';
 import Logger from '../../core/Logger';
 import getProxyLogger from './proxyLogger'
 import getProxyTopCfg from './proxyTopCfg';
 import { registerOpenConfigModalEvent } from './keyboardEvents';
-export default function (namespace?: string | null, options?: ILogOptions): Logger {
+import { registerConfigStore } from './store';
+export default async function (namespace?: string | null, options?: ILogOptions): Promise<Logger> {
     const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
     let logger: Logger
     // 创建配置代理对象
@@ -44,6 +45,23 @@ export default function (namespace?: string | null, options?: ILogOptions): Logg
 
     // 挂载到全局对象上
     options?.isGlobal && setGlobalLogger(proxyLogger);
+
+
+    // 创建配置存储对象
+    const configStore = registerConfigStore()
+    // 获取缓存配置
+    const config = await configStore.getItem(namespace || defaultNamespace);
+
+    // 默认配置
+    proxyLogger.defaultConfig = {
+        isEnableLog: options?.isEnable ?? (options?.env ?? Env.Dev) !== Env.Prod, // 生产环境禁用日志
+        level: options?.level || defaultLevel, // 默认日志级别
+        isRecordLog: options?.isRecord ?? false, // 是否记录日志
+        isPersistentConfig: options?.isPersistentConfig ?? false, // 是否持久化配置
+        isDebugLog: false, // 是否调试日志
+    }
+    // 设置缓存配置
+    proxyLogger.setConfig(config)
 
     return proxyLogger
 }

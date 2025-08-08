@@ -16,7 +16,7 @@ export function debugAlert(
 ) {
   if (
     level === LogLevel.Debug &&
-    logger.config.isDebugLog &&
+    logger.config?.isDebugLog &&
     checkIsBrowser()
   ) {
     (globalThis as any)["al" + "ert"](`时间: ${getCurrentTimeDate()}
@@ -94,7 +94,7 @@ export function shouldLog(logger: Logger, level?: LogLevel): boolean {
   return !level || level === LogLevel.Silent
     ? true
     : levels.indexOf(level) >=
-    levels.indexOf(logger.config.level || LogLevel.Debug);
+    levels.indexOf(logger.config?.level || LogLevel.Debug);
 }
 
 /**
@@ -102,7 +102,7 @@ export function shouldLog(logger: Logger, level?: LogLevel): boolean {
  * @returns {boolean} - 如果启用日志，则返回true，否则返回false
  */
 export function isEnable(logger: Logger): boolean {
-  return logger.config.isEnableLog;
+  return logger.config?.isEnableLog ?? true;
 }
 
 /**
