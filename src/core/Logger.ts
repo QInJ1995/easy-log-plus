@@ -123,7 +123,7 @@ export default class Logger {
                 break;
             default:
                 const title = await print('log', printOptions)
-                this.config?.isRecordLog && this.logStore?.setItem(uuidv4(), { title, messages, })
+                this.config?.isRecordLog && this.logStore?.setItem(uuidv4(), { title, messages, timestamp: Date.now() })
                 debugAlert(level, this, printOptions)
                 break;
         }

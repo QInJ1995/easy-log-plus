@@ -30,7 +30,20 @@ function _getLogInstanceCallback(modal: Modal, callback: (logInstanceName: strin
     callback(logInstanceName)
 }
 
-function __registerSelectEvent(
+function _registerCheckboxEvent(
+    id: string,
+    modal: Modal,
+    options: {
+        onchange?: (e: Event) => void
+    }
+) {
+    const checkboxDom = (modal.body!.querySelector(`#${id}`) as HTMLInputElement)
+    checkboxDom.onchange = (e: Event) => {
+        options.onchange && options.onchange(e)
+    }
+}
+
+function _registerSelectEvent(
     id: string,
     modal: Modal,
     options: {
@@ -144,6 +157,10 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
                     <label for="recordLog" style="text-align: center">${(languageCfg as any)[language].recordLog}</label>
                     <input type="checkbox" ${isRecordLog ? ' checked' : ''} id="recordLog" style="margin-left: 10px;">
                 </div>
+                <div style="display: ${isRecordLog ? 'flex' : 'none'}; align-items: center;">
+                    <label for="persistentConfig" style="text-align: center">${(languageCfg as any)[language].autoClearTime}</label>
+                    <input type="number" id="autoClearTime" style="margin: 0 3px 0 10px; width: 50px;">小时
+                </div>
                 <div style="display: flex; align-items: center;">
                     <label for="persistentConfig" style="text-align: center">${(languageCfg as any)[language].persistentConfig}</label>
                     <input type="checkbox" ${isPersistentConfig ? ' checked' : ''} id="persistentConfig" style="margin-left: 10px;">
@@ -164,7 +181,7 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
     modal.cancelBtn && (modal.cancelBtn.textContent = (languageCfg as any)[language].close)
 
     // 语言选择
-    __registerSelectEvent('language', modal, {
+    _registerSelectEvent('language', modal, {
         onchange: (e: Event) => {
             const language = (e.target! as HTMLSelectElement).value
             language && configModal && (configModal.language = language)
@@ -173,10 +190,19 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
     })
 
     // 日志实例选择
-    __registerSelectEvent('logInstance', modal, {
+    _registerSelectEvent('logInstance', modal, {
         onchange: (e: Event) => {
             const logInstanceName = (e.target! as HTMLSelectElement).value
             logger = logInstanceName && logInstanceName !== 'all' ? hasLogs.get(logInstanceName) : null
+            _updateConfigModal(modal, logger)
+        }
+    })
+
+    // 是否启用日志
+    _registerCheckboxEvent('recordLog', modal, {
+        onchange: (e: Event) => {
+            const isRecordLog = (e.target! as HTMLInputElement).checked
+            logger.config && (logger.config.isRecordLog = isRecordLog)
             _updateConfigModal(modal, logger)
         }
     })

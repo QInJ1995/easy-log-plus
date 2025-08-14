@@ -24,13 +24,16 @@ export default async function (logger: Logger) {
             return
         }
         let content = '';
-
-        for (const key of keys) {
+        const logs = await Promise.all(keys.map(async (key) => {
             const value = await logStore?.getItem(key);
-            let { title, messages } = value
+            let { title, messages, timestamp } = value
             messages = _serializeMessage(messages)
+            return { title, messages, timestamp }
+        }))
+        // 按时间排序
+        logs.sort((a, b) => b.timestamp - a.timestamp).forEach(({ title, messages }) => {
             content += `${title} -> ${messages}\n\n`;
-        }
+        })
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8', })
         const link = topGlobalThis.document.createElement('a')
         link.href = URL.createObjectURL(blob)

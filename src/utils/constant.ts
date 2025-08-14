@@ -56,6 +56,7 @@ export const languageCfg = {
         all: '全部',
         modifyConfig: '修改配置',
         config: '配置',
+        autoClearTime: '自动清理时间',
     },
     'en-US': {
         language: 'Language',
@@ -73,5 +74,6 @@ export const languageCfg = {
         all: 'All',
         modifyConfig: 'Modify Config',
         config: 'Config',
+        autoClearTime: 'Auto Clear Time',
     },
 }

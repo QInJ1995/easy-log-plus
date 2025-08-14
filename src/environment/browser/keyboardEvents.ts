@@ -4,12 +4,10 @@ import { getTopGlobalThis, localConsoleLog, } from "../../utils/common";
 
 
 function _registerKeyboardEvent(fn: (event: KeyboardEvent) => void) {
-    const topGlobalThis = getTopGlobalThis()
-    topGlobalThis.document.addEventListener('keydown', fn);
+    globalThis.document.addEventListener('keydown', fn);
 }
 function _removeKeyboardEvent(fn: (event: KeyboardEvent) => void) {
-    const topGlobalThis = getTopGlobalThis()
-    topGlobalThis.document.removeEventListener('keydown', fn);
+    globalThis.document.removeEventListener('keydown', fn);
 }
 
 
