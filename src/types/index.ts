@@ -155,6 +155,7 @@ export type Emojis = {
   new?: string;
   image?: string;
   down?: string;
+  performance?: string;
 }
 
 /**

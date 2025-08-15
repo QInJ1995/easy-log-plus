@@ -13,7 +13,7 @@ npm install easy-log-plus
 ```typescript
 import { createLogger } from 'easy-log-plus';
 
-const logger = createLogger()
+const logger = await createLogger()
 
 logger.log('这是一条调试信息');
 
@@ -26,7 +26,7 @@ logger.log('这是一条调试信息');
 ```typescript
 import {createLogger} from 'easy-log-plus';
 
-const logger = createLogger('MyApp', {
+const logger = await createLogger('MyApp', {
   env: 'prod', // 环境变量 默认为 'dev'
   level: 'debug', // 日志级别 默认为 'debug'：'debug' <= 'info' <= 'warn' <= 'error' 
   formatter: '', // 默认：[$namespace$] [$time$] [$level$] [$tracker$] [$label$] 日志格式说明： $namespace$：命名空间，$time$：时间戳，$level$：日志级别，$tracker$：跟踪器，$label$：标签  
@@ -78,7 +78,7 @@ logger.label('CustomInfo').color('#ff0000').bold.italic.underline.strikethrough.
 const EasyLogPlus = require('easy-log-plus');
 const { createLogger } = require('easy-log-plus')
 
-const logger = createLogger('MyApp', {
+const logger = await createLogger('MyApp', {
   level: 'debug',
   isEmoji: true
 });
@@ -90,12 +90,12 @@ logger.info('Hello World');
 
 ```typescript
 import { createApp } from 'vue'
-import { EasyLogVuePlugin } from 'easy-log-plus'
+import { EasyLogPlusVuePlugin } from 'easy-log-plus'
 import App from './App.vue'
 
 const app = createApp(App)
 
-app.use(EasyLogVuePlugin, {
+app.use(EasyLogPlusVuePlugin, {
   namespace: 'MyApp',
   level: 'debug',
   isVue: true,        // 是否在 Vue 实例上挂载 $logger 默认为 true
@@ -176,7 +176,9 @@ logger.info('这是一条日志')
 ## 生产环境在浏览器的Console中查看日志
 
 ```text
-
+快捷键：Alter(Option on Mac) + Shift + L
+或者
+在浏览器控制台中输入：__EASY_LOG_PLUS__.configModal.isOpen = true
 ```
 
 ## 特性

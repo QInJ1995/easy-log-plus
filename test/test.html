@@ -54,6 +54,12 @@
     logger2.color("red").label("info1").bgColor("green").log(111);
     logger2.log(45454222);
     logger2.underline.log(222);
+    logger.label('性能测试').performance(() => {
+      for (let i = 0; i < 1000; i++) {
+
+      }
+      return "performance done";
+    });
     logger2.bold.italic.underline.strikethrough
       .color("green")
       .label("info3")

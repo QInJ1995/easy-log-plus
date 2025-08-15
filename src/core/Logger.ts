@@ -93,7 +93,7 @@ export default class Logger {
      * @param {LogLevel} level 日志级别
      * @returns {void}
      */
-    private async print(type: string, level: LogLevel, messages?: any[],): Promise<void> {
+    private async print(type: string, level: LogLevel, messages?: any[],): Promise<void | any> {
         if (type === 'log' && !shouldLog(this, level)) return
         const printCustomStyle = mergeObjects(this.options.style!, getPrintCustomStyle(this.printMap))
         const labels: string[] = this.printMap.get('labels') || []
@@ -109,6 +109,12 @@ export default class Logger {
         }
         this.printMap.clear()
         switch (type) {
+            case 'performance':
+                {
+                    const { title, taskFnResult, messages } = await print('performance', printOptions)
+                    this.config?.isRecordLog && this.logStore?.setItem(uuidv4(), { title, messages, timestamp: Date.now() })
+                    return taskFnResult
+                }
             case 'time':
                 print('time', printOptions)
                 break;
@@ -192,7 +198,8 @@ export default class Logger {
      * @returns 
      */
     get overline(): Logger {
-        isEnable(this) && this.printMap.set('overline', true)
+        const isBrowser = checkIsBrowser();
+        !isBrowser && isEnable(this) && this.printMap.set('overline', true)
         return this
     }
 
@@ -222,7 +229,8 @@ export default class Logger {
      * @returns 
      */
     dim(): Logger {
-        isEnable(this) && this.printMap.set('dim', true)
+        const isBrowser = checkIsBrowser();
+        !isBrowser && isEnable(this) && this.printMap.set('dim', true)
         return this
     }
     /**
@@ -231,7 +239,8 @@ export default class Logger {
     * @returns 
     */
     get inverse(): Logger {
-        isEnable(this) && this.printMap.set('inverse', true)
+        const isBrowser = checkIsBrowser();
+        !isBrowser && isEnable(this) && this.printMap.set('inverse', true)
         return this
     }
 
@@ -321,6 +330,18 @@ export default class Logger {
     }
 
     /**
+     * 性能日志
+     * 
+     * @returns {Logger}
+     */
+    performance(taskFn: Function): any | void {
+        const isBrowser = checkIsBrowser();
+        if (isBrowser && isEnable(this)) {
+            return this.print('performance', LogLevel.Silent, [taskFn])
+        }
+    }
+
+    /**
      *  图片日志
      *
      * @param {string} url - 图片地址
@@ -328,7 +349,8 @@ export default class Logger {
      * @returns {void}
      */
     image(url: string, scale: number = 0.1): Logger {
-        isEnable(this) && this.print('image', LogLevel.Silent, [{ url, scale }])
+        const isBrowser = checkIsBrowser();
+        isBrowser && isEnable(this) && this.print('image', LogLevel.Silent, [{ url, scale }])
         return this
     }
 
@@ -354,6 +376,9 @@ export default class Logger {
             this.configStore?.setItem(this.namespace || defaultNamespace, this.config)
         } else {
             this.configStore?.removeItem(this.namespace || defaultNamespace)
+        }
+        if (!this.config.isRecordLog) {
+            this.logStore?.clear()
         }
     }
 

@@ -7,6 +7,7 @@ import {
     getLogTrace,
     getChalk,
 } from "./common";
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * 打印日志处理 避免打包被删除
@@ -17,8 +18,14 @@ import {
 export async function print(
     type: string,
     options: PrintOptions
-): Promise<string | void> {
+): Promise<any | void> {
     switch (type) {
+        case 'performance':
+            {
+                const { printList, title, taskFnResult, messages } = await formatPerformance(options);
+                (globalThis as any)["con" + "sole"]["log"](...printList);
+                return { taskFnResult, title, messages }
+            }
         case "time":
             (globalThis as any)["con" + "sole"]["time"](formatTime(options));
             break;
@@ -40,6 +47,65 @@ export async function print(
             const { printList, title } = formatLog(options);
             (globalThis as any)["con" + "sole"]["log"](...printList);
             return title
+    }
+}
+
+async function formatPerformance(options: PrintOptions): Promise<any> {
+    let {
+        level,
+        messages,
+        namespace,
+        labels,
+        logOptions,
+        callStackInfo,
+        printCustomStyle,
+    } = options;
+    let color = printCustomStyle.color;
+    let title = formatString(logOptions.formatter!, {
+        namespace: namespace || "",
+        time: getCurrentTimeDate(),
+        level: level !== "silent" ? `${level!.toUpperCase()}` : "",
+        tracker:
+            getLogTrace(
+                callStackInfo.fileName,
+                callStackInfo.functionName,
+                callStackInfo.lineNumber
+            ) || "",
+        label: labels!.join("|") || "",
+    });
+    title = removeEmptyBrackets(title);
+    logOptions.isEmoji &&
+        (title = `${emojis.new} ${title} ${emojis[level!] || emojis.performance}`);
+    const nowTitle = title;
+    const placeHolder = messages
+        .map((item) => (typeof item === "string" ? "%s" : "%o"))
+        .join(" ");
+    title = `${title} -> ${placeHolder}`;
+    color = logOptions.isColor
+        ? color || logOptions.levelColors![level!]
+        : "#fff";
+    printCustomStyle.color = color;
+    // 性能分析处理
+    const uuid = uuidv4();
+    const startMark = `${uuid}-start`;
+    const endMark = `${uuid}-end`;
+    globalThis.performance.mark(startMark);
+    let taskFnResult = null;
+    try {
+        const taskFn = messages[0]
+        if (taskFn instanceof Function) {
+            taskFnResult = await taskFn();
+        }
+    } finally {
+        performance.mark(endMark);
+        performance.measure(uuid, startMark, endMark);
+        const [entry] = performance.getEntriesByName(uuid);
+        // 清理标记，避免内存堆积
+        performance.clearMarks(startMark);
+        performance.clearMarks(endMark);
+        performance.clearMeasures(uuid);
+        messages = [entry.duration + "ms", taskFnResult]
+        return { printList: [getChalk(printCustomStyle)(title), ...messages], title: nowTitle, taskFnResult, messages }
     }
 }
 
