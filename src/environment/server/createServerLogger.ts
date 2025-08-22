@@ -1,11 +1,15 @@
 import Logger from "../../core/Logger";
-import { ILogOptions } from "../../types";
+import { Env, ILogOptions } from "../../types";
+import { printAsciiArt } from "../../utils/common";
 import { setGlobalLogger } from "../../utils/globals";
 import getProxyLogger from './proxyLogger'
 
 export default function (namespace?: string | null, options?: ILogOptions): Logger {
     // 创建日志实例
     const logger = new Logger(namespace, options);
+
+    // 打印 ascii 艺术字
+    (options?.env ?? Env.Dev) !== Env.Prod && printAsciiArt(namespace || '')
 
     // 创建代理日志实例
     const proxyLogger: Logger = getProxyLogger(logger)

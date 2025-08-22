@@ -257,10 +257,11 @@ export default class Modal {
         this.topGlobalThis.document.body.style.overflow = 'hidden';
 
         // 触发动画
-        setTimeout(() => {
-            this.backdrop.style.opacity = '1';
-            this.content && (this.content.style.transform = 'scale(1)');
-            this.content && (this.content.style.opacity = '1');
+        const _this = this;
+        this.topGlobalThis.setTimeout(() => {
+            _this.backdrop.style.opacity = '1';
+            _this.content && (_this.content.style.transform = 'scale(1)');
+            _this.content && (_this.content.style.opacity = '1');
         }, 10);
     }
 

@@ -1,6 +1,6 @@
 // 注册监听键盘ctrl + shift + d 键盘事件
 
-import { getTopGlobalThis, localConsoleLog, } from "../../utils/common";
+import { getTopGlobalThis, } from "../../utils/common";
 
 
 function _registerKeyboardEvent(fn: (event: KeyboardEvent) => void) {
@@ -26,7 +26,6 @@ function openConfigModal(event: KeyboardEvent) {
 
 export function registerOpenConfigModalEvent() {
     _registerKeyboardEvent(openConfigModal)
-    localConsoleLog('[easy-log-plus]: you can open config modal by press Alter(Option on Mac) + Shift + L')
 }
 
 // 移除监听

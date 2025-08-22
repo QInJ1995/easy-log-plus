@@ -334,6 +334,7 @@ export function getCallStackInfo(depth: number = 0): CallStackInfo {
  * 打印 ASCII 艺术字
  */
 export function printAsciiArt(namespace: string = "") {
+  const isBrowser = checkIsBrowser()
   localConsoleLog(`
 .----------------------------------------------------------.
 ${_getTextLine((namespace ? namespace + " | " : "") + "Created Successfully!")}
@@ -345,6 +346,8 @@ ${_getTextLine((namespace ? namespace + " | " : "") + "Created Successfully!")}
 ${_getTextLine("v" + buildInfo.version)}
 '----------------------------------------------------------'
 `);
+
+  isBrowser && localConsoleLog('[easy-log-plus]: you can open config modal by press Alter(Option on Mac) + Shift + L')
 
   function _getTextLine(text: string = "") {
     const blankNumber = 60 - 2 - text.length;
