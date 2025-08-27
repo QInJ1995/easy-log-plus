@@ -4,7 +4,7 @@ import {
     getCurrentTimeDate,
     formatString,
     removeEmptyBrackets,
-    getLogTrace,
+    formatTrace,
     getChalk,
 } from "./common";
 import { v4 as uuidv4 } from 'uuid';
@@ -65,12 +65,7 @@ async function formatPerformance(options: PrintOptions): Promise<any> {
         namespace: namespace || "",
         time: getCurrentTimeDate(),
         level: level !== "silent" ? `${level!.toUpperCase()}` : "",
-        tracker:
-            getLogTrace(
-                callStackInfo.fileName,
-                callStackInfo.functionName,
-                callStackInfo.lineNumber
-            ) || "",
+        tracker: formatTrace(callStackInfo) || "",
         label: labels!.join("|") || "",
     });
     title = removeEmptyBrackets(title);
@@ -133,12 +128,7 @@ function formatTable(options: PrintOptions): {
         namespace: namespace || "",
         time: getCurrentTimeDate(),
         level: level !== "silent" ? `${level!.toUpperCase()}` : "",
-        tracker:
-            getLogTrace(
-                callStackInfo.fileName,
-                callStackInfo.functionName,
-                callStackInfo.lineNumber
-            ) || "",
+        tracker: formatTrace(callStackInfo) || "",
         label: labels!.join("|") || "",
     });
     title = removeEmptyBrackets(title);
@@ -172,12 +162,7 @@ function formatImage(options: PrintOptions): Promise<any[]> {
             namespace: namespace || "",
             time: getCurrentTimeDate(),
             level: "",
-            tracker:
-                getLogTrace(
-                    callStackInfo.fileName,
-                    callStackInfo.functionName,
-                    callStackInfo.lineNumber
-                ) || "",
+            tracker: formatTrace(callStackInfo) || "",
             label: labels!.join("|") || "",
         });
         title = removeEmptyBrackets(title);
@@ -283,12 +268,7 @@ export function formatLog(options: PrintOptions): any {
         namespace: namespace || "",
         time: getCurrentTimeDate(),
         level: level !== "silent" ? `${level!.toUpperCase()}` : "",
-        tracker:
-            getLogTrace(
-                callStackInfo.fileName,
-                callStackInfo.functionName,
-                callStackInfo.lineNumber
-            ) || "",
+        tracker: formatTrace(callStackInfo) || "",
         label: labels!.join("|") || "",
     });
     title = removeEmptyBrackets(title);

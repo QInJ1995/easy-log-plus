@@ -106,7 +106,7 @@
         [1, "2", { c: 3 }]
       );
     }
-    // qqqq()
+    qqqq2()
 
     logger.label("测试").time("test").log("测试时间");
     logger.debug("debug", "dads", {}, 111, true);
@@ -123,6 +123,17 @@
       [1, "2", { c: 3 }]
     );
     logger.label("测试").timeEnd("test").log("测试时间结束");
+
+    // window.addEventListener('error', (event) => {
+    //   console.log("🚀 ~ event:", event)
+    //   logger.label('全局错误捕获').error(event.error)
+    // })
+    // console.log(dddddddddd)
+
+    (function () {
+      logger.error('error', 'ddasdasdada');
+    })();
+
   </script>
 </body>
 

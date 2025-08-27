@@ -130,27 +130,22 @@ export function checkIsBrowser(): boolean {
 
 /**
  * 获取日志追踪信息
- * @param {string} fileName - 文件名
- * @param {string} functionName - 函数名
- * @param {string} lineNumber - 行号
+ * @param {CallStackInfo} callStackInfo - 调用堆栈信息对象
  * @returns {string} - 返回日志追踪信息
  */
-export function getLogTrace(
-  fileName: string | undefined,
-  functionName: string | undefined,
-  lineNumber: string | undefined
-): string {
+export function formatTrace(callStackInfo: CallStackInfo): string {
+  const { fileName, functionName, lineNumber, location } = callStackInfo;
+  let tracker = ''
   if (functionName && fileName && lineNumber) {
-    return `${functionName ? functionName + "()" : ""} ${fileName}${lineNumber ? ":" + lineNumber : ""
+    tracker = `${functionName ? functionName + "()" : ""} ${fileName}${lineNumber ? ":" + lineNumber : ""
       }`;
   } else if (!functionName && fileName && lineNumber) {
-    return `${fileName}${lineNumber ? ":" + lineNumber : ""}`;
+    tracker = `${fileName}${lineNumber ? ":" + lineNumber : ""}`;
   } else if (functionName && !fileName && lineNumber) {
-    return `${functionName ? functionName + "()" : ""}${lineNumber ? ":" + lineNumber : ""
+    tracker = `${functionName ? functionName + "()" : ""}${lineNumber ? ":" + lineNumber : ""
       }`;
-  } else {
-    return "";
   }
+  return `${tracker} | ${location}`; 
 }
 
 /**
@@ -292,12 +287,14 @@ export function getCallStackInfo(depth: number = 0): CallStackInfo {
         functionName: "",
         fileName: "",
         lineNumber: "",
+        location: ''
       };
     }
     const stackLine = stack[callStackIndex]; // 获取指定深度的调用栈行
     let functionName = "";
     let fileName = "";
     let lineNumber = "";
+    let location = '';
     // 统一的正则表达式，兼容浏览器和Node.js
     // 浏览器格式: "at functionName (http://127.0.0.1:5500/test.html:15:9)"
     // Node.js格式: "at functionName (/path/to/file.js:15:9)"
@@ -310,6 +307,7 @@ export function getCallStackInfo(depth: number = 0): CallStackInfo {
       lineNumber = namedFunctionMatch[3];
       // 提取文件名
       fileName = _extractFileName(fullPath);
+      location = `${fullPath}:${lineNumber}:${namedFunctionMatch[4]}`
     } else {
       // 匹配匿名函数的情况
       // 浏览器: "at http://127.0.0.1:5500/test.html:15:9"
@@ -320,12 +318,14 @@ export function getCallStackInfo(depth: number = 0): CallStackInfo {
         lineNumber = anonymousFunctionMatch[2];
         fileName = _extractFileName(fullPath);
         functionName = "";
+        location = `${fullPath}:${lineNumber}:${anonymousFunctionMatch[3]}`;
       }
     }
     return {
       functionName,
       fileName,
       lineNumber,
+      location
     };
   }
 }

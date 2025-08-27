@@ -2,6 +2,8 @@ import { createLogger } from '../dist/easy-log-plus.mjs'
 import EasyLogPlus from '../dist/easy-log-plus.mjs'
 console.log("🚀 ~ EasyLogPlus:", EasyLogPlus)
 
+// import { createLogger } from '../src/index.ts';
+
 
 const logger2 = createLogger('EasyLogPlus3aS AAHSG ', {
     level: 'debug',
@@ -31,7 +33,11 @@ logger.error('a->', { a: 1, b: { c: 2 } }, [1, '2', { c: 3 }], [1, '2', { c: 3 }
 function qqq() {
     logger.debug('debug', 'dads', {}, 111, true)
     logger.warn('warn')
-    logger.error('error', 111)
+    logger.error('error', 111);
 }
 
-qqq()
+
+(function () {
+    qqq()
+    logger.error('error', 'ddasdasdada');
+})();

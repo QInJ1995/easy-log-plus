@@ -168,6 +168,7 @@ export type CallStackInfo = {
   fileName?: string;
   functionName?: string;
   lineNumber?: string;
+  location?: string;
 }
 
 /**
