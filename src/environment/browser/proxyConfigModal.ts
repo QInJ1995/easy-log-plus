@@ -11,6 +11,7 @@ function _getModalConfigValues(modal: Modal): ILoggerConfig {
     const isDebugLog = (modal.body!.querySelector('#debugLog') as HTMLInputElement).checked
     const isRecordLog = (modal.body!.querySelector('#recordLog') as HTMLInputElement).checked
     const isPersistentConfig = (modal.body!.querySelector('#persistentConfig') as HTMLInputElement).checked
+    const isSourceCodeLocation = (modal.body!.querySelector('#sourceCodeLocation') as HTMLInputElement).checked
 
     // 获取级别选择下拉框的值
     const level = (modal.body!.querySelector('#level') as HTMLSelectElement).value as LogLevel;
@@ -22,6 +23,7 @@ function _getModalConfigValues(modal: Modal): ILoggerConfig {
         isRecordLog,
         isPersistentConfig,
         level,
+        isSourceCodeLocation
     };
 }
 
@@ -114,6 +116,7 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
     const isDebugLog = logger?.config?.isDebugLog ?? false
     const isRecordLog = logger?.config?.isRecordLog ?? false
     const isPersistentConfig = logger?.config?.isPersistentConfig ?? false
+    const isSourceCodeLocation = logger?.config?.isSourceCodeLocation ?? false
 
     const logInstanceEntries = hasLogs.entries().toArray() || []
     const content = `
@@ -149,7 +152,11 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
                         <option value="silent" ${level === 'silent' ? 'selected' : ''}>silent</option>
                     </select>
                 </div>
-                  <div style="display: flex; align-items: center;">
+                <div style="display: flex; align-items: center;">
+                    <label for="sourceCodeLocation" style="text-align: center">${(languageCfg as any)[language].sourceCodeLocation}</label>
+                    <input type="checkbox" ${isSourceCodeLocation ? ' checked' : ''} id="sourceCodeLocation" style="margin-left: 10px;">
+                </div>
+                <div style="display: flex; align-items: center;">
                     <label for="debugLog" style="text-align: center">${(languageCfg as any)[language].debugLog}</label>
                     <input type="checkbox" ${isDebugLog ? ' checked' : ''} id="debugLog" style="margin-left: 10px;">
                 </div>

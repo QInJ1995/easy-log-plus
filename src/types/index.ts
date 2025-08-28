@@ -19,6 +19,7 @@ export interface ILoggerConfig {
   isDebugLog?: boolean; // 是否调试模式
   isRecordLog: boolean; // 是否记录日志
   isPersistentConfig: boolean; // 是否持久化配置
+  isSourceCodeLocation: boolean; // 是否显示源代码位置
 }
 
 /** * 顶层 window 配置代理目标
@@ -89,6 +90,7 @@ export type PrintOptions = {
   logOptions: ILogOptions;
   callStackInfo: CallStackInfo;
   printCustomStyle: PrintCustomStyle;
+  logger: Logger;
 }
 
 /**
@@ -229,6 +231,7 @@ export type BaseColors = 'black' | 'red' | 'green' | 'yellow' | 'blue' | 'magent
  * @property {string} env - 环境变量(默认：dev)
  * @property {boolean} isRecord - 是否记录日志
  * @property {boolean} isPersistentConfig - 是否持久化配置
+ * @property {boolean} isSourceCodeLocation - 是否显示源代码位置
  * @property {string} language - 语言
  * @property {boolean} isEnable - 是否启用日志
  */
@@ -255,6 +258,7 @@ export interface ILogOptions {
   isEnable?: boolean;
   isRecord?: boolean;
   isPersistentConfig?: boolean;
+  isSourceCodeLocation?: boolean;
 }
 
 /**

@@ -133,7 +133,7 @@ export function checkIsBrowser(): boolean {
  * @param {CallStackInfo} callStackInfo - 调用堆栈信息对象
  * @returns {string} - 返回日志追踪信息
  */
-export function formatTrace(callStackInfo: CallStackInfo): string {
+export function formatTrace(callStackInfo: CallStackInfo, logger: Logger): string {
   const { fileName, functionName, lineNumber, location } = callStackInfo;
   let tracker = ''
   if (functionName && fileName && lineNumber) {
@@ -145,7 +145,7 @@ export function formatTrace(callStackInfo: CallStackInfo): string {
     tracker = `${functionName ? functionName + "()" : ""}${lineNumber ? ":" + lineNumber : ""
       }`;
   }
-  return `${tracker} | ${location}`; 
+  return logger.config?.isSourceCodeLocation ? `${tracker} | ${location}` : `${tracker}`;
 }
 
 /**

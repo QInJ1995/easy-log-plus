@@ -105,7 +105,8 @@ export default class Logger {
             messages: messages || [],
             logOptions: this.options,
             callStackInfo,
-            printCustomStyle
+            printCustomStyle,
+            logger: this
         }
         this.printMap.clear()
         switch (type) {

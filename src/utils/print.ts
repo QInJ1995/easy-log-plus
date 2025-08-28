@@ -59,13 +59,14 @@ async function formatPerformance(options: PrintOptions): Promise<any> {
         logOptions,
         callStackInfo,
         printCustomStyle,
+        logger
     } = options;
     let color = printCustomStyle.color;
     let title = formatString(logOptions.formatter!, {
         namespace: namespace || "",
         time: getCurrentTimeDate(),
         level: level !== "silent" ? `${level!.toUpperCase()}` : "",
-        tracker: formatTrace(callStackInfo) || "",
+        tracker: formatTrace(callStackInfo, logger) || "",
         label: labels!.join("|") || "",
     });
     title = removeEmptyBrackets(title);
@@ -121,6 +122,7 @@ function formatTable(options: PrintOptions): {
         logOptions,
         callStackInfo,
         printCustomStyle,
+        logger
     } = options;
     const table = messages[0] ?? {};
     let color = printCustomStyle.color;
@@ -128,7 +130,7 @@ function formatTable(options: PrintOptions): {
         namespace: namespace || "",
         time: getCurrentTimeDate(),
         level: level !== "silent" ? `${level!.toUpperCase()}` : "",
-        tracker: formatTrace(callStackInfo) || "",
+        tracker: formatTrace(callStackInfo, logger) || "",
         label: labels!.join("|") || "",
     });
     title = removeEmptyBrackets(title);
@@ -156,13 +158,14 @@ function formatImage(options: PrintOptions): Promise<any[]> {
             level,
             callStackInfo,
             printCustomStyle,
+            logger
         } = options;
         const { url, scale } = messages[0];
         let title = formatString(logOptions.formatter!, {
             namespace: namespace || "",
             time: getCurrentTimeDate(),
             level: "",
-            tracker: formatTrace(callStackInfo) || "",
+            tracker: formatTrace(callStackInfo, logger) || "",
             label: labels!.join("|") || "",
         });
         title = removeEmptyBrackets(title);
@@ -262,13 +265,14 @@ export function formatLog(options: PrintOptions): any {
         logOptions,
         callStackInfo,
         printCustomStyle,
+        logger
     } = options;
     let color = printCustomStyle.color;
     let title = formatString(logOptions.formatter!, {
         namespace: namespace || "",
         time: getCurrentTimeDate(),
         level: level !== "silent" ? `${level!.toUpperCase()}` : "",
-        tracker: formatTrace(callStackInfo) || "",
+        tracker: formatTrace(callStackInfo, logger) || "",
         label: labels!.join("|") || "",
     });
     title = removeEmptyBrackets(title);
