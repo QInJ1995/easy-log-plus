@@ -1,5 +1,4 @@
 import Logger from "../core/Logger";
-import Modal from "../core/Modal";
 
 declare global {
   // Extend the globalThis type to include logger
@@ -20,6 +19,7 @@ export interface ILoggerConfig {
   isRecordLog: boolean; // 是否记录日志
   isPersistentConfig: boolean; // 是否持久化配置
   isSourceCodeLocation: boolean; // 是否显示源代码位置
+  language: Language; // 语言
 }
 
 /** * 顶层 window 配置代理目标
@@ -30,8 +30,8 @@ export interface ILoggerConfig {
  * @property {any} [key: symbol] - 其他任意属性
  */
 export type TopCfgProxyTarget = {
+  showConfigModal: boolean; // 是否显示配置弹窗
   hasLogs?: Map<string, Logger>; // 存储已创建的日志实例
-  configModal?: { isOpen: boolean, modal: Modal }; // 配置弹窗
 };
 
 /**
@@ -259,6 +259,7 @@ export interface ILogOptions {
   isRecord?: boolean;
   isPersistentConfig?: boolean;
   isSourceCodeLocation?: boolean;
+  language?: Language;
 }
 
 /**

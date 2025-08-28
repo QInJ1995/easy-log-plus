@@ -20,9 +20,7 @@ export function debugAlert(
     logger.config?.isDebugLog &&
     checkIsBrowser()
   ) {
-    const topGlobalThis = getTopGlobalThis()
-    const { configModal } = topGlobalThis?.__EASY_LOG_PLUS__ || {}
-    const language = (configModal?.language ?? Language.CN)! as Language
+    const language = (logger?.config?.language ?? Language.EN)! as Language
     (globalThis as any)["al" + "ert"](`${(languageCfg as any)[language].time}: ${getCurrentTimeDate()}
 ${(languageCfg as any)[language].namespace}: ${options.namespace}
 ${(languageCfg as any)[language].label}: ${options.labels!.join("|") || ""}

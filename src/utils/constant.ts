@@ -64,6 +64,7 @@ export const languageCfg = {
         label: '标签',
         fileName: '文件名',
         functionName: '方法名',
+        version: '版本',
 
     },
     'en-US': {
@@ -89,5 +90,6 @@ export const languageCfg = {
         label: 'Label',
         fileName: 'File Name',
         functionName: 'Method Name',
+        version: 'Version',
     },
 }

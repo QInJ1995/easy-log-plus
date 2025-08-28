@@ -1,4 +1,4 @@
-import { Env, type ILogOptions, type TopCfgProxyTarget } from '../../types';
+import { Env, Language, type ILogOptions, type TopCfgProxyTarget } from '../../types';
 import { getTopGlobalThis, printAsciiArt } from '../../utils/common';
 import { defaultLevel, defaultNamespace, } from '../../utils/constant';
 import { setGlobalLogger, } from '../../utils/globals';
@@ -60,6 +60,7 @@ export default async function (namespace?: string | null, options?: ILogOptions)
         isPersistentConfig: options?.isPersistentConfig ?? false, // 是否持久化配置
         isSourceCodeLocation: options?.isSourceCodeLocation ?? false, // 是否显示源代码位置
         isDebugLog: false, // 是否调试日志
+        language: options?.language ?? Language.EN, // 默认语言
     }
     // 设置缓存配置
     proxyLogger.setConfig(config)

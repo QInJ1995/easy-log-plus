@@ -1,89 +1,17 @@
 import Logger from "../../core/Logger";
 import Modal from "../../core/Modal";
 import { ILoggerConfig, Language, LogLevel } from "../../types";
-import { getTopGlobalThis, localConsoleError, localConsoleLog, localConsoleWarn } from "../../utils/common";
+import { getTopGlobalThis, localConsoleError, localConsoleLog } from "../../utils/common";
 import { defaultLevel, languageCfg } from "../../utils/constant";
-import downloadLog from './downloadLog'
+import downloadLog from "./downloadLog";
+import buildInfo from "../../../build-info.json";
 
-function _getModalConfigValues(modal: Modal): ILoggerConfig {
-    // 获取复选框的选中状态（布尔值）
-    const isEnableLog = (modal.body!.querySelector('#enableLog') as HTMLInputElement).checked
-    const isDebugLog = (modal.body!.querySelector('#debugLog') as HTMLInputElement).checked
-    const isRecordLog = (modal.body!.querySelector('#recordLog') as HTMLInputElement).checked
-    const isPersistentConfig = (modal.body!.querySelector('#persistentConfig') as HTMLInputElement).checked
-    const isSourceCodeLocation = (modal.body!.querySelector('#sourceCodeLocation') as HTMLInputElement).checked
-
-    // 获取级别选择下拉框的值
-    const level = (modal.body!.querySelector('#level') as HTMLSelectElement).value as LogLevel;
-
-    // 返回所有值的对象
-    return {
-        isEnableLog,
-        isDebugLog,
-        isRecordLog,
-        isPersistentConfig,
-        level,
-        isSourceCodeLocation
-    };
-}
-
-function _getLogInstanceCallback(modal: Modal, callback: (logInstanceName: string) => void) {
-    const logInstanceName = (modal.body!.querySelector('#logInstance') as HTMLInputElement).value
-    callback(logInstanceName)
-}
-
-// function _registerCheckboxEvent(
-//     id: string,
-//     modal: Modal,
-//     options: {
-//         onchange?: (e: Event) => void
-//     }
-// ) {
-//     const checkboxDom = (modal.body!.querySelector(`#${id}`) as HTMLInputElement)
-//     checkboxDom.onchange = (e: Event) => {
-//         options.onchange && options.onchange(e)
-//     }
-// }
-
-function _registerSelectEvent(
-    id: string,
-    modal: Modal,
-    options: {
-        onchange?: (e: Event) => void
-    }) {
-    const selectDom = (modal.body!.querySelector(`#${id}`) as HTMLSelectElement)
-    selectDom.onchange = (e: Event) => {
-        options.onchange && options.onchange(e)
-    }
-}
-
-function _registerBtnEvent(
-    id: string,
-    modal: Modal,
-    options: {
-        onclick?: () => void
-        allCallback?: () => void,
-        singleCallback?: (logInstanceName: string) => void
-    }) {
-    const btnDom = (modal.body!.querySelector(`#${id}`) as HTMLButtonElement)
-    btnDom.onclick = () => {
-        options.onclick && options.onclick()
-        _getLogInstanceCallback(modal, (logInstanceName) => {
-            if (logInstanceName === 'all') {
-                options.allCallback && options.allCallback()
-            } else {
-                options.singleCallback && options.singleCallback(logInstanceName)
-            }
-        })
-    }
-}
-
-function _createConfigModal() {
-    return new Modal({
+export function openConfigModal() {
+    const topGlobalThis = getTopGlobalThis()
+    const { hasLogs } = topGlobalThis?.__EASY_LOG_PLUS__ || {}
+    const configModal = new Modal({
         title: 'EasyLogPlus Config',
         onConfirm: (modal: Modal) => {
-            const topGlobalThis = getTopGlobalThis()
-            const { hasLogs, configModal } = topGlobalThis.__EASY_LOG_PLUS__ || {}
             if (hasLogs) {
                 const configValues = _getModalConfigValues(modal);
                 _getLogInstanceCallback(modal, (logInstanceName) => {
@@ -97,20 +25,21 @@ function _createConfigModal() {
                     }
                 })
             }
-            configModal && (configModal.isOpen = false)
+            _destroyConfigModal(configModal)
         },
         onCancel: () => {
-            const topGlobalThis = getTopGlobalThis()
-            const configModal = topGlobalThis.__EASY_LOG_PLUS__?.configModal
-            configModal && (configModal.isOpen = false)
+            _destroyConfigModal(configModal)
         }
     });
+    configModal.open()
+    const logInstances = hasLogs.values().toArray() || []
+    _updateConfigModal(configModal, logInstances[0])
 }
 
 function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
     const topGlobalThis = getTopGlobalThis()
+    language = ((language || logger?.config?.language) ?? Language.EN)! as Language
     const { hasLogs, configModal } = topGlobalThis.__EASY_LOG_PLUS__ || {}
-    language = ((language || configModal?.language) ?? Language.CN)! as Language
     const isEnableLog = logger?.config?.isEnableLog ?? false
     const level = logger?.config?.level ?? defaultLevel
     const isDebugLog = logger?.config?.isDebugLog ?? false
@@ -169,11 +98,16 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
                     <input type="checkbox" ${isPersistentConfig ? ' checked' : ''} id="persistentConfig" style="margin-left: 10px;">
                 </div>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #ccc; padding-top: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #ccc; padding: 10px 0;">
                 <button id="downloadLog">${(languageCfg as any)[language].downloadLog}</button>
                 <button id="clearLog">${(languageCfg as any)[language].clearLog}</button>
                 <button id="restConfig">${(languageCfg as any)[language].restConfig}</button>
                 <button id="clearCache">${(languageCfg as any)[language].clearCache}</button>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid #ccc; padding-top: 10px;">
+                <span>${(languageCfg as any)[language].version}: ${buildInfo.version}</span>
+                <span>Released under the MIT License</span>
+                <span>Copyright © 2025-present 秦佬湿</span>
             </div>
         </div>
  
@@ -207,12 +141,12 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
             hasLogs.forEach((logger: Logger) => {
                 logger && logger.setConfig()
             })
-            modal && modal.destroy()
+            _destroyConfigModal(modal)
         },
         singleCallback: (logInstanceName) => {
             const logger = hasLogs.get(logInstanceName) as Logger
             logger && logger.setConfig()
-            modal && modal.destroy()
+            _destroyConfigModal(modal)
         }
     })
 
@@ -248,7 +182,7 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
             const request = indexedDB.deleteDatabase('EasyLogPlus');
             request.onsuccess = () => {
                 localConsoleLog('[easy-log-plus]: Clear cache success!');
-                modal && modal.destroy()
+                _destroyConfigModal(modal)
             };
             request.onerror = () => {
                 localConsoleError('[easy-log-plus]: Clear cache error!');
@@ -261,56 +195,71 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
 
 }
 
-export default function () {
-    const configModal = {
-        isOpen: false, // 是否打开配置弹窗
-        language: Language.CN, // 当前语言
-        modal: _createConfigModal(), // 配置弹窗实例
+function _destroyConfigModal(modal: Modal) {
+    modal && modal.destroy()
+    const topGlobalThis = getTopGlobalThis()
+    topGlobalThis?.__EASY_LOG_PLUS__ && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = false)
+}
+
+function _registerSelectEvent(
+    id: string,
+    modal: Modal,
+    options: {
+        onchange?: (e: Event) => void
+    }) {
+    const selectDom = (modal.body!.querySelector(`#${id}`) as HTMLSelectElement)
+    selectDom.onchange = (e: Event) => {
+        options.onchange && options.onchange(e)
     }
-    const proxyConfigModal = new Proxy(configModal, {
-        // 拦截属性的删除
-        deleteProperty(_target, property) {
-            localConsoleWarn(`[easy-log-plus]: Not allow to delete property: ${String(property)}!`);
-            return false; // 不允许删除属性
-        },
+}
 
-        // 拦截属性的设置
-        set(_target, property, value, receiver) {
-            const allowedProperties = new Set(['isOpen', 'language']);
-            if (!allowedProperties.has(property as string)) {
-                localConsoleWarn(`[easy-log-plus]: Not allow to set unsupported property: ${String(property)}!`);
-                return false; // 不允许设置不支持的属性
+function _registerBtnEvent(
+    id: string,
+    modal: Modal,
+    options: {
+        onclick?: () => void
+        allCallback?: () => void,
+        singleCallback?: (logInstanceName: string) => void
+    }) {
+    const btnDom = (modal.body!.querySelector(`#${id}`) as HTMLButtonElement)
+    btnDom.onclick = () => {
+        options.onclick && options.onclick()
+        _getLogInstanceCallback(modal, (logInstanceName) => {
+            if (logInstanceName === 'all') {
+                options.allCallback && options.allCallback()
             } else {
-                // 如果设置的是 isOpen 属性，则更新弹窗的 isOpen 属性
-                if (property === 'isOpen') {
-                    if (typeof value !== 'boolean') {
-                        localConsoleWarn('[easy-log-plus]: isOpen must be a boolean!');
-                        return false;
-                    }
-                    if (value) {
-                        proxyConfigModal.modal.open();
-                        const topGlobalThis = getTopGlobalThis()
-                        const { hasLogs } = topGlobalThis.__EASY_LOG_PLUS__ || {}
-                        const logInstances = hasLogs.values().toArray() || []
-                        _updateConfigModal(proxyConfigModal.modal, logInstances[0])
-                    } else {
-                        proxyConfigModal.modal.destroy();
-                    }
-                }
-                if (property === 'language') {
-                    if (typeof value !== 'string') {
-                        localConsoleWarn('[easy-log-plus]: language must be a string!')
-                        return false
-                    }
-                    if (!Object.values(Language).includes(value as Language)) {
-                        localConsoleWarn('[easy-log-plus]: language must be one of the following: ' + Object.values(Language).join(', '))
-                        return false
-                    }
-                }
-                return Reflect.set(_target, property, value, receiver);
+                options.singleCallback && options.singleCallback(logInstanceName)
             }
-        }
-    })
+        })
+    }
+}
 
-    return proxyConfigModal
+
+function _getModalConfigValues(modal: Modal): ILoggerConfig {
+    // 获取复选框的选中状态（布尔值）
+    const isEnableLog = (modal.body!.querySelector('#enableLog') as HTMLInputElement).checked
+    const isDebugLog = (modal.body!.querySelector('#debugLog') as HTMLInputElement).checked
+    const isRecordLog = (modal.body!.querySelector('#recordLog') as HTMLInputElement).checked
+    const isPersistentConfig = (modal.body!.querySelector('#persistentConfig') as HTMLInputElement).checked
+    const isSourceCodeLocation = (modal.body!.querySelector('#sourceCodeLocation') as HTMLInputElement).checked
+
+    // 获取级别选择下拉框的值
+    const level = (modal.body!.querySelector('#level') as HTMLSelectElement).value as LogLevel;
+    const language = (modal.body!.querySelector('#language') as HTMLSelectElement).value as Language;
+
+    // 返回所有值的对象
+    return {
+        isEnableLog,
+        isDebugLog,
+        isRecordLog,
+        isPersistentConfig,
+        level,
+        isSourceCodeLocation,
+        language
+    };
+}
+
+function _getLogInstanceCallback(modal: Modal, callback: (logInstanceName: string) => void) {
+    const logInstanceName = (modal.body!.querySelector('#logInstance') as HTMLInputElement).value
+    callback(logInstanceName)
 }

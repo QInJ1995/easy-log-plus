@@ -29,9 +29,8 @@ function _params2Obj(urlParams: string = ''): Record<string, string> {
 // 打开配置弹窗
 function _openConfigModal() {
     const topGlobalThis = getTopGlobalThis()
-    const configModal = topGlobalThis?.__EASY_LOG_PLUS__?.configModal
-    // 创建并打开弹窗
-    configModal && (configModal.isOpen = true)
+    topGlobalThis?.__EASY_LOG_PLUS__ && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = true)
+
 }
 
 // shift + alt + W

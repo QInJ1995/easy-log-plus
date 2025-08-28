@@ -1,11 +1,12 @@
 import createLogger from './core/createLogger';
 import EasyLogPlusVuePlugin from './plugins/vue-plugin';
-import { Env, LogLevel } from './types'
+import { Env, Language, LogLevel } from './types'
 
 
 const EasyLogPlus = {
     createLogger,
     Env,
+    Language,
     LogLevel,
     EasyLogPlusVuePlugin
 }
@@ -16,6 +17,7 @@ export {
     EasyLogPlusVuePlugin as EasyLogVuePlugin,
     EasyLogPlusVuePlugin,
     Env,
+    Language,
     LogLevel,
 };
 export default EasyLogPlus;
