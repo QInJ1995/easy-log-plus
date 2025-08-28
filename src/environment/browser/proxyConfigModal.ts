@@ -153,7 +153,7 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
                     </select>
                 </div>
                 <div style="display: flex; align-items: center;">
-                    <label for="sourceCodeLocation" style="text-align: center">${(languageCfg as any)[language].sourceCodeLocation}</label>
+                    <label for="sourceCodeLocation" style="text-align: center">${(languageCfg as any)[language].showSourceCodeLocation}</label>
                     <input type="checkbox" ${isSourceCodeLocation ? ' checked' : ''} id="sourceCodeLocation" style="margin-left: 10px;">
                 </div>
                 <div style="display: flex; align-items: center;">

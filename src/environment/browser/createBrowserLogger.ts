@@ -5,7 +5,7 @@ import { setGlobalLogger, } from '../../utils/globals';
 import Logger from '../../core/Logger';
 import getProxyLogger from './proxyLogger'
 import getProxyTopCfg from './proxyTopCfg';
-import { registerOpenConfigModalEvent } from './keyboardEvents';
+import { registerShortcutKeyEvents } from './shortcutKeyEvents';
 import { registerConfigStore } from './store';
 export default async function (namespace?: string | null, options?: ILogOptions): Promise<Logger> {
     const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
@@ -36,8 +36,8 @@ export default async function (namespace?: string | null, options?: ILogOptions)
         // 打印 ascii 艺术字
         (options?.env ?? Env.Dev) !== Env.Prod && printAsciiArt(namespace || '')
     }
-    // 注册打开配置模态框事件
-    registerOpenConfigModalEvent()
+    // 注册快捷键事件
+    registerShortcutKeyEvents()
 
     // 创建代理日志实例
     const proxyLogger: Logger = getProxyLogger(logger)

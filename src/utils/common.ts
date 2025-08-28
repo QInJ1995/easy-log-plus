@@ -4,8 +4,9 @@ import {
   CallStackInfo,
   PrintCustomStyle,
   PrintOptions,
+  Language,
 } from "../types/index";
-import { defaultCallStackIndex } from "./constant";
+import { defaultCallStackIndex, languageCfg } from "./constant";
 import Logger from "../core/Logger";
 import buildInfo from "../../build-info.json";
 
@@ -19,12 +20,15 @@ export function debugAlert(
     logger.config?.isDebugLog &&
     checkIsBrowser()
   ) {
-    (globalThis as any)["al" + "ert"](`时间: ${getCurrentTimeDate()}
-命名空间: ${options.namespace}
-标签: ${options.labels!.join("|") || ""}
-文件名: ${options.callStackInfo.fileName}
-方法名: ${options.callStackInfo.functionName}
-行号: ${options.callStackInfo.lineNumber}`);
+    const topGlobalThis = getTopGlobalThis()
+    const { configModal } = topGlobalThis?.__EASY_LOG_PLUS__ || {}
+    const language = (configModal?.language ?? Language.CN)! as Language
+    (globalThis as any)["al" + "ert"](`${(languageCfg as any)[language].time}: ${getCurrentTimeDate()}
+${(languageCfg as any)[language].namespace}: ${options.namespace}
+${(languageCfg as any)[language].label}: ${options.labels!.join("|") || ""}
+${(languageCfg as any)[language].fileName}: ${options.callStackInfo.fileName}
+${(languageCfg as any)[language].functionName}: ${options.callStackInfo.functionName}
+${(languageCfg as any)[language].sourceCodeLocation}: ${options.callStackInfo.location}`);
   }
 }
 
@@ -110,10 +114,19 @@ export function isEnable(logger: Logger): boolean {
  * @returns
  */
 export function getTopGlobalThis(): any {
-  if (checkIsBrowser()) {
+  if (!checkIsBrowser()) {
+    return globalThis;
+  }
+  // 优先使用 top 属性
+  if (globalThis.top) {
     return globalThis.top;
   }
-  return globalThis;
+  // 如果没有 top 属性，则向上遍历 parent 链
+  let current = globalThis as any;
+  while (current.parent && current !== current.parent) {
+    current = current.parent;
+  }
+  return current;
 }
 
 /**

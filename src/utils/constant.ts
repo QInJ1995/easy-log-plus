@@ -57,7 +57,14 @@ export const languageCfg = {
         all: '全部',
         modifyConfig: '修改配置',
         config: '配置',
-        sourceCodeLocation: '显示源代码位置',
+        sourceCodeLocation: '源代码位置',
+        showSourceCodeLocation: '显示源代码位置',
+        time: '时间',
+        namespace: '命名空间',
+        label: '标签',
+        fileName: '文件名',
+        functionName: '方法名',
+
     },
     'en-US': {
         language: 'Language',
@@ -76,5 +83,11 @@ export const languageCfg = {
         modifyConfig: 'Modify Config',
         config: 'Config',
         sourceCodeLocation: 'Source Code Location',
+        showSourceCodeLocation: 'Show Source Code Location',
+        time: 'Time',
+        namespace: 'Namespace',
+        label: 'Label',
+        fileName: 'File Name',
+        functionName: 'Method Name',
     },
 }
