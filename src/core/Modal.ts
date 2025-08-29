@@ -49,7 +49,7 @@ export default class Modal {
     // 创建所有DOM元素
     createElements() {
         // 创建背景遮罩
-        this.backdrop = this.topGlobalThis.document.createElement('div');
+        this.backdrop = globalThis.document.createElement('div');
         this.backdrop.style.cssText = `
       position: fixed;
       top: 0;
@@ -64,7 +64,7 @@ export default class Modal {
     `;
 
         // 创建容器
-        this.container = this.topGlobalThis.document.createElement('div');
+        this.container = globalThis.document.createElement('div');
         this.container.style.cssText = `
       position: fixed;
       top: 0;
@@ -79,7 +79,7 @@ export default class Modal {
     `;
 
         // 创建内容框
-        this.content = this.topGlobalThis.document.createElement('div');
+        this.content = globalThis.document.createElement('div');
         this.content!.style.cssText = `
       background: white;
       border-radius: 8px;
@@ -91,7 +91,7 @@ export default class Modal {
     `;
 
         // 创建标题栏
-        this.header = this.topGlobalThis.document.createElement('div');
+        this.header = globalThis.document.createElement('div');
         this.header!.style.cssText = `
       padding: 16px 20px;
       border-bottom: 1px solid #eee;
@@ -100,7 +100,7 @@ export default class Modal {
       align-items: center;
     `;
 
-        this.title = this.topGlobalThis.document.createElement('h3');
+        this.title = globalThis.document.createElement('h3');
         this.title!.style.cssText = `
       margin: 0;
       font-size: 18px;
@@ -108,7 +108,7 @@ export default class Modal {
     `;
         this.title!.textContent = this.options.title;
 
-        this.closeBtn = this.topGlobalThis.document.createElement('button');
+        this.closeBtn = globalThis.document.createElement('button');
         this.closeBtn!.style.cssText = `
       background: none;
       border: none;
@@ -134,7 +134,7 @@ export default class Modal {
         };
 
         // 创建内容区域
-        this.body = this.topGlobalThis.document.createElement('div');
+        this.body = globalThis.document.createElement('div');
         this.body!.style.cssText = `
       padding: 10px;
       font-size: 14px;
@@ -143,7 +143,7 @@ export default class Modal {
         this.body!.innerHTML = this.options.content;
 
         // 创建按钮区域
-        this.footer = this.topGlobalThis.document.createElement('div');
+        this.footer = globalThis.document.createElement('div');
         this.footer.style.cssText = `
       padding: 12px 20px;
       border-top: 1px solid #eee;
@@ -152,7 +152,7 @@ export default class Modal {
       gap: 10px;
     `;
 
-        this.cancelBtn = this.topGlobalThis.document.createElement('button');
+        this.cancelBtn = globalThis.document.createElement('button');
         this.cancelBtn!.style.cssText = `
       padding: 6px 16px;
       border: 1px solid #ddd;
@@ -170,7 +170,7 @@ export default class Modal {
             this.cancelBtn && (this.cancelBtn.style.backgroundColor = '');
         };
 
-        this.confirmBtn = this.topGlobalThis.document.createElement('button');
+        this.confirmBtn = globalThis.document.createElement('button');
         this.confirmBtn!.style.cssText = `
       padding: 6px 16px;
       border: none;
