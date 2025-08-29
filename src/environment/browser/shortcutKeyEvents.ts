@@ -56,14 +56,14 @@ function _shiftAndAltAndLKey(callback: () => void) {
 // 注册快捷键
 function _registerShortcutKeyEvents(handles: ((event: KeyboardEvent) => void)[]) {
     handles.forEach(fn => {
-        globalThis.document.addEventListener('keydown', fn);
+        globalThis.document.addEventListener('keydown', fn, true);
     });
 }
 
 // 移除快捷键
 function _removeShortcutKeyEvents(handles: ((event: KeyboardEvent) => void)[]) {
     handles.forEach(fn => {
-        globalThis.document.removeEventListener('keydown', fn);
+        globalThis.document.removeEventListener('keydown', fn, true);
     });
 }
 

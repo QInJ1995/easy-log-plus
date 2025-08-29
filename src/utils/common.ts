@@ -341,6 +341,32 @@ export function getCallStackInfo(depth: number = 0): CallStackInfo {
   }
 }
 
+export function delayExecute(callback: () => void, delay: number) {
+  const start = performance.now();
+  let animationFrameId: number;
+
+  function checkTime(currentTime: number) {
+    if (currentTime - start >= delay) {
+      callback();
+      // 清理引用
+      clear();
+    } else {
+      animationFrameId = requestAnimationFrame(checkTime);
+    }
+  }
+  animationFrameId = requestAnimationFrame(checkTime);
+  function clear() {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = 0;
+    }
+  }
+
+  // 返回一个清理函数
+  return clear
+}
+
+
 /**
  * 打印 ASCII 艺术字
  */

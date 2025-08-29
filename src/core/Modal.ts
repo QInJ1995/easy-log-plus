@@ -1,4 +1,4 @@
-import { getTopGlobalThis } from "../utils/common";
+import { delayExecute, getTopGlobalThis } from "../utils/common";
 
 export default class Modal {
     private options: any; // 默认配置和用户配置
@@ -257,11 +257,10 @@ export default class Modal {
         this.topGlobalThis.document.body.style.overflow = 'hidden';
 
         // 触发动画
-        const _this = this;
-        this.topGlobalThis.setTimeout(() => {
-            _this.backdrop.style.opacity = '1';
-            _this.content && (_this.content.style.transform = 'scale(1)');
-            _this.content && (_this.content.style.opacity = '1');
+        delayExecute(() => {
+            this.backdrop.style.opacity = '1';
+            this.content && (this.content.style.transform = 'scale(1)');
+            this.content && (this.content.style.opacity = '1');
         }, 10);
     }
 
@@ -277,7 +276,7 @@ export default class Modal {
         this.topGlobalThis.document.body.style.overflow = '';
 
         // 动画结束后隐藏
-        setTimeout(() => {
+        delayExecute(() => {
             this.backdrop.style.display = 'none';
             this.container.style.display = 'none';
         }, 300);
@@ -287,7 +286,7 @@ export default class Modal {
     destroy() {
         if (!this.isOpen) return;
         this.close();
-        setTimeout(() => {
+        delayExecute(() => {
             this.topGlobalThis.document.body.removeChild(this.backdrop);
             this.topGlobalThis.document.body.removeChild(this.container);
         }, 300);
