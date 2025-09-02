@@ -6,133 +6,154 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Document</title>
   <!-- <script src="./dist/easy-log-plus.umd.js"></script> -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 
 <body>
   <script type="module">
-    import { createLogger } from '../src/index.ts';
+    const { ref } = Vue;
+    import { createLogger, Language, Env } from '../src/index.ts';
+    const testRecordLogger = await createLogger('test-record-log', {
+      isGlobal: true, // 是否为全局日志 true: 挂载到window对象上
+      env: Env.Dev, // 日志环境
+      language: Language.CN, // 日志语言
+      isRecord: true // 是否记录日志
+    });
+    testRecordLogger.label('测试记录日志').label('String').debug('字符串');
+    testRecordLogger.label('测试记录日志').label('Boolean').debug(true, false);
+    testRecordLogger.label('测试记录日志').label('Number').debug(123);
+    testRecordLogger.label('测试记录日志').label('Array').debug([]);
+    testRecordLogger.label('测试记录日志').label('Array').debug([1, 2, 3]);
+    testRecordLogger.label('测试记录日志').label('Array').debug(['1', '2', '3']);
+    testRecordLogger.label('测试记录日志').label('Array').debug([1, '2', false]);
+    testRecordLogger.label('测试记录日志').label('Array').debug([{ a: 1 }, { b: 2 }, { c: 3 }]);
+    testRecordLogger.label('测试记录日志').label('Object').debug({});
+    testRecordLogger.label('测试记录日志').label('Object').debug({ a: 1, b: 2, c: 3 });
+    testRecordLogger.label('测试记录日志').label('Object').debug({ a: 1, b: { b1: 11, b2: 22 }, c: { c1: { c11: 111 } } });
+    testRecordLogger.label('测试记录日志').label('Object').debug({ a: 1, b: [{ c: { d: 1 } }] });
+    testRecordLogger.label('测试记录日志').label('其他类型').debug(ref({ a: 1 }));
+
     // const { createLogger } = window.EasyLogPlus;
+    // const logger2 = await createLogger("", {
+    //   // level: "error",
+    //   formatter: "$namespace$ | [$time$] [$level$] [$tracker$] $label$",
+    //   isGlobal: true,
+    //   style: {
+    //     // color: 'red',
+    //     // bgColor: 'blue',
+    //     // bold: true,
+    //     // italic: true,
+    //     // underline: true,
+    //     // overline: true,
+    //     // strikethrough: true,
+    //     // dim: true,
+    //     // inverse: true,
+    //   },
+    // });
+    // const logger3 = await createLogger("qj-logger", {
+    //   // level: "error",
+    //   env: "prod",
+    //   levelColors: {
+    //     debug: "red",
+    //     info: "blue",
+    //     warn: "yellow",
+    //     error: "red",
+    //     silent: "green",
+    //   },
+    // });
+    // const logger = await createLogger("hit-emr", {
+    //   // level: "error",
+    //   // env: "prod",
+    // });
+    // logger3.table([1, 2]);
+    // // logger2.image('https://lsky-pro.smartideahub.site:2083/qls/image-20210724174717647.png')
+    // logger2
+    //   .label("图片")
+    //   .image(
+    //     "https://img2.baidu.com/it/u=2814429148,2262424695&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1730998800&t=e60940f39f2a1e0cf5e65c6df7b0227a"
+    //   );
+    // logger2.color("red").label("info1").bgColor("green").log(111);
+    // logger2.log(45454222);
+    // logger2.underline.log(222);
+    // logger.label('性能测试').performance(() => {
+    //   for (let i = 0; i < 1000; i++) {
 
-    const logger2 = await createLogger("", {
-      // level: "error",
-      formatter: "$namespace$ | [$time$] [$level$] [$tracker$] $label$",
-      isGlobal: true,
-      style: {
-        // color: 'red',
-        // bgColor: 'blue',
-        // bold: true,
-        // italic: true,
-        // underline: true,
-        // overline: true,
-        // strikethrough: true,
-        // dim: true,
-        // inverse: true,
-      },
-    });
-    const logger3 = await createLogger("qj-logger", {
-      // level: "error",
-      env: "prod",
-      levelColors: {
-        debug: "red",
-        info: "blue",
-        warn: "yellow",
-        error: "red",
-        silent: "green",
-      },
-    });
-    const logger = await createLogger("hit-emr", {
-      // level: "error",
-      // env: "prod",
-    });
-    logger3.table([1, 2]);
-    // logger2.image('https://lsky-pro.smartideahub.site:2083/qls/image-20210724174717647.png')
-    logger2
-      .label("图片")
-      .image(
-        "https://img2.baidu.com/it/u=2814429148,2262424695&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1730998800&t=e60940f39f2a1e0cf5e65c6df7b0227a"
-      );
-    logger2.color("red").label("info1").bgColor("green").log(111);
-    logger2.log(45454222);
-    logger2.underline.log(222);
-    logger.label('性能测试').performance(() => {
-      for (let i = 0; i < 1000; i++) {
+    //   }
+    //   return "performance done";
+    // });
+    // logger2.bold.italic.underline.strikethrough
+    //   .color("green")
+    //   .label("info3")
+    //   .log(333);
+    // function qqqq() {
+    //   logger3.underline
+    //     .log("overline1")
+    //     .color("red")
+    //     .log("overline2")
+    //     .log("overline3")
+    //     .log("overline4")
+    //     .log("overline5");
+    //   logger2.bold.italic.underline.strikethrough
+    //     .color("#FFA500")
+    //     .label("打印信息wwwwww")
+    //     .log("wwwwwwwwwwwwwwwww");
+    //   logger3
+    //     .label("logger3")
+    //     .label("测试222")
+    //     .log([{ a: 1 }, 1, "2"]);
+    //   logger3.label("logger3").debug([1, 2, 3]);
+    //   logger3.label("logger3").info(1);
+    //   logger3.label("logger3").warn(true);
+    //   logger3.label("logger3").error(null);
+    //   setTimeout(() => {
+    //     logger3.label("setTimeout").log("1秒");
+    //   }, 3000);
+    // }
 
-      }
-      return "performance done";
-    });
-    logger2.bold.italic.underline.strikethrough
-      .color("green")
-      .label("info3")
-      .log(333);
-    function qqqq() {
-      logger3.underline
-        .log("overline1")
-        .color("red")
-        .log("overline2")
-        .log("overline3")
-        .log("overline4")
-        .log("overline5");
-      logger2.bold.italic.underline.strikethrough
-        .color("#FFA500")
-        .label("打印信息wwwwww")
-        .log("wwwwwwwwwwwwwwwww");
-      logger3
-        .label("logger3")
-        .label("测试222")
-        .log([{ a: 1 }, 1, "2"]);
-      logger3.label("logger3").debug([1, 2, 3]);
-      logger3.label("logger3").info(1);
-      logger3.label("logger3").warn(true);
-      logger3.label("logger3").error(null);
-      setTimeout(() => {
-        logger3.label("setTimeout").log("1秒");
-      }, 3000);
-    }
+    // function qqqq2() {
+    //   logger3.label("测试1").log("测试1111");
+    //   logger3.label("测试2").log("测试12222");
+    //   logger3.label("测试3").log("测试13333");
+    //   logger3.label("测试3").log({ a: { b: { c: 1 } } });
+    //   logger3.label("测试3").log([1, "2", { c: 3 }]);
+    //   logger3.label("测试4").log("测试444", 1, { a: { b: { c: 1 } } }, true, false, [1, 2, 3]);
+    //   logger.error(
+    //     "aaaa",
+    //     { a: 1, b: { c: 2 } },
+    //     [1, "2", { c: 3 }],
+    //     [1, "2", { c: 3 }],
+    //     [1, "2", { c: 3 }],
+    //     [1, "2", { c: 3 }],
+    //     [1, "2", { c: 3 }]
+    //   );
+    // }
+    // qqqq2()
 
-    function qqqq2() {
-      logger3.label("测试1").log("测试1111");
-      logger3.label("测试2").log("测试12222");
-      logger3.label("测试3").log("测试13333");
-      logger3.label("测试3").log({ a: { b: { c: 1 } } });
-      logger3.label("测试3").log([1, "2", { c: 3 }]);
-      logger3.label("测试4").log("测试444", 1, { a: { b: { c: 1 } } }, true, false, [1, 2, 3]);
-      logger.error(
-        "aaaa",
-        { a: 1, b: { c: 2 } },
-        [1, "2", { c: 3 }],
-        [1, "2", { c: 3 }],
-        [1, "2", { c: 3 }],
-        [1, "2", { c: 3 }],
-        [1, "2", { c: 3 }]
-      );
-    }
-    qqqq2()
+    // logger.label("测试").time("test").log("测试时间");
+    // logger.debug("debug", "dads", {}, 111, true);
+    // logger.info("打印信息", 1, 2);
+    // logger.warn("warn");
+    // logger.error("error", 111, "sdasdasd");
+    // logger.error(
+    //   "aaaa",
+    //   { a: 1, b: { c: 2 } },
+    //   [1, "2", { c: 3 }],
+    //   [1, "2", { c: 3 }],
+    //   [1, "2", { c: 3 }],
+    //   [1, "2", { c: 3 }],
+    //   [1, "2", { c: 3 }]
+    // );
+    // logger.label("测试").timeEnd("test").log("测试时间结束");
 
-    logger.label("测试").time("test").log("测试时间");
-    logger.debug("debug", "dads", {}, 111, true);
-    logger.info("打印信息", 1, 2);
-    logger.warn("warn");
-    logger.error("error", 111, "sdasdasd");
-    logger.error(
-      "aaaa",
-      { a: 1, b: { c: 2 } },
-      [1, "2", { c: 3 }],
-      [1, "2", { c: 3 }],
-      [1, "2", { c: 3 }],
-      [1, "2", { c: 3 }],
-      [1, "2", { c: 3 }]
-    );
-    logger.label("测试").timeEnd("test").log("测试时间结束");
+    // // window.addEventListener('error', (event) => {
+    // //   console.log("🚀 ~ event:", event)
+    // //   logger.label('全局错误捕获').error(event.error)
+    // // })
+    // // console.log(dddddddddd)
 
-    // window.addEventListener('error', (event) => {
-    //   console.log("🚀 ~ event:", event)
-    //   logger.label('全局错误捕获').error(event.error)
-    // })
-    // console.log(dddddddddd)
-
-    (function () {
-      logger.error('error', 'ddasdasdada');
-    })();
+    // (function () {
+    //   logger.error('error', 'ddasdasdada');
+    // })();
 
   </script>
 </body>

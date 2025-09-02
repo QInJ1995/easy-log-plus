@@ -12,7 +12,6 @@ export default class Modal {
     closeBtn?: HTMLButtonElement; // 关闭按钮
     cancelBtn?: HTMLButtonElement; // 取消按钮
     confirmBtn?: HTMLButtonElement; // 确认按钮
-    isOpen?: boolean; // 是否已打开
     topGlobalThis: any;
     constructor(options = {}) {
         // 默认配置
@@ -34,9 +33,6 @@ export default class Modal {
 
         // 创建模态框元素
         this.createElements();
-
-        // 绑定事件
-        this.bindEvents()
 
     }
 
@@ -67,10 +63,9 @@ export default class Modal {
         this.container = globalThis.document.createElement('div');
         this.container.style.cssText = `
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       display: none;
       justify-content: center;
       align-items: center;
@@ -211,7 +206,7 @@ export default class Modal {
     }
 
     ESCEvent(e: KeyboardEvent) {
-        if (e.key === 'Escape' && this.isOpen) {
+        if (e.key === 'Escape') {
             this.options.onCancel();
         }
     }
@@ -231,7 +226,7 @@ export default class Modal {
         this.backdrop && this.backdrop.addEventListener('click', this.closeEvent.bind(this));
 
         // ESC键关闭
-        this.topGlobalThis.document.addEventListener('keydown', this.ESCEvent.bind(this));
+        globalThis.document.addEventListener('keydown', this.ESCEvent.bind(this));
     }
 
     // 移除事件
@@ -240,15 +235,17 @@ export default class Modal {
         this.cancelBtn && this.cancelBtn.removeEventListener('click', this.closeEvent.bind(this));
         this.confirmBtn && this.confirmBtn.removeEventListener('click', this.confirmEvent.bind(this));
         this.backdrop && this.backdrop.removeEventListener('click', this.closeEvent.bind(this));
-        this.topGlobalThis.document.removeEventListener('keydown', this.ESCEvent.bind(this));
+        globalThis.document.removeEventListener('keydown', this.ESCEvent.bind(this));
     }
 
     // 打开模态框
     open() {
-        if (this.isOpen) return;
-        this.isOpen = true;
         // 挂载元素
         this.mount();
+
+        // 绑定事件
+        this.bindEvents()
+
         // 显示元素
         this.backdrop.style.display = 'block';
         this.container.style.display = 'flex';
@@ -266,7 +263,6 @@ export default class Modal {
 
     // 关闭模态框
     close() {
-        this.isOpen = false;
         // 反向动画
         this.backdrop.style.opacity = '0';
         this.content && (this.content.style.transform = 'scale(0.9)');
@@ -275,20 +271,20 @@ export default class Modal {
         // 恢复页面滚动
         this.topGlobalThis.document.body.style.overflow = '';
 
+        this.unbindEvents();
+
         // 动画结束后隐藏
         delayExecute(() => {
             this.backdrop.style.display = 'none';
             this.container.style.display = 'none';
         }, 300);
-    }
-
-    // 销毁模态框
-    destroy() {
-        if (!this.isOpen) return;
-        this.close();
         delayExecute(() => {
-            this.topGlobalThis.document.body.removeChild(this.backdrop);
-            this.topGlobalThis.document.body.removeChild(this.container);
+            if (this.backdrop && this.topGlobalThis.document.body.contains(this.backdrop)) {
+                this.topGlobalThis.document.body.removeChild(this.backdrop);
+            }
+            if (this.container && this.topGlobalThis.document.body.contains(this.container)) {
+                this.topGlobalThis.document.body.removeChild(this.container);
+            }
         }, 300);
     }
 }

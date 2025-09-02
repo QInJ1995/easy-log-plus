@@ -25,10 +25,10 @@ export function openConfigModal() {
                     }
                 })
             }
-            _destroyConfigModal(configModal)
+            _closeConfigModal(configModal)
         },
         onCancel: () => {
-            _destroyConfigModal(configModal)
+            _closeConfigModal(configModal)
         }
     });
     configModal.open()
@@ -141,12 +141,12 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
             hasLogs.forEach((logger: Logger) => {
                 logger && logger.setConfig()
             })
-            _destroyConfigModal(modal)
+            _closeConfigModal(modal)
         },
         singleCallback: (logInstanceName) => {
             const logger = hasLogs.get(logInstanceName) as Logger
             logger && logger.setConfig()
-            _destroyConfigModal(modal)
+            _closeConfigModal(modal)
         }
     })
 
@@ -182,7 +182,7 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
             const request = indexedDB.deleteDatabase('EasyLogPlus');
             request.onsuccess = () => {
                 localConsoleLog('[easy-log-plus]: Clear cache success!');
-                _destroyConfigModal(modal)
+                _closeConfigModal(modal)
             };
             request.onerror = () => {
                 localConsoleError('[easy-log-plus]: Clear cache error!');
@@ -195,10 +195,10 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
 
 }
 
-function _destroyConfigModal(modal: Modal) {
-    modal && modal.destroy()
+function _closeConfigModal(modal: Modal) {
+    modal && modal.close()
     const topGlobalThis = getTopGlobalThis()
-    topGlobalThis?.__EASY_LOG_PLUS__ && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = false)
+    topGlobalThis?.__EASY_LOG_PLUS__?.showConfigModal && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = false)
 }
 
 function _registerSelectEvent(

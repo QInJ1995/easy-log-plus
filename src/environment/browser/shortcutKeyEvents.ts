@@ -30,7 +30,6 @@ function _params2Obj(urlParams: string = ''): Record<string, string> {
 function _openConfigModal() {
     const topGlobalThis = getTopGlobalThis()
     topGlobalThis?.__EASY_LOG_PLUS__ && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = true)
-
 }
 
 // shift + alt + W
@@ -56,14 +55,14 @@ function _shiftAndAltAndLKey(callback: () => void) {
 // 注册快捷键
 function _registerShortcutKeyEvents(handles: ((event: KeyboardEvent) => void)[]) {
     handles.forEach(fn => {
-        globalThis.document.addEventListener('keydown', fn, true);
+        globalThis.document.addEventListener('keydown', fn);
     });
 }
 
 // 移除快捷键
 function _removeShortcutKeyEvents(handles: ((event: KeyboardEvent) => void)[]) {
     handles.forEach(fn => {
-        globalThis.document.removeEventListener('keydown', fn, true);
+        globalThis.document.removeEventListener('keydown', fn);
     });
 }
 
