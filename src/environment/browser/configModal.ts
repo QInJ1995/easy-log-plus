@@ -6,7 +6,17 @@ import { defaultLevel, languageCfg } from "../../utils/constant";
 import downloadLog from "./downloadLog";
 import buildInfo from "../../../build-info.json";
 
-export function openConfigModal() {
+let modal: Modal | null = null
+
+export function getConfigModalInstance() {
+    return modal
+}
+
+export function clearConfigModalInstance() {
+    modal = null
+}
+
+export function openConfigModal(_logger: Logger) {
     const topGlobalThis = getTopGlobalThis()
     const { hasLogs } = topGlobalThis?.__EASY_LOG_PLUS__ || {}
     const configModal = new Modal({
@@ -25,15 +35,16 @@ export function openConfigModal() {
                     }
                 })
             }
-            _closeConfigModal(configModal)
+            _closeConfigModal(configModal, _logger)
         },
         onCancel: () => {
-            _closeConfigModal(configModal)
+            _closeConfigModal(configModal, _logger)
         }
     });
     configModal.open()
     const logInstances = hasLogs.values().toArray() || []
     _updateConfigModal(configModal, logInstances[0])
+    modal = configModal
 }
 
 function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
@@ -141,12 +152,12 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
             hasLogs.forEach((logger: Logger) => {
                 logger && logger.setConfig()
             })
-            _closeConfigModal(modal)
+            _closeConfigModal(modal, logger)
         },
         singleCallback: (logInstanceName) => {
             const logger = hasLogs.get(logInstanceName) as Logger
             logger && logger.setConfig()
-            _closeConfigModal(modal)
+            _closeConfigModal(modal, logger)
         }
     })
 
@@ -182,7 +193,7 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
             const request = indexedDB.deleteDatabase('EasyLogPlus');
             request.onsuccess = () => {
                 localConsoleLog('[easy-log-plus]: Clear cache success!');
-                _closeConfigModal(modal)
+                _closeConfigModal(modal, logger)
             };
             request.onerror = () => {
                 localConsoleError('[easy-log-plus]: Clear cache error!');
@@ -195,10 +206,12 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
 
 }
 
-function _closeConfigModal(modal: Modal) {
-    modal && modal.close()
-    const topGlobalThis = getTopGlobalThis()
-    topGlobalThis?.__EASY_LOG_PLUS__?.showConfigModal && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = false)
+function _closeConfigModal(modal: Modal, logger: Logger) {
+    if (logger._isOpenConfigModal === true) {
+        modal && modal.close()
+        logger._clearConfigModalInstance()
+        logger._isOpenConfigModal = false
+    }
 }
 
 function _registerSelectEvent(

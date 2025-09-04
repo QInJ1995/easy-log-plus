@@ -30,7 +30,6 @@ export interface ILoggerConfig {
  * @property {any} [key: symbol] - 其他任意属性
  */
 export type TopCfgProxyTarget = {
-  showConfigModal: boolean; // 是否显示配置弹窗
   hasLogs?: Map<string, Logger>; // 存储已创建的日志实例
 };
 

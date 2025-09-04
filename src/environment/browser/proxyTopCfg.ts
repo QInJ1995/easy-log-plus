@@ -1,12 +1,11 @@
 import { TopCfgProxyTarget } from "../../types";
 import { getTopGlobalThis, localConsoleWarn } from "../../utils/common";
-import { openConfigModal } from './configModal'
 
 export default () => {
     const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
         const topCfgProxyTarget: TopCfgProxyTarget = {
-            showConfigModal: false,
+
         };
         // 定义一个不可枚举、不可写、不可配置的属性 hasLogs
         Object.defineProperty(topCfgProxyTarget, 'hasLogs', {
@@ -29,20 +28,12 @@ export default () => {
             },
             // 拦截属性的设置
             set(target, property, value, receiver) {
-                const allowedProperties = new Set<string>(['showConfigModal']);
+                const allowedProperties = new Set<string>([]);
                 // 检查属性是否在允许列表中
                 if (!allowedProperties.has(property as string)) {
                     localConsoleWarn(`[easy-log-plus]: Not allow to set unsupported property: ${String(property)}!`);
                     return false; // 不允许设置不支持的属性
                 } else {
-                    if (property === 'showConfigModal') {
-                        if (typeof value !== 'boolean') {
-                            localConsoleWarn('[easy-log-plus]: showLog must be a boolean!');
-                            return false;
-                        }
-                        // 打开配置弹窗
-                        proxyTopCfg.showConfigModal === false && openConfigModal();
-                    }
                     return Reflect.set(target, property, value, receiver);
                 }
 

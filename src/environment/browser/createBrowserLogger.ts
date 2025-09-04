@@ -37,7 +37,7 @@ export default async function (namespace?: string | null, options?: ILogOptions)
         (options?.env ?? Env.Dev) !== Env.Prod && printAsciiArt(namespace || '')
     }
     // 注册快捷键事件
-    registerShortcutKeyEvents()
+    registerShortcutKeyEvents(logger)
 
     // 创建代理日志实例
     const proxyLogger: Logger = getProxyLogger(logger)
