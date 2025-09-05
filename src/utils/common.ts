@@ -115,20 +115,20 @@ export function getTopGlobalThis(): any {
   if (!checkIsBrowser()) {
     return globalThis;
   }
+  let top = globalThis as any;
   // 优先使用 top 属性
   if (globalThis.top) {
-    return globalThis.top;
+    top = globalThis.top;
+  } else {
+    while (top.parent && top !== top.parent) {
+      top = top.parent;
+    }
   }
-  // 如果没有 top 属性，则向上遍历 parent 链
-  let current = globalThis as any;
-  while (current.parent && current !== current.parent) {
-    current = current.parent;
-  }
-  // 跨域访问 parent 属性会抛出错误，此时返回 globalThis
+  // 跨域访问顶层属性会抛出错误，此时返回 globalThis
   try {
-    current?.__EASY_LOG_PLUS__
-    return current;
-  } catch (error) {
+    top?.__EASY_LOG_PLUS__
+    return top;
+  } catch (_error) {
     return globalThis;
   }
 }
