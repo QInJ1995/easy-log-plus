@@ -205,6 +205,12 @@ export default class Modal {
         this.options.onConfirm(this);
     }
 
+    ESCEvent(e: KeyboardEvent) {
+        if (e.key === 'Escape') {
+            this.options.onCancel();
+        }
+    }
+
     // 绑定事件
     bindEvents() {
         // 关闭按钮
@@ -218,6 +224,9 @@ export default class Modal {
 
         // 点击背景关闭
         this.backdrop && this.backdrop.addEventListener('click', this.closeEvent.bind(this));
+
+        // ESC键关闭
+        globalThis.document.addEventListener('keydown', this.ESCEvent.bind(this));
     }
 
     // 移除事件
@@ -226,6 +235,7 @@ export default class Modal {
         this.cancelBtn && this.cancelBtn.removeEventListener('click', this.closeEvent.bind(this));
         this.confirmBtn && this.confirmBtn.removeEventListener('click', this.confirmEvent.bind(this));
         this.backdrop && this.backdrop.removeEventListener('click', this.closeEvent.bind(this));
+        globalThis.document.removeEventListener('keydown', this.ESCEvent.bind(this));
     }
 
     // 打开模态框

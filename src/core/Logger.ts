@@ -7,7 +7,6 @@ import registerBrowser from '../environment/browser/registerBrowser'
 import registerServer from '../environment/server/registerServer'
 import chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
-import { clearConfigModalInstance, getConfigModalInstance, openConfigModal } from '../environment/browser/configModal';
 
 /**
  * 日志记录器类，用于按命名空间输出结构化日志。
@@ -18,12 +17,6 @@ import { clearConfigModalInstance, getConfigModalInstance, openConfigModal } fro
  * @param {ILogOptions} [options] - 日志配置选项
  */
 export default class Logger {
-    /**
- * 存储打印样式的 Map 对象
- *
- * @type {Map<string, any>}
- */
-    private printMap: Map<string, any> = new Map();
 
     /**
      * 顶层全局对象
@@ -70,13 +63,11 @@ export default class Logger {
     public options: ILogOptions = {};
 
     /**
-     * 配置弹窗
+     * 存储打印样式的 Map 对象
+     *
+     * @type {Map<string, any>}
      */
-    public _openConfigModal: (logger: Logger) => void = openConfigModal;
-    public _getConfigModalInstance: () => any = getConfigModalInstance;
-    public _clearConfigModalInstance: () => void = clearConfigModalInstance
-    public _isOpenConfigModal: boolean = false
-
+    private printMap: Map<string, any> = new Map();
 
     constructor(namespace?: string | null, options: ILogOptions = {}, topGlobalThis?: any) {
         const isBrowser = checkIsBrowser();
