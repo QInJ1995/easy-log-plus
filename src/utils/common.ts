@@ -124,7 +124,13 @@ export function getTopGlobalThis(): any {
   while (current.parent && current !== current.parent) {
     current = current.parent;
   }
-  return current;
+  // 跨域访问 parent 属性会抛出错误，此时返回 globalThis
+  try {
+    current?.__EASY_LOG_PLUS__
+    return current;
+  } catch (error) {
+    return globalThis;
+  }
 }
 
 /**
