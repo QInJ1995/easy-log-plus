@@ -1,10 +1,11 @@
 import {
   getCurrentTimeDate,
-  getTopGlobalThis,
   localConsoleError,
   localConsoleLog,
   localConsoleWarn,
 } from "../../utils/common";
+
+import topGlobalThis from "../../utils/topGlobalThis";
 
 let recordFile: any = null; // 文件句柄
 let recordList: string[] = []; // 记录列表，用于批量写入文件
@@ -49,7 +50,6 @@ export function closeRecordFile() {
 
 // 导出一个函数，用于将内容追加到文件中
 export function appendToFile(content: string) {
-  const topGlobalThis = getTopGlobalThis();
   if (!topGlobalThis?.__EASY_LOG_PLUS__?.recordLog) {
     return;
   }

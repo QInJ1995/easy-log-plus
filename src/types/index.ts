@@ -276,4 +276,3 @@ export interface IEasyLogPlusVuePluginOptions extends ILogOptions {
   isProvide?: boolean; // 是否使用 provide/inject 只支持vue3
   enabled?: boolean; // 是否启用插件
 }
-

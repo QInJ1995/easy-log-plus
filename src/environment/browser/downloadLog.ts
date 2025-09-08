@@ -1,16 +1,16 @@
 import Logger from "../../core/Logger";
 import {
-    getCurrentTimeDate, getTopGlobalThis, localConsoleError,
+    getCurrentTimeDate, localConsoleError,
     localConsoleLog, localConsoleWarn
 } from "../../utils/common";
 import { defaultNamespace } from "../../utils/constant";
+import topGlobalThis from "../../utils/topGlobalThis";
 
 export default async function (logger: Logger) {
     if (!logger) {
         localConsoleWarn("[easy-log-plus]: download logs failed! please choose a logger instance!");
         return
     }
-    const topGlobalThis = getTopGlobalThis()
     const logStore = logger.logStore
     const namespace = logger.namespace || defaultNamespace
     try {
