@@ -10,10 +10,9 @@ function _getTopGlobalThis(): any {
     }
     while (topGlobalThis !== topGlobalThis.top) {
         try {
-            // 使用 postMessage 进行跨域测试
-            topGlobalThis.postMessage('__test__', '*');
-            // 如果能发送消息，说明可以访问
-            topGlobalThis = topGlobalThis.parent
+            if (topGlobalThis.parent.location.href) {
+                topGlobalThis = topGlobalThis.parent
+            }
         } catch (_error) {
             break;
         }
