@@ -1,5 +1,5 @@
 import { Env, Language, type ILogOptions, type TopCfgProxyTarget } from '../../types';
-import { getTopGlobalThis, printAsciiArt } from '../../utils/common';
+import { printAsciiArt } from '../../utils/common';
 import { defaultLevel, defaultNamespace, } from '../../utils/constant';
 import { setGlobalLogger, } from '../../utils/globals';
 import Logger from '../../core/Logger';
@@ -7,8 +7,9 @@ import getProxyLogger from './proxyLogger'
 import getProxyTopCfg from './proxyTopCfg';
 import { registerShortcutKeyEvents } from './shortcutKeyEvents';
 import { registerConfigStore } from './store';
+import topGlobalThis from '../../utils/topGlobalThis';
+
 export default async function (namespace?: string | null, options?: ILogOptions): Promise<Logger> {
-    const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
     let logger: Logger
     // 创建配置代理对象
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
@@ -30,7 +31,7 @@ export default async function (namespace?: string | null, options?: ILogOptions)
             }
         }
         // 创建日志实例
-        logger = new Logger(namespace, options, topGlobalThis);
+        logger = new Logger(namespace, options);
         // 将日志实例存储在全局变量中
         topGlobalThis.__EASY_LOG_PLUS__.hasLogs.set(namespace || defaultNamespace, logger);
         // 打印 ascii 艺术字

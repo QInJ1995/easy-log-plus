@@ -1,8 +1,11 @@
 // 注册监听键盘ctrl + shift + d 键盘事件
 
-import { getTopGlobalThis, } from "../../utils/common";
+import topGlobalThis from "../../utils/topGlobalThis";
 
-const shortcutKeyHandles = [_shiftAndAltAndLKey(() => _openConfigModal()), _shiftAndAltAndWKey(() => _openNewWindow())]
+const shortcutKeyHandles = [
+    _shiftAndAltAndLKey(() => _openConfigModal()),
+    _shiftAndAltAndWKey(() => _openNewWindow()),
+    _escKey(() => _closeConfigModal()),]
 
 // 打开新窗口
 function _openNewWindow() {
@@ -28,8 +31,22 @@ function _params2Obj(urlParams: string = ''): Record<string, string> {
 
 // 打开配置弹窗
 function _openConfigModal() {
-    const topGlobalThis = getTopGlobalThis()
-    topGlobalThis?.__EASY_LOG_PLUS__ && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = true)
+    topGlobalThis?.__EASY_LOG_PLUS__?.showConfigModal === false && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = true)
+}
+
+// 
+function _closeConfigModal() {
+    topGlobalThis?.__EASY_LOG_PLUS__?.showConfigModal === true && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = false)
+}
+
+// ESC
+function _escKey(callback: () => void) {
+    return (event: KeyboardEvent) => {
+        if (event.code === 'Escape') {
+            event.preventDefault()
+            callback()
+        }
+    }
 }
 
 // shift + alt + W
@@ -55,14 +72,14 @@ function _shiftAndAltAndLKey(callback: () => void) {
 // 注册快捷键
 function _registerShortcutKeyEvents(handles: ((event: KeyboardEvent) => void)[]) {
     handles.forEach(fn => {
-        globalThis.document.addEventListener('keydown', fn);
+        globalThis.addEventListener('keydown', fn);
     });
 }
 
 // 移除快捷键
 function _removeShortcutKeyEvents(handles: ((event: KeyboardEvent) => void)[]) {
     handles.forEach(fn => {
-        globalThis.document.removeEventListener('keydown', fn);
+        globalThis.removeEventListener('keydown', fn);
     });
 }
 

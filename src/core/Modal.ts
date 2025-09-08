@@ -1,4 +1,5 @@
-import { delayExecute, getTopGlobalThis } from "../utils/common";
+import { clearConfigModalInstance } from "../environment/browser/configModal";
+import topGlobalThis from '../utils/topGlobalThis'
 
 export default class Modal {
     private options: any; // 默认配置和用户配置
@@ -12,7 +13,6 @@ export default class Modal {
     closeBtn?: HTMLButtonElement; // 关闭按钮
     cancelBtn?: HTMLButtonElement; // 取消按钮
     confirmBtn?: HTMLButtonElement; // 确认按钮
-    topGlobalThis: any;
     constructor(options = {}) {
         // 默认配置
         this.options = {
@@ -26,8 +26,6 @@ export default class Modal {
             animate: true
         };
 
-        this.topGlobalThis = getTopGlobalThis()
-
         // 合并用户配置
         Object.assign(this.options, options);
 
@@ -38,8 +36,8 @@ export default class Modal {
 
     mount() {
         // 添加到文档
-        this.topGlobalThis.document.body.appendChild(this.backdrop);
-        this.topGlobalThis.document.body.appendChild(this.container);
+        topGlobalThis.document.body.appendChild(this.backdrop);
+        topGlobalThis.document.body.appendChild(this.container);
     }
 
     // 创建所有DOM元素
@@ -205,12 +203,6 @@ export default class Modal {
         this.options.onConfirm(this);
     }
 
-    ESCEvent(e: KeyboardEvent) {
-        if (e.key === 'Escape') {
-            this.options.onCancel();
-        }
-    }
-
     // 绑定事件
     bindEvents() {
         // 关闭按钮
@@ -225,8 +217,6 @@ export default class Modal {
         // 点击背景关闭
         this.backdrop && this.backdrop.addEventListener('click', this.closeEvent.bind(this));
 
-        // ESC键关闭
-        globalThis.document.addEventListener('keydown', this.ESCEvent.bind(this));
     }
 
     // 移除事件
@@ -235,7 +225,6 @@ export default class Modal {
         this.cancelBtn && this.cancelBtn.removeEventListener('click', this.closeEvent.bind(this));
         this.confirmBtn && this.confirmBtn.removeEventListener('click', this.confirmEvent.bind(this));
         this.backdrop && this.backdrop.removeEventListener('click', this.closeEvent.bind(this));
-        globalThis.document.removeEventListener('keydown', this.ESCEvent.bind(this));
     }
 
     // 打开模态框
@@ -251,11 +240,11 @@ export default class Modal {
         this.container.style.display = 'flex';
 
         // 防止页面滚动
-        this.topGlobalThis.document.body.style.overflow = 'hidden';
+        topGlobalThis.document.body.style.overflow = 'hidden';
 
         // 触发动画
-        delayExecute(() => {
-            this.backdrop.style.opacity = '1';
+        setTimeout(() => {
+            this.backdrop && (this.backdrop.style.opacity = '1');
             this.content && (this.content.style.transform = 'scale(1)');
             this.content && (this.content.style.opacity = '1');
         }, 10);
@@ -269,21 +258,23 @@ export default class Modal {
         this.content && (this.content.style.opacity = '0');
 
         // 恢复页面滚动
-        this.topGlobalThis.document.body.style.overflow = '';
+        topGlobalThis.document.body.style.overflow = '';
 
         this.unbindEvents();
 
-        // 动画结束后隐藏
-        delayExecute(() => {
-            this.backdrop.style.display = 'none';
-            this.container.style.display = 'none';
+        clearConfigModalInstance()
+
+        setTimeout(() => {
+            this.backdrop && (this.backdrop.style.display = 'none');
+            this.container && (this.container.style.display = 'none');
         }, 300);
-        delayExecute(() => {
-            if (this.backdrop && this.topGlobalThis.document.body.contains(this.backdrop)) {
-                this.topGlobalThis.document.body.removeChild(this.backdrop);
+
+        setTimeout(() => {
+            if (this.backdrop && topGlobalThis.document.body.contains(this.backdrop)) {
+                topGlobalThis.document.body.removeChild(this.backdrop);
             }
-            if (this.container && this.topGlobalThis.document.body.contains(this.container)) {
-                this.topGlobalThis.document.body.removeChild(this.container);
+            if (this.container && topGlobalThis.document.body.contains(this.container)) {
+                topGlobalThis.document.body.removeChild(this.container);
             }
         }, 300);
     }

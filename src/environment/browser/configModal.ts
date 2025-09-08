@@ -1,13 +1,23 @@
 import Logger from "../../core/Logger";
 import Modal from "../../core/Modal";
 import { ILoggerConfig, Language, LogLevel } from "../../types";
-import { getTopGlobalThis, localConsoleError, localConsoleLog } from "../../utils/common";
+import { localConsoleError, localConsoleLog } from "../../utils/common";
 import { defaultLevel, languageCfg } from "../../utils/constant";
 import downloadLog from "./downloadLog";
 import buildInfo from "../../../build-info.json";
+import topGlobalThis from "../../utils/topGlobalThis";
+
+let modal: Modal | null = null
+
+export function getConfigModalInstance() {
+    return modal
+}
+
+export function clearConfigModalInstance() {
+    modal = null
+}
 
 export function openConfigModal() {
-    const topGlobalThis = getTopGlobalThis()
     const { hasLogs } = topGlobalThis?.__EASY_LOG_PLUS__ || {}
     const configModal = new Modal({
         title: 'EasyLogPlus Config',
@@ -34,10 +44,10 @@ export function openConfigModal() {
     configModal.open()
     const logInstances = hasLogs.values().toArray() || []
     _updateConfigModal(configModal, logInstances[0])
+    modal = configModal
 }
 
 function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
-    const topGlobalThis = getTopGlobalThis()
     language = ((language || logger?.config?.language) ?? Language.EN)! as Language
     const { hasLogs, configModal } = topGlobalThis.__EASY_LOG_PLUS__ || {}
     const isEnableLog = logger?.config?.isEnableLog ?? false
@@ -197,7 +207,6 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
 
 function _closeConfigModal(modal: Modal) {
     modal && modal.close()
-    const topGlobalThis = getTopGlobalThis()
     topGlobalThis?.__EASY_LOG_PLUS__?.showConfigModal && (topGlobalThis.__EASY_LOG_PLUS__.showConfigModal = false)
 }
 

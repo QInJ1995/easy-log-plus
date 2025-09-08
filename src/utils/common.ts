@@ -107,31 +107,6 @@ export function isEnable(logger: Logger): boolean {
   return logger.config?.isEnableLog ?? true;
 }
 
-/**
- * 获取顶层 Window
- * @returns
- */
-export function getTopGlobalThis(): any {
-  if (!checkIsBrowser()) {
-    return globalThis;
-  }
-  let top = globalThis as any;
-  // 优先使用 top 属性
-  if (globalThis.top) {
-    top = globalThis.top;
-  } else {
-    while (top.parent && top !== top.parent) {
-      top = top.parent;
-    }
-  }
-  // 跨域访问顶层属性会抛出错误，此时返回 globalThis
-  try {
-    top?.__EASY_LOG_PLUS__
-    return top;
-  } catch (_error) {
-    return globalThis;
-  }
-}
 
 /**
  *  检查当前环境是否为浏览器

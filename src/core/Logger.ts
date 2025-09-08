@@ -1,12 +1,13 @@
 import LocalForageService from '../environment/browser/LocalForageService';
 import { LogLevel, ILogOptions, PrintOptions, Env, ILoggerConfig, } from '../types';
-import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, getTopGlobalThis, debugAlert, checkIsBrowser } from '../utils/common';
+import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, debugAlert, checkIsBrowser } from '../utils/common';
 import { chalkLevel, defaultNamespace, defaultLevelColors } from '../utils/constant';
 import { print } from '../utils/print';
 import registerBrowser from '../environment/browser/registerBrowser'
 import registerServer from '../environment/server/registerServer'
 import chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
+import topGlobalThis from '../utils/topGlobalThis'
 
 /**
  * 日志记录器类，用于按命名空间输出结构化日志。
@@ -69,11 +70,11 @@ export default class Logger {
      */
     private printMap: Map<string, any> = new Map();
 
-    constructor(namespace?: string | null, options: ILogOptions = {}, topGlobalThis?: any) {
+    constructor(namespace?: string | null, options: ILogOptions = {}) {
         const isBrowser = checkIsBrowser();
         chalk.level = chalkLevel;
         this.namespace = namespace ?? defaultNamespace
-        this.topGlobalThis = topGlobalThis ?? getTopGlobalThis()
+        this.topGlobalThis = topGlobalThis
         this.env = options.env ?? Env.Dev
         this.options = {
             levelColors: options.levelColors ? { ...defaultLevelColors, ...options.levelColors! } : defaultLevelColors,

@@ -1,9 +1,9 @@
 import { TopCfgProxyTarget } from "../../types";
-import { getTopGlobalThis, localConsoleWarn } from "../../utils/common";
-import { openConfigModal } from './configModal'
+import { localConsoleWarn } from "../../utils/common";
+import { getConfigModalInstance, openConfigModal } from './configModal'
+import topGlobalThis from "../../utils/topGlobalThis";
 
 export default () => {
-    const topGlobalThis = getTopGlobalThis() // 获取顶层 window 对象
     if (!topGlobalThis.__EASY_LOG_PLUS__) {
         const topCfgProxyTarget: TopCfgProxyTarget = {
             showConfigModal: false,
@@ -40,8 +40,12 @@ export default () => {
                             localConsoleWarn('[easy-log-plus]: showLog must be a boolean!');
                             return false;
                         }
-                        // 打开配置弹窗
-                        proxyTopCfg.showConfigModal === false && openConfigModal();
+                        if (target[property] === false) {
+                            openConfigModal()
+                        } else {
+                            const modal = getConfigModalInstance()
+                            modal && modal.close()
+                        }
                     }
                     return Reflect.set(target, property, value, receiver);
                 }
