@@ -16,6 +16,8 @@ export default class Modal {
     // 事件处理函数引用（addEventListener 与 removeEventListener 必须使用同一引用才能正确移除监听）
     private boundCloseEvent: () => void;
     private boundConfirmEvent: () => void;
+    // 打开弹窗前 body 的原始 overflow 值，关闭时恢复，避免抹掉页面原有样式
+    private prevBodyOverflow: string = '';
     constructor(options = {}) {
         // 默认配置
         this.options = {
@@ -246,7 +248,8 @@ export default class Modal {
         this.backdrop.style.display = 'block';
         this.container.style.display = 'flex';
 
-        // 防止页面滚动
+        // 防止页面滚动（保存原始值以便关闭时恢复）
+        this.prevBodyOverflow = topGlobalThis.document.body.style.overflow;
         topGlobalThis.document.body.style.overflow = 'hidden';
 
         // 触发动画
@@ -258,14 +261,21 @@ export default class Modal {
     }
 
     // 关闭模态框
-    close() {
+    // isCancelTrigger: 是否以"取消"语义关闭（如 ESC 键），
+    // 为 true 时先触发 onCancel 回调再关闭，与关闭按钮/遮罩点击行为保持一致
+    close(isCancelTrigger: boolean = false) {
+        if (isCancelTrigger) {
+            this.options.onCancel();
+            // onCancel 回调内部可能已调用 close() 完成关闭，直接返回避免重复执行
+            return;
+        }
         // 反向动画
         this.backdrop.style.opacity = '0';
         this.content && (this.content.style.transform = 'scale(0.9)');
         this.content && (this.content.style.opacity = '0');
 
-        // 恢复页面滚动
-        topGlobalThis.document.body.style.overflow = '';
+        // 恢复页面滚动（还原打开前的原始值）
+        topGlobalThis.document.body.style.overflow = this.prevBodyOverflow;
 
         this.unbindEvents();
 

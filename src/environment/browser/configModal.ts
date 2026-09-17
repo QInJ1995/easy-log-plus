@@ -9,6 +9,14 @@ import topGlobalThis from "../../utils/topGlobalThis";
 
 let modal: Modal | null = null
 
+// HTML 特殊字符转义：namespace 为业务方传入的任意字符串，
+// 直接插入 innerHTML 会造成标记注入
+function _escapeHtml(str: string): string {
+    return String(str).replace(/[&<>"']/g, (s) => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s] as string
+    ))
+}
+
 export function getConfigModalInstance() {
     return modal
 }
@@ -49,7 +57,7 @@ export function openConfigModal() {
 
 function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
     language = ((language || logger?.config?.language) ?? Language.EN)! as Language
-    const { hasLogs, configModal } = topGlobalThis.__EASY_LOG_PLUS__ || {}
+    const { hasLogs } = topGlobalThis.__EASY_LOG_PLUS__ || {}
     const isEnableLog = logger?.config?.isEnableLog ?? false
     const level = logger?.config?.level ?? defaultLevel
     const isDebugLog = logger?.config?.isDebugLog ?? false
@@ -71,7 +79,7 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
                 <div style="display: flex; align-items: center;">
                     <label for="logInstance">${(languageCfg as any)[language].logInstance}</label>
                     <select id="logInstance" style="margin-left: 10px;">
-                        ${logInstanceEntries.map((item: [string, Logger]) => `<option value="${item[0]}" ${item[1] === logger ? 'selected' : ''}>${item[0]}</option>`).join('')}
+                        ${logInstanceEntries.map((item: [string, Logger]) => `<option value="${_escapeHtml(item[0])}" ${item[1] === logger ? 'selected' : ''}>${_escapeHtml(item[0])}</option>`).join('')}
                         <option value="all" ${!logger ? 'selected' : ''}>${(languageCfg as any)[language].all}</option>
                     </select> 
                 </div>
@@ -127,12 +135,12 @@ function _updateConfigModal(modal: Modal, logger: Logger, language?: string) {
     modal.confirmBtn && (modal.confirmBtn.textContent = (languageCfg as any)[language].modifyConfig)
     modal.cancelBtn && (modal.cancelBtn.textContent = (languageCfg as any)[language].close)
 
-    // 语言选择
+    // 语言选择：切换仅影响当前弹窗渲染，
+    // 确认后随配置一并持久化（取消则回到实例配置的语言）
     _registerSelectEvent('language', modal, {
         onchange: (e: Event) => {
             const language = (e.target! as HTMLSelectElement).value
-            language && configModal && (configModal.language = language)
-            _updateConfigModal(modal, logger, language)
+            language && _updateConfigModal(modal, logger, language)
         }
     })
 

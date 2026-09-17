@@ -59,6 +59,7 @@ export default async function (namespace?: string | null, options?: ILogOptions)
         level: options?.level || defaultLevel, // 默认日志级别
         isRecordLog: options?.isRecord ?? false, // 是否记录日志
         maxLogCount: options?.maxLogCount ?? defaultMaxLogCount, // 日志最大记录条数，超过后自动淘汰最旧的日志
+        isAutoClearAfterDownload: true, // 下载日志后自动清空本地记录（保持历史行为，可关闭以保留本地副本）
         isPersistentConfig: options?.isPersistentConfig ?? false, // 是否持久化配置
         isSourceCodeLocation: options?.isSourceCodeLocation ?? false, // 是否显示源代码位置
         isDebugLog: false, // 是否调试日志

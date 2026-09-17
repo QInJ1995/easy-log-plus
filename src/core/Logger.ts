@@ -110,7 +110,11 @@ export default class Logger {
      * @returns {void | Promise<any>}
      */
     private print(type: string, level: LogLevel, messages?: any[],): void | Promise<any> {
-        if (type === 'log' && !shouldLog(this, level)) return
+        if (type === 'log' && !shouldLog(this, level)) {
+            // 级别过滤时同样清空链式样式，避免残留泄漏到下一条日志
+            this.printMap.clear()
+            return
+        }
         // 快路径：无链式自定义样式时直接复用冻结的基础样式，避免每条日志重复构造对象
         const printCustomStyle = this.printMap.size === 0
             ? this.basePrintStyle
@@ -161,13 +165,13 @@ export default class Logger {
 
     /**
      * 当前配置是否需要解析调用堆栈
-     * 堆栈捕获（约 25μs/次）仅应服务于 $tracker$ 占位符或源码位置显示
+     * 堆栈捕获（约 25μs/次）仅应服务于 $tracker$ 占位符、源码位置显示或调试弹窗信息
      *
      * @returns {boolean}
      */
     private _isTraceEnabled(): boolean {
         const formatter = this.options.formatter || ''
-        return formatter.includes('$tracker$') || !!this.config?.isSourceCodeLocation
+        return formatter.includes('$tracker$') || !!this.config?.isSourceCodeLocation || !!this.config?.isDebugLog
     }
 
     /**

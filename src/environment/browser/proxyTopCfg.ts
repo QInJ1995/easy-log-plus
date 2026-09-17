@@ -44,7 +44,8 @@ export default () => {
                             openConfigModal()
                         } else {
                             const modal = getConfigModalInstance()
-                            modal && modal.close()
+                            // ESC 关闭与关闭按钮/遮罩点击语义一致：触发 onCancel 回调
+                            modal && modal.close(true)
                         }
                     }
                     return Reflect.set(target, property, value, receiver);

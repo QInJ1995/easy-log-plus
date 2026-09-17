@@ -236,12 +236,13 @@ function formatImage(options: PrintOptions): Promise<any[]> {
 
 /**
  * 格式化时间打印
+ * 计时标签使用纯文本：部分环境（如浏览器 console.time）不解释 ANSI 色码，
+ * 带色标签会显示原始转义符，且可能影响 time/timeEnd 的标签匹配
  * @param options
  * @returns string
  */
 function formatTime(options: PrintOptions): string {
-    const { level, namespace, labels, logOptions, printCustomStyle } = options;
-    let color = options.printCustomStyle.color;
+    const { namespace, labels, logOptions } = options;
     let title = formatString(logOptions.formatter!, {
         namespace: namespace || "",
         time: "",
@@ -251,11 +252,7 @@ function formatTime(options: PrintOptions): string {
     });
     title = removeEmptyBrackets(title);
     logOptions.isEmoji && (title = `${emojis.new} ${title} ${emojis.clock}`);
-    title = `${title} -> `;
-    color = logOptions.isColor
-        ? color || logOptions.levelColors![level!]
-        : "#fff";
-    return getChalk(printCustomStyle, color)(title);
+    return `${title} -> `;
 }
 
 /**

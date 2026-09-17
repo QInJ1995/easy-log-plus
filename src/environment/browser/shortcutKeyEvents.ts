@@ -1,15 +1,27 @@
-// 注册监听键盘ctrl + shift + d 键盘事件
+// 注册快捷键监听：
+//   Alt(Option) + Shift + L  打开配置弹窗
+//   Alt(Option) + Shift + O  打开新窗口（追加地址参数）
+//   Esc                      关闭配置弹窗
 
 import topGlobalThis from "../../utils/topGlobalThis";
+import { Language } from "../../types";
+import { languageCfg } from "../../utils/constant";
 
 const shortcutKeyHandles = [
     _shiftAndAltAndLKey(() => _openConfigModal()),
-    _shiftAndAltAndWKey(() => _openNewWindow()),
+    _shiftAndAltAndOKey(() => _openNewWindow()),
     _escKey(() => _closeConfigModal()),]
+
+// 获取当前语言对应的文案
+function _getLangText(key: 'inputUrlParams'): string {
+    const logger = topGlobalThis?.__EASY_LOG_PLUS__?.hasLogs?.values()?.next()?.value
+    const language = ((logger?.config?.language ?? Language.EN) as Language) ?? Language.EN
+    return (languageCfg as any)[language]?.[key] ?? (languageCfg as any)[Language.EN][key]
+}
 
 // 打开新窗口
 function _openNewWindow() {
-    const urlParams = prompt('请输入地址参数')
+    const urlParams = prompt(_getLangText('inputUrlParams'))
     if (urlParams === null) return
     const curUrl = globalThis.location.href
     const [baseUrl, query] = curUrl.split('?')
@@ -23,8 +35,12 @@ function _openNewWindow() {
 
 function _params2Obj(urlParams: string = ''): Record<string, string> {
     return urlParams.split('&').reduce((acc: Record<string, string>, param) => {
-        const [key, value] = param.split('=')
-        key && value && (acc[key] = decodeURIComponent(value))
+        const [key, ...rest] = param.split('=')
+        const value = rest.join('=')
+        // 仅在参数缺失时跳过（保留空值与 '0' 值参数）
+        if (key && value !== undefined) {
+            acc[key] = decodeURIComponent(value)
+        }
         return acc
     }, {} as Record<string, string>)
 }
@@ -49,9 +65,19 @@ function _escKey(callback: () => void) {
     }
 }
 
-// shift + alt + W
-function _shiftAndAltAndWKey(callback: () => void) {
+// 事件目标是否为输入场景（输入框/文本域/下拉框/可编辑区域），
+// 组合快捷键在输入场景中应放行给输入行为，不触发弹窗
+function _isTypingTarget(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement | null
+    if (!target) return false
+    const tag = target.tagName
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable === true
+}
+
+// shift + alt + O
+function _shiftAndAltAndOKey(callback: () => void) {
     return (event: KeyboardEvent) => {
+        if (_isTypingTarget(event)) return
         if (event.shiftKey && event.altKey && event.code === 'KeyO') {
             event.preventDefault()
             callback()
@@ -62,6 +88,7 @@ function _shiftAndAltAndWKey(callback: () => void) {
 // shift + alt + L
 function _shiftAndAltAndLKey(callback: () => void) {
     return (event: KeyboardEvent) => {
+        if (_isTypingTarget(event)) return
         if (event.shiftKey && event.altKey && event.code === 'KeyL') {
             event.preventDefault()
             callback()

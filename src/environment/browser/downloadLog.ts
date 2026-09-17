@@ -40,7 +40,10 @@ export default async function (logger: Logger) {
         link.click()
         URL.revokeObjectURL(link.href) // 释放内存
         link.remove() // 移除链接
-        logStore?.clear() // 清空存储
+        // 按配置决定下载后是否清空本地记录（默认清空，保持历史行为）
+        if (logger.config?.isAutoClearAfterDownload !== false) {
+            logStore?.clear()
+        }
         localConsoleLog('[easy-log-plus]: download logs success!');
     } catch (error) {
         localConsoleError('[easy-log-plus]: download logs error!', error);
@@ -48,10 +51,11 @@ export default async function (logger: Logger) {
 }
 
 function _serializeMessage(messages: any[]): string {
-    // 创建一个Set用于跟踪已序列化的对象，处理循环引用
-    const seen = new Set();
     // 安全的字符串化函数
     const safeStringify = (obj: any) => {
+        // 每次序列化独立的已访问集合：仅在同一次 stringify 内检测循环引用，
+        // 避免多条消息共享同一对象引用时被误判为循环引用
+        const seen = new Set();
         return JSON.stringify(obj, (_key, value) => {
             // 处理循环引用
             if (typeof value === 'object' && value !== null) {

@@ -87,11 +87,13 @@ export function getCurrentTimeDate(recordLog?: boolean): string {
  * @returns {boolean} - 如果日志级别应该被记录，则返回true，否则返回false
  */
 // 日志级别优先级映射（模块级缓存，避免热路径上每次调用都分配数组并做 indexOf 查找）
+// Silent 高于所有级别：级别设为 silent 时 debug/info/warn/error 全部静默
 const levelRanks: Partial<Record<LogLevel, number>> = {
   [LogLevel.Debug]: 0,
   [LogLevel.Info]: 1,
   [LogLevel.Warn]: 2,
   [LogLevel.Error]: 3,
+  [LogLevel.Silent]: 4,
 };
 
 export function shouldLog(logger: Logger, level?: LogLevel): boolean {

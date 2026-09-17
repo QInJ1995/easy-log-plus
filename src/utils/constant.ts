@@ -66,6 +66,7 @@ export const languageCfg = {
         fileName: '文件名',
         functionName: '方法名',
         version: '版本',
+        inputUrlParams: '请输入地址参数',
 
     },
     'en-US': {
@@ -92,5 +93,6 @@ export const languageCfg = {
         fileName: 'File Name',
         functionName: 'Method Name',
         version: 'Version',
+        inputUrlParams: 'Enter URL params',
     },
 }
