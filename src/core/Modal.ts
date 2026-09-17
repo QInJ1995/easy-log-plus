@@ -13,6 +13,9 @@ export default class Modal {
     closeBtn?: HTMLButtonElement; // 关闭按钮
     cancelBtn?: HTMLButtonElement; // 取消按钮
     confirmBtn?: HTMLButtonElement; // 确认按钮
+    // 事件处理函数引用（addEventListener 与 removeEventListener 必须使用同一引用才能正确移除监听）
+    private boundCloseEvent: () => void;
+    private boundConfirmEvent: () => void;
     constructor(options = {}) {
         // 默认配置
         this.options = {
@@ -31,6 +34,10 @@ export default class Modal {
 
         // 创建模态框元素
         this.createElements();
+
+        // 统一绑定事件处理函数引用
+        this.boundCloseEvent = this.closeEvent.bind(this);
+        this.boundConfirmEvent = this.confirmEvent.bind(this);
 
     }
 
@@ -206,25 +213,25 @@ export default class Modal {
     // 绑定事件
     bindEvents() {
         // 关闭按钮
-        this.closeBtn && this.closeBtn.addEventListener('click', this.closeEvent.bind(this));
+        this.closeBtn && this.closeBtn.addEventListener('click', this.boundCloseEvent);
 
         // 取消按钮
-        this.cancelBtn && this.cancelBtn.addEventListener('click', this.closeEvent.bind(this));
+        this.cancelBtn && this.cancelBtn.addEventListener('click', this.boundCloseEvent);
 
         // 确认按钮
-        this.confirmBtn && this.confirmBtn.addEventListener('click', this.confirmEvent.bind(this));
+        this.confirmBtn && this.confirmBtn.addEventListener('click', this.boundConfirmEvent);
 
         // 点击背景关闭
-        this.backdrop && this.backdrop.addEventListener('click', this.closeEvent.bind(this));
+        this.backdrop && this.backdrop.addEventListener('click', this.boundCloseEvent);
 
     }
 
     // 移除事件
     unbindEvents() {
-        this.closeBtn && this.closeBtn.removeEventListener('click', this.closeEvent.bind(this));
-        this.cancelBtn && this.cancelBtn.removeEventListener('click', this.closeEvent.bind(this));
-        this.confirmBtn && this.confirmBtn.removeEventListener('click', this.confirmEvent.bind(this));
-        this.backdrop && this.backdrop.removeEventListener('click', this.closeEvent.bind(this));
+        this.closeBtn && this.closeBtn.removeEventListener('click', this.boundCloseEvent);
+        this.cancelBtn && this.cancelBtn.removeEventListener('click', this.boundCloseEvent);
+        this.confirmBtn && this.confirmBtn.removeEventListener('click', this.boundConfirmEvent);
+        this.backdrop && this.backdrop.removeEventListener('click', this.boundCloseEvent);
     }
 
     // 打开模态框
@@ -276,6 +283,17 @@ export default class Modal {
             if (this.container && topGlobalThis.document.body.contains(this.container)) {
                 topGlobalThis.document.body.removeChild(this.container);
             }
+            // 断开所有 DOM 元素引用，确保整个元素子树可被垃圾回收
+            this.backdrop = null;
+            this.container = null;
+            this.content = undefined;
+            this.header = undefined;
+            this.title = undefined;
+            this.body = undefined;
+            this.footer = null;
+            this.closeBtn = undefined;
+            this.cancelBtn = undefined;
+            this.confirmBtn = undefined;
         }, 300);
     }
 }

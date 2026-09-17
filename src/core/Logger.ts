@@ -1,10 +1,11 @@
 import LocalForageService from '../environment/browser/LocalForageService';
-import { LogLevel, ILogOptions, PrintOptions, Env, ILoggerConfig, } from '../types';
-import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, debugAlert, checkIsBrowser } from '../utils/common';
-import { chalkLevel, defaultNamespace, defaultLevelColors } from '../utils/constant';
-import { print } from '../utils/print';
+import { LogLevel, ILogOptions, PrintOptions, Env, ILoggerConfig, PrintCustomStyle, CallStackInfo } from '../types';
+import { shouldLog, getCallStackInfo, getPrintCustomStyle, mergeObjects, isEnable, debugAlert, checkIsBrowser, localConsoleError, EMPTY_PRINT_STYLE, EMPTY_CALL_STACK_INFO } from '../utils/common';
+import { chalkLevel, defaultNamespace, defaultLevelColors, defaultMaxLogCount } from '../utils/constant';
+import { printSync, printAsync } from '../utils/print';
 import registerBrowser from '../environment/browser/registerBrowser'
 import registerServer from '../environment/server/registerServer'
+import { removeShortcutKeyEvents } from '../environment/browser/shortcutKeyEvents'
 import chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
 import topGlobalThis from '../utils/topGlobalThis'
@@ -70,6 +71,18 @@ export default class Logger {
      */
     private printMap: Map<string, any> = new Map();
 
+    /**
+     * 基础打印样式（构造时由用户配置计算，冻结复用，
+     * 热路径无链式自定义样式时直接引用，避免每条日志重复构造对象）
+     */
+    private basePrintStyle: PrintCustomStyle = EMPTY_PRINT_STYLE;
+
+    /**
+     * 日志修剪检查计数器（每 100 条日志检查一次存储上限，
+     * 避免每条日志都向 IndexedDB 发起 length 查询）
+     */
+    private _pruneCounter: number = 0;
+
     constructor(namespace?: string | null, options: ILogOptions = {}) {
         const isBrowser = checkIsBrowser();
         chalk.level = chalkLevel;
@@ -84,21 +97,27 @@ export default class Logger {
             depth: typeof options.depth === 'number' && options.depth >= 0 ? options.depth : 0,
             formatter: options.formatter || '[$namespace$] [$time$] [$level$] [$tracker$] [$label$]',
         }
+        // 预计算基础打印样式（冻结复用，热路径直接引用）
+        this.basePrintStyle = Object.freeze(mergeObjects(this.options.style! as PrintCustomStyle, EMPTY_PRINT_STYLE))
         // 注册不同环境注册
         isBrowser ? registerBrowser(this) : registerServer()
     }
 
     /**
-     * 
+     *
      * @param {any[]} messages 日志参数
      * @param {LogLevel} level 日志级别
-     * @returns {void}
+     * @returns {void | Promise<any>}
      */
-    private async print(type: string, level: LogLevel, messages?: any[],): Promise<void | any> {
+    private print(type: string, level: LogLevel, messages?: any[],): void | Promise<any> {
         if (type === 'log' && !shouldLog(this, level)) return
-        const printCustomStyle = mergeObjects(this.options.style!, getPrintCustomStyle(this.printMap))
+        // 快路径：无链式自定义样式时直接复用冻结的基础样式，避免每条日志重复构造对象
+        const printCustomStyle = this.printMap.size === 0
+            ? this.basePrintStyle
+            : mergeObjects(this.basePrintStyle, getPrintCustomStyle(this.printMap))
         const labels: string[] = this.printMap.get('labels') || []
-        const callStackInfo = getCallStackInfo(this.options.depth)
+        // 仅在需要展示调用追踪信息时才捕获堆栈（堆栈捕获约 25μs，是单条日志输出的最大开销）
+        const callStackInfo: CallStackInfo = this._isTraceEnabled() ? getCallStackInfo(this.options.depth) : EMPTY_CALL_STACK_INFO
         const printOptions: PrintOptions = {
             level,
             namespace: this.namespace,
@@ -112,28 +131,81 @@ export default class Logger {
         this.printMap.clear()
         switch (type) {
             case 'performance':
-                {
-                    const { title, taskFnResult, messages } = await print('performance', printOptions)
-                    this.config?.isRecordLog && this.logStore?.setItem(uuidv4(), { title, messages, timestamp: Date.now() })
+                // performance 需要 await 用户任务，保持异步链
+                return printAsync('performance', printOptions).then(({ title, taskFnResult, messages }) => {
+                    if (this.config?.isRecordLog) {
+                        this.logStore?.setItem(uuidv4(), { title, messages, timestamp: Date.now() })
+                        this._pruneLogStore() // 异步修剪超限日志，不阻塞日志输出
+                    }
                     return taskFnResult
-                }
-            case 'time':
-                print('time', printOptions)
-                break;
-            case 'timeEnd':
-                print('timeEnd', printOptions)
-                break;
+                })
             case 'image':
-                print('image', printOptions)
-                break;
+                return printAsync('image', printOptions)
+            case 'time':
+            case 'timeEnd':
             case 'table':
-                print('table', printOptions)
+                printSync(type, printOptions)
                 break;
             default:
-                const title = await print('log', printOptions)
-                this.config?.isRecordLog && this.logStore?.setItem(uuidv4(), { title, messages, timestamp: Date.now() })
-                debugAlert(level, this, printOptions)
+                {
+                    const title = printSync('log', printOptions) as string
+                    if (this.config?.isRecordLog) {
+                        this.logStore?.setItem(uuidv4(), { title, messages, timestamp: Date.now() })
+                        this._pruneLogStore() // 异步修剪超限日志，不阻塞日志输出
+                    }
+                    debugAlert(level, this, printOptions)
+                }
                 break;
+        }
+    }
+
+    /**
+     * 当前配置是否需要解析调用堆栈
+     * 堆栈捕获（约 25μs/次）仅应服务于 $tracker$ 占位符或源码位置显示
+     *
+     * @returns {boolean}
+     */
+    private _isTraceEnabled(): boolean {
+        const formatter = this.options.formatter || ''
+        return formatter.includes('$tracker$') || !!this.config?.isSourceCodeLocation
+    }
+
+    /**
+     * 修剪日志存储（带节流）
+     * 每 100 条日志才向存储发起一次 length 查询，避免每条日志都产生额外的存储请求
+     *
+     * @returns {void}
+     */
+    private _pruneLogStore(): void {
+        if (++this._pruneCounter < 100) return
+        this._pruneCounter = 0
+        this._pruneLogStoreNow()
+    }
+
+    /**
+     * 执行修剪：超过最大记录条数时淘汰最旧的日志
+     * 淘汰到最大条数的 90%，避免每写入一条都触发全量遍历
+     *
+     * @returns {Promise<void>}
+     */
+    private async _pruneLogStoreNow(): Promise<void> {
+        try {
+            const maxLogCount = this.config?.maxLogCount ?? defaultMaxLogCount
+            if (!this.logStore || maxLogCount <= 0) return
+            const length = await this.logStore.length()
+            if (typeof length !== 'number' || length <= maxLogCount) return
+            // 收集所有日志的 key 与时间戳，按时间排序淘汰最旧的
+            const entries: { key: string; timestamp: number }[] = []
+            await this.logStore.iterate((value: any, key: string) => {
+                entries.push({ key, timestamp: value?.timestamp ?? 0 })
+            })
+            entries.sort((a, b) => a.timestamp - b.timestamp)
+            const removeCount = entries.length - Math.floor(maxLogCount * 0.9)
+            for (let i = 0; i < removeCount; i++) {
+                await this.logStore.removeItem(entries[i].key)
+            }
+        } catch (error) {
+            localConsoleError('[easy-log-plus]: prune log store failed!', error);
         }
     }
 
@@ -369,11 +441,13 @@ export default class Logger {
 
     /**
      * 设置日志配置
-     * @param config 
-     * @returns 
+     * @param config
+     * @returns
      */
     setConfig(config?: ILoggerConfig): void {
         this.config = { ...(this.config || {}), ...(config || this.defaultConfig || {} as ILoggerConfig) }
+        // 兼容旧版本持久化配置中缺失的 maxLogCount 字段
+        this.config.maxLogCount = this.config.maxLogCount ?? this.defaultConfig?.maxLogCount
         if (this.config.isPersistentConfig) {
             this.configStore?.setItem(this.namespace || defaultNamespace, this.config)
         } else {
@@ -381,6 +455,35 @@ export default class Logger {
         }
         if (!this.config.isRecordLog) {
             this.logStore?.clear()
+        }
+    }
+
+    /**
+     * 销毁日志实例
+     * 从顶层全局对象的日志实例表中移除当前实例并释放存储引用，
+     * 避免 iframe / 微前端等场景下实例被顶层 window 持有导致无法回收
+     *
+     * @param {boolean} [isClearData=false] - 是否同时清空已记录的日志数据与持久化配置
+     * @returns {void}
+     */
+    destroy(isClearData: boolean = false): void {
+        const hasLogs = this.topGlobalThis?.__EASY_LOG_PLUS__?.hasLogs
+        hasLogs?.delete(this.namespace || defaultNamespace)
+        if (isClearData) {
+            this.logStore?.clear()
+            this.configStore?.removeItem(this.namespace || defaultNamespace)
+        }
+        this.logStore = undefined
+        this.configStore = undefined
+        this.printMap.clear()
+        // 清理挂载在全局对象上的日志引用
+        const globalLogger = (globalThis as any).logger
+        if (globalLogger && (globalLogger === this || globalLogger.namespace === this.namespace)) {
+            (globalThis as any).logger = undefined
+        }
+        // 所有日志实例销毁后移除全局快捷键监听
+        if (!hasLogs || hasLogs.size === 0) {
+            removeShortcutKeyEvents()
         }
     }
 

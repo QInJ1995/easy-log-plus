@@ -84,12 +84,19 @@ function _removeShortcutKeyEvents(handles: ((event: KeyboardEvent) => void)[]) {
 }
 
 
+// 是否已注册快捷键，防止重复注册全局键盘监听
+let isRegistered = false;
+
 export function registerShortcutKeyEvents() {
+    if (isRegistered) return
     _registerShortcutKeyEvents(shortcutKeyHandles)
+    isRegistered = true
 }
 
 export function removeShortcutKeyEvents() {
+    if (!isRegistered) return
     _removeShortcutKeyEvents(shortcutKeyHandles)
+    isRegistered = false
 }
 
 

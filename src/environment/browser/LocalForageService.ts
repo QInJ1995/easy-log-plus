@@ -149,14 +149,5 @@ export default class LocalForageService {
             localConsoleError(`[easy-log-plus]: ${this.config.storeName} store failed to iterate:`, error);
         }
     }
-
-    /**
-     * 创建一个新的存储实例
-     * @param {Object} config - 新实例的配置
-     * @returns {LocalForageService} - 返回新的实例
-     */
-    createInstance(config: LocalForageOptions): LocalForageService {
-        return new LocalForageService(config);
-    }
 }
 

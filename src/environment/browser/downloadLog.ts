@@ -23,18 +23,17 @@ export default async function (logger: Logger) {
             localConsoleWarn(`[easy-log-plus]: download logs failed! ${namespace || ''} logStore is empty.`);
             return
         }
-        let content = '';
-        const logs = await Promise.all(keys.map(async (key) => {
-            const value = await logStore?.getItem(key);
-            let { title, messages, timestamp } = value
-            messages = _serializeMessage(messages)
-            return { title, messages, timestamp }
-        }))
-        // 按时间排序
-        logs.sort((a, b) => b.timestamp - a.timestamp).forEach(({ title, messages }) => {
-            content += `${title} -> ${messages}\n\n`;
+        // 使用 iterate 逐条读取并立即序列化，避免全量加载原始日志对象导致内存峰值过高
+        const logs: { title: any; messages: string; timestamp: number }[] = []
+        await logStore.iterate((value: any) => {
+            const { title, messages, timestamp } = value || {}
+            logs.push({ title, messages: _serializeMessage(messages || []), timestamp: timestamp ?? 0 })
         })
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8', })
+        // 按时间排序，直接用字符串数组构造 Blob，避免拼接出巨型字符串
+        const parts = logs
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .map(({ title, messages }) => `${title} -> ${messages}\n\n`)
+        const blob = new Blob(parts, { type: 'text/plain;charset=utf-8', })
         const link = topGlobalThis.document.createElement('a')
         link.href = URL.createObjectURL(blob)
         link.download = `easy-log-plus_${namespace}_${getCurrentTimeDate(true)}.log`

@@ -86,17 +86,17 @@ export function getCurrentTimeDate(recordLog?: boolean): string {
  * @param {LogOptions} options - 日志选项
  * @returns {boolean} - 如果日志级别应该被记录，则返回true，否则返回false
  */
+// 日志级别优先级映射（模块级缓存，避免热路径上每次调用都分配数组并做 indexOf 查找）
+const levelRanks: Partial<Record<LogLevel, number>> = {
+  [LogLevel.Debug]: 0,
+  [LogLevel.Info]: 1,
+  [LogLevel.Warn]: 2,
+  [LogLevel.Error]: 3,
+};
+
 export function shouldLog(logger: Logger, level?: LogLevel): boolean {
-  const levels: LogLevel[] = [
-    LogLevel.Debug,
-    LogLevel.Info,
-    LogLevel.Warn,
-    LogLevel.Error,
-  ];
-  return !level || level === LogLevel.Silent
-    ? true
-    : levels.indexOf(level) >=
-    levels.indexOf(logger.config?.level || LogLevel.Debug);
+  if (!level || level === LogLevel.Silent) return true;
+  return (levelRanks[level] ?? 0) >= (levelRanks[logger.config?.level || LogLevel.Debug] ?? -1);
 }
 
 /**
@@ -108,16 +108,18 @@ export function isEnable(logger: Logger): boolean {
 }
 
 
+// 环境检测结果（模块加载时执行一次，进程生命周期内环境不会变化）
+const isBrowserEnv: boolean =
+  typeof window !== "undefined" &&
+  typeof document !== "undefined" &&
+  typeof navigator !== "undefined";
+
 /**
  *  检查当前环境是否为浏览器
  *
  */
 export function checkIsBrowser(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    typeof document !== "undefined" &&
-    typeof navigator !== "undefined"
-  );
+  return isBrowserEnv;
 }
 
 /**
@@ -191,39 +193,6 @@ export function getPrintCustomStyle(
 }
 
 /**
- * 获取 chalk 实例
- * @param {PrintCustomStyle} printCustomStyle - 打印样式对象
- * @returns {Function} - chalk 实例
- */
-export function getChalk(printCustomStyle: PrintCustomStyle): Function {
-  return Object.entries(printCustomStyle).reduce((acc, cur) => {
-    let [key, value] = cur;
-    const isColor = ["color", "bgColor"].includes(key);
-    const curKey = isColor
-      ? capitalizeFirstLetter(value as string, false)
-      : key;
-    if (value) {
-      if (Reflect.has(acc, curKey)) {
-        if (key === "bgColor") {
-          return Reflect.get(acc, "bg" + capitalizeFirstLetter(curKey));
-        }
-        return Reflect.get(acc, curKey);
-      } else {
-        if (isColor) {
-          switch (key) {
-            case "color":
-              return acc.hex(value as string);
-            default:
-              return acc.bgHex(value as string);
-          }
-        }
-      }
-    }
-    return acc;
-  }, chalk.reset);
-}
-
-/**
  * 合并对象
  * @param target
  * @param source
@@ -259,6 +228,92 @@ function capitalizeFirstLetter(
     ? str.charAt(0).toUpperCase()
     : str.charAt(0).toLowerCase();
   return firstChar + str.slice(1);
+}
+
+// 空打印样式（无自定义样式时复用的冻结对象，避免热路径重复构造对象）
+export const EMPTY_PRINT_STYLE: PrintCustomStyle = Object.freeze({
+  color: undefined,
+  bgColor: undefined,
+  bold: undefined,
+  italic: undefined,
+  underline: undefined,
+  overline: undefined,
+  strikethrough: undefined,
+  dim: undefined,
+  inverse: undefined,
+  reset: undefined,
+});
+
+// 空调用栈信息（无需追踪时复用，避免堆栈捕获开销与对象分配）
+export const EMPTY_CALL_STACK_INFO: CallStackInfo = Object.freeze({
+  functionName: "",
+  fileName: "",
+  lineNumber: "",
+  location: "",
+});
+
+// chalk 样式链缓存上限，防止任意颜色组合无限增长
+const chalkStyleCacheMaxSize = 1000;
+
+// chalk 样式链缓存（按样式签名），避免每条日志重复构造样式链
+const chalkStyleCache = new Map<string, Function>();
+
+// 布尔样式标记（用于构造缓存签名）
+const styleFlags = ["bold", "italic", "underline", "strikethrough", "dim", "inverse", "reset", "overline"];
+
+/**
+ * 获取 chalk 实例（按样式签名缓存）
+ * @param {PrintCustomStyle} printCustomStyle - 打印样式对象
+ * @param {string} [overrideColor] - 覆盖色（如级别默认色），优先于样式对象中的 color
+ * @returns {Function} - chalk 实例
+ */
+export function getChalk(printCustomStyle: PrintCustomStyle, overrideColor?: string): Function {
+  const color = overrideColor || printCustomStyle.color;
+  let key = color ? `c=${color}` : "";
+  if (printCustomStyle.bgColor) key += `&bg=${printCustomStyle.bgColor}`;
+  for (const flag of styleFlags) {
+    if (printCustomStyle[flag as keyof PrintCustomStyle]) key += `&${flag}=1`;
+  }
+  const cached = chalkStyleCache.get(key);
+  if (cached) return cached;
+  const chalkInstance = _buildChalk({ ...printCustomStyle, color });
+  if (chalkStyleCache.size < chalkStyleCacheMaxSize) {
+    chalkStyleCache.set(key, chalkInstance);
+  }
+  return chalkInstance;
+}
+
+/**
+ * 构造 chalk 样式链
+ * @param {PrintCustomStyle} printCustomStyle - 打印样式对象
+ * @returns {Function} - chalk 实例
+ */
+function _buildChalk(printCustomStyle: PrintCustomStyle): Function {
+  return Object.entries(printCustomStyle).reduce((acc, cur) => {
+    let [key, value] = cur;
+    const isColor = ["color", "bgColor"].includes(key);
+    const curKey = isColor
+      ? capitalizeFirstLetter(value as string, false)
+      : key;
+    if (value) {
+      if (Reflect.has(acc, curKey)) {
+        if (key === "bgColor") {
+          return Reflect.get(acc, "bg" + capitalizeFirstLetter(curKey));
+        }
+        return Reflect.get(acc, curKey);
+      } else {
+        if (isColor) {
+          switch (key) {
+            case "color":
+              return acc.hex(value as string);
+            default:
+              return acc.bgHex(value as string);
+          }
+        }
+      }
+    }
+    return acc;
+  }, chalk.reset);
 }
 
 /**

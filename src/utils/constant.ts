@@ -12,6 +12,9 @@ export const defaultNamespace = 'Easy-Log-Plus'
 // 默认日志等级
 export const defaultLevel: LogLevel = LogLevel.Debug
 
+// 默认日志最大记录条数，超过后自动淘汰最旧的日志
+export const defaultMaxLogCount: number = 1000
+
 // Emoji
 export const emojis: Emojis = {
     debug: '🐞',
@@ -36,8 +39,6 @@ export const defaultLevelColors: LevelColors = {
     silent: '#A7B0C4',
 };
 
-// 替换字符
-export const replaceCharacters: string[] = ['[]', '【】']
 
 
 export const languageCfg = {

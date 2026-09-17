@@ -1,6 +1,6 @@
 import { Env, Language, type ILogOptions, type TopCfgProxyTarget } from '../../types';
 import { printAsciiArt } from '../../utils/common';
-import { defaultLevel, defaultNamespace, } from '../../utils/constant';
+import { defaultLevel, defaultMaxLogCount, defaultNamespace, } from '../../utils/constant';
 import { setGlobalLogger, } from '../../utils/globals';
 import Logger from '../../core/Logger';
 import getProxyLogger from './proxyLogger'
@@ -58,6 +58,7 @@ export default async function (namespace?: string | null, options?: ILogOptions)
         isEnableLog: options?.isEnable ?? (options?.env ?? Env.Dev) !== Env.Prod, // 生产环境禁用日志
         level: options?.level || defaultLevel, // 默认日志级别
         isRecordLog: options?.isRecord ?? false, // 是否记录日志
+        maxLogCount: options?.maxLogCount ?? defaultMaxLogCount, // 日志最大记录条数，超过后自动淘汰最旧的日志
         isPersistentConfig: options?.isPersistentConfig ?? false, // 是否持久化配置
         isSourceCodeLocation: options?.isSourceCodeLocation ?? false, // 是否显示源代码位置
         isDebugLog: false, // 是否调试日志

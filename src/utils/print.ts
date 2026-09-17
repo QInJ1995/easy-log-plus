@@ -6,16 +6,52 @@ import {
     removeEmptyBrackets,
     formatTrace,
     getChalk,
+    localConsoleWarn,
 } from "./common";
 import { v4 as uuidv4 } from 'uuid';
 
 /**
- * 打印日志处理 避免打包被删除
+ * 同步打印日志处理（log/time/timeEnd/table）
+ * 避免打包被删除
  *
  * @param {string} type 日志类型
  * @param {PrintOptions} options 打印参数
  */
-export async function print(
+export function printSync(
+    type: string,
+    options: PrintOptions
+): any | void {
+    switch (type) {
+        case "time":
+            (globalThis as any)["con" + "sole"]["time"](formatTime(options));
+            return;
+        case "timeEnd":
+            (globalThis as any)["con" + "sole"]["timeEnd"](formatTime(options));
+            return;
+        case "table":
+            {
+                const { table, groupCollapsed } = formatTable(options);
+                (globalThis as any)["con" + "sole"]["groupCollapsed"](groupCollapsed);
+                (globalThis as any)["con" + "sole"]["table"](table);
+                (globalThis as any)["con" + "sole"]["groupEnd"]();
+            }
+            return;
+        default:
+            {
+                const { printList, title } = formatLog(options);
+                (globalThis as any)["con" + "sole"]["log"](...printList);
+                return title
+            }
+    }
+}
+
+/**
+ * 异步打印日志处理（performance/image）
+ *
+ * @param {string} type 日志类型
+ * @param {PrintOptions} options 打印参数
+ */
+export async function printAsync(
     type: string,
     options: PrintOptions
 ): Promise<any | void> {
@@ -26,27 +62,11 @@ export async function print(
                 (globalThis as any)["con" + "sole"]["log"](...printList);
                 return { taskFnResult, title, messages }
             }
-        case "time":
-            (globalThis as any)["con" + "sole"]["time"](formatTime(options));
-            break;
-        case "timeEnd":
-            (globalThis as any)["con" + "sole"]["timeEnd"](formatTime(options));
-            break;
         case "image":
             (globalThis as any)["con" + "sole"]["log"](
                 ...(await formatImage(options))
             );
             break;
-        case "table":
-            const { table, groupCollapsed } = formatTable(options);
-            (globalThis as any)["con" + "sole"]["groupCollapsed"](groupCollapsed);
-            (globalThis as any)["con" + "sole"]["table"](table);
-            (globalThis as any)["con" + "sole"]["groupEnd"]();
-            break;
-        default:
-            const { printList, title } = formatLog(options);
-            (globalThis as any)["con" + "sole"]["log"](...printList);
-            return title
     }
 }
 
@@ -80,7 +100,6 @@ async function formatPerformance(options: PrintOptions): Promise<any> {
     color = logOptions.isColor
         ? color || logOptions.levelColors![level!]
         : "#fff";
-    printCustomStyle.color = color;
     // 性能分析处理
     const uuid = uuidv4();
     const startMark = `${uuid}-start`;
@@ -101,7 +120,7 @@ async function formatPerformance(options: PrintOptions): Promise<any> {
         performance.clearMarks(endMark);
         performance.clearMeasures(uuid);
         messages = [entry.duration + "ms", taskFnResult]
-        return { printList: [getChalk(printCustomStyle)(title), ...messages], title: nowTitle, taskFnResult, messages }
+        return { printList: [getChalk(printCustomStyle, color)(title), ...messages], title: nowTitle, taskFnResult, messages }
     }
 }
 
@@ -139,8 +158,7 @@ function formatTable(options: PrintOptions): {
     color = logOptions.isColor
         ? color || logOptions.levelColors![level!]
         : "#fff";
-    printCustomStyle.color = color;
-    return { table, groupCollapsed: getChalk(printCustomStyle)(title) };
+    return { table, groupCollapsed: getChalk(printCustomStyle, color)(title) };
 }
 
 /**
@@ -175,23 +193,15 @@ function formatImage(options: PrintOptions): Promise<any[]> {
         color = logOptions.isColor
             ? color || logOptions.levelColors![level!]
             : "#fff";
+        // 只加载图片获取宽高，直接使用原始 URL 作为背景，
+        // 避免整图 canvas 绘制与 toDataURL 编码造成的主线程阻塞（大图可达 100ms+）与内存开销
         let img: HTMLImageElement | null = new Image();
-        img.crossOrigin = "anonymous";
         img.onload = () => {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            if (ctx) {
-                canvas.width = img!.width;
-                canvas.height = img!.height;
-                ctx.fillStyle = "red";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img!, 0, 0);
-                const dataUrl = canvas.toDataURL("image/png");
-                resolve([
-                    `%c${title}%c sup?`,
-                    `background: ${printCustomStyle.bgColor}; 
-                        border:1px solid ${printCustomStyle.bgColor}; 
-                        padding: 1px; 
+            resolve([
+                `%c${title}%c sup?`,
+                `background: ${printCustomStyle.bgColor};
+                        border:1px solid ${printCustomStyle.bgColor};
+                        padding: 1px;
                         border-radius: 2px 0 0 2px;
                         color: ${color};
                         font-weight: ${printCustomStyle.bold ? "bold" : "normal"
@@ -201,19 +211,24 @@ function formatImage(options: PrintOptions): Promise<any[]> {
                         font-style: ${printCustomStyle.italic ? "italic" : "normal"
                     };
                         `,
-                    `font-size: 1px;
+                `font-size: 1px;
                         padding: ${Math.floor(
                         (img!.height * scale) / 2
                     )}px ${Math.floor((img!.width * scale) / 2)}px;
-                        background-image: url(${dataUrl});
+                        background-image: url("${url}");
                         background-repeat: no-repeat;
                         background-size: ${img!.width * scale}px ${img!.height * scale
                     }px;
                         color: transparent;
                     `,
-                ]);
-                img = null;
-            }
+            ]);
+            img = null;
+        };
+        // 图片加载失败时也必须 resolve，避免 Promise 永久悬挂导致调用链无法释放
+        img.onerror = () => {
+            localConsoleWarn(`[easy-log-plus]: image log load failed! url: ${url}`);
+            resolve([`%c${title}${emojis.warn ?? ''} image load failed!`, `color: ${color};`]);
+            img = null;
         };
         img.src = url;
     });
@@ -240,8 +255,7 @@ function formatTime(options: PrintOptions): string {
     color = logOptions.isColor
         ? color || logOptions.levelColors![level!]
         : "#fff";
-    printCustomStyle.color = color;
-    return getChalk(printCustomStyle)(title);
+    return getChalk(printCustomStyle, color)(title);
 }
 
 /**
@@ -286,6 +300,5 @@ export function formatLog(options: PrintOptions): any {
     color = logOptions.isColor
         ? color || logOptions.levelColors![level!]
         : "#fff";
-    printCustomStyle.color = color;
-    return { printList: [getChalk(printCustomStyle)(title), ...messages], title: nowTitle }
+    return { printList: [getChalk(printCustomStyle, color)(title), ...messages], title: nowTitle }
 }

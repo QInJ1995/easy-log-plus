@@ -17,6 +17,7 @@ export interface ILoggerConfig {
   level: LogLevel; // 日志级别
   isDebugLog?: boolean; // 是否调试模式
   isRecordLog: boolean; // 是否记录日志
+  maxLogCount?: number; // 日志最大记录条数，超过后自动淘汰最旧的日志
   isPersistentConfig: boolean; // 是否持久化配置
   isSourceCodeLocation: boolean; // 是否显示源代码位置
   language: Language; // 语言
@@ -257,6 +258,7 @@ export interface ILogOptions {
   depth?: number;
   isEnable?: boolean;
   isRecord?: boolean;
+  maxLogCount?: number;
   isPersistentConfig?: boolean;
   isSourceCodeLocation?: boolean;
   language?: Language;
